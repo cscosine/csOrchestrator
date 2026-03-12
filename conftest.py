@@ -1,7 +1,7 @@
 """Pytest configuration for src-layout package.
 
 This conftest.py adds src/ to sys.path so that tests can import
-toc_generator even with editable installs.
+csorchestrator even with editable installs.
 """
 
 import sys

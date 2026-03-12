@@ -155,17 +155,11 @@ The csOrchestrator logic is a installable package in `src/csorchestrator/`. This
 ### Package structure (src-layout)
 
 ```
-src/toc_generator/
-├── __init__.py           # Public API exports
-├── cli.py                # Command-line entry point
-├── markdown_utils.py     # File parsing and anchor generation
-├── report.py             # Reporting and pretty-printing
-├── tree.py               # Folder/file tree model and scanning
-├── toc.py                # TOC tree construction and finalization
-└── writer.py             # TOC generation and file injection
+src/csorchestrator/
+├── core/                 # Core lib
 ```
 
-**Why src-layout?** It prevents import shadowing (ensures `import toc_generator` always loads the installed package, not a local directory) and makes the structure explicit.
+**Why src-layout?** It prevents import shadowing (ensures `import csorchestrator` always loads the installed package, not a local directory) and makes the structure explicit.
 
 ### Using the package
 
@@ -174,18 +168,13 @@ After installation (`pip install -e .`), you can:
 1. **Use as a library:**
 
     ```python
-    from toc_generator import create_tree, create_toc_tree, write_toc_on_files
-    
-    root = create_tree(Path("./docs"), "index")
-    toc_tree = create_toc_tree(Path("./docs"), root.root)
-    write_toc_on_files(toc_tree)
+    TODO
     ```
 
 2. **Use the CLI:**
 
     ```bash
-    cstoc              # equivalent to ./generateTOC.py
-    cstoc --quiet      # suppress debug output
+    TODO
     ```
 
 ### Running the tests
@@ -200,7 +189,7 @@ pytest
 PYTHONPATH=src pytest
 ```
 
-**How imports work:** A `conftest.py` file at the project root is automatically loaded by pytest before running tests. It adds `src/` to Python's import path, ensuring tests can find and import `toc_generator` correctly. This is a standard pytest pattern for src-layout projects and requires no special setup.
+**How imports work:** A `conftest.py` file at the project root is automatically loaded by pytest before running tests. It adds `src/` to Python's import path, ensuring tests can find and import `csorchestrator` correctly. This is a standard pytest pattern for src-layout projects and requires no special setup.
 
 All tests pass - the package works independently of the repository structure.
 
