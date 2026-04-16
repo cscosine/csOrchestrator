@@ -1,6 +1,6 @@
-from csorchestrator.core.orchestrator import Orchestrator
-from csorchestrator.core.phase import Phase
-from csorchestrator.core.step_echo_message import StepEchoMessage
+from csorchestrator.orchestrator.orchestrator import Orchestrator
+from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.step.step_echo_message import StepEchoMessage
 
 
 def test_orchestrator_add_phases() -> None:
@@ -8,7 +8,9 @@ def test_orchestrator_add_phases() -> None:
 
     p = Phase("phase_1").add_step(StepEchoMessage(name="p1s1", description="p1 step s1", message="phase 1 step 2"))
     p.add_step(StepEchoMessage(name="p1s2", description="p1 step s2", message="phase 1 step 2"))
-    o.add_phase(p)
+    pb = Phase("phase_1b").add_step(StepEchoMessage(name="p1bs1", description="p1b step s1", message="phase 1b step 2"))
+
+    o.add_phase(p).add_phase(pb)
 
     o.create_phase("phase_2").add_step(
         StepEchoMessage(name="p2s1", description="p2 step s1", message="phase 2 step 1")
@@ -16,9 +18,10 @@ def test_orchestrator_add_phases() -> None:
         StepEchoMessage(name="p2s2", description="p2 step s2", message="phase 2 step 3")
     )
 
-    assert len(o.phases) == 2
+    assert len(o.phases) == 3
     assert len(o.phases[0].steps) == 2
-    assert len(o.phases[1].steps) == 3
+    assert len(o.phases[1].steps) == 1
+    assert len(o.phases[2].steps) == 3
 
     # TODO we need smt like oe = OrchestratorExecutor(o, args)
     # this will first validate the orchestrator (no repeated names etc)

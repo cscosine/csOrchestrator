@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from .phase import Phase
+from csorchestrator.orchestrator.phase import Phase
 
 
 @dataclass
@@ -15,8 +15,9 @@ class Orchestrator:
 
     phases: list[Phase] = field(default_factory=list)
 
-    def add_phase(self, phase: Phase) -> None:
+    def add_phase(self, phase: Phase) -> "Orchestrator":
         self.phases.append(phase)
+        return self
 
     def create_phase(self, phase_name: str) -> Phase:
         phase = Phase(phase_name)

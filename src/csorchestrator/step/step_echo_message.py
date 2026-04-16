@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 
-from .command_github_action import CommandGithubAction
-from .command_local import CommandLocal
-from .command_text_description import CommandTextDescription
-from .context_github_execution import ContextGithubExecution
-from .context_local_execution import ContextLocalExecution
-from .step import Step
+from csorchestrator.commands.command_github_action import CommandGithubAction
+from csorchestrator.commands.command_local import CommandLocal
+from csorchestrator.commands.command_text_description import CommandTextDescription
+from csorchestrator.context.context_github_execution import ContextGithubExecution
+from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.orchestrator.step_base import StepBase
 
 
 @dataclass
-class StepEchoMessage(Step):  # impl Step
+class StepEchoMessage(StepBase):  # impl StepBase
     message: str
 
     def to_local_command(self, context: ContextLocalExecution) -> CommandLocal:

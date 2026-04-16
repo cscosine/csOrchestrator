@@ -12,16 +12,13 @@ authors = [
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
+dependencies = []
 
-[tool.setuptools]
-package-dir = { "" = "src" }
-packages = ["csorchestrator"]
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [project.scripts]
 csorchestrator = "csorchestrator.cli:main"
-
-# dependencies could go here
-# dependencies = []
 
 [project.optional-dependencies]
 # development tools (tests, linting, type checking)
@@ -75,6 +72,7 @@ quote-style = "double"
 # MyPy - Static Type Checker
 # ===============================
 [tool.mypy]
+mypy_path = "src"
 
 # Python version used for type checking.
 python_version = "3.11"
