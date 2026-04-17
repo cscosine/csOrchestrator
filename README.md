@@ -40,9 +40,9 @@ source .venv/bin/activate
 # 3. Install package in editable mode with dev dependencies
 pip install -e .[dev]
 
-this
-- Installs the project `.` in editable mode (because of `-e`)
-- Installs the optional dependency group dev normally.
+# this
+# - Installs the project `.` in editable mode (because of `-e`)
+# - Installs the optional dependency group dev normally.
 
 # 4. Run tests directly (package is now importable)
 pytest

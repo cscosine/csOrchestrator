@@ -1,3 +1,4 @@
+# __init__.py
 """Top-level package for csorchestrator."""
 
-# __init__.py
+__version__ = "0.1.0"
