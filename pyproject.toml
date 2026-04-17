@@ -24,6 +24,7 @@ csorchestrator = "csorchestrator.cli:main"
 # development tools (tests, linting, type checking)
 dev = [
     "pytest",
+    "pytest-cov",
     "mypy",
     "ruff",
     "black",

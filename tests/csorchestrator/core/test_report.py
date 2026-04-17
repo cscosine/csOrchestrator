@@ -48,6 +48,17 @@ def test_report_append_and_print(capfd):
     assert "[WARNING] be careful" in clean
     assert "[INFO] info" in clean
 
+    # capture output
+    r2.print()
+    captured = capfd.readouterr()
+    text = captured.out
+    # remove ANSI escapes for easier assertions
+    import re
+
+    clean = re.sub(r"\x1b\[[0-9;]*m", "", text)
+
+    assert "[ERROR] another" in clean
+
     # printing empty report should be silent
     empty = Report()
     empty.print()
