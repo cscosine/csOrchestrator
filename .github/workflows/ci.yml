@@ -30,7 +30,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=csorchestrator --cov-branch --cov-report=xml --cov-report=term        
+          pytest --cov=csorchestrator --cov-branch --cov-report=xml --cov-report=html --cov-report=term-missing | tee coverage.txt
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v6
@@ -40,3 +40,16 @@ jobs:
           fail_ci_if_error: true
           slug: cscosine/csOrchestrator
 
+      - name: Upload coverage HTML as artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage-html
+          path: htmlcov          
+
+      - name: Add coverage to summary
+        run: |
+          echo "## 🧪 Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          cat coverage.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
