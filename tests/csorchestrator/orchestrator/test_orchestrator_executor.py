@@ -190,3 +190,63 @@ def test_orchestrator_executor_base_only_visitor() -> None:
     assert ovb.phase_end_count == 2
 
     assert ovb.visited_steps == 4
+
+
+# ------------------------------------------------------------------------------------------------
+
+
+@dataclass
+class OrchestratorVisitorConcreteUseVisitBase(OrchestratorVisitorBase):
+    visit_init_count: int = 0
+    visit_end_count: int = 0
+    phase_init_count: int = 0
+    phase_end_count: int = 0
+    visited_steps: int = 0
+
+    def init_visit(self) -> None:
+        self.visit_init_count += 1
+
+    def end_visit(self) -> None:
+        self.visit_end_count += 1
+
+    def begin_phase(self, phase: Phase) -> None:
+        self.phase_init_count += 1
+
+    def end_phase(self) -> None:
+        self.phase_end_count += 1
+
+    def visit_base(self, step: StepBase) -> None:
+        self.visited_steps += 1
+
+    # create the visit dispatch but do not register any handler, so all steps fall through to visit_base
+    visit = OrchestratorVisitorBase.create_visit_dispatch()
+
+
+def test_orchestrator_executor_base_only_visitor_use_visit_base() -> None:
+    o = Orchestrator()
+
+    o.create_phase("p1").add_step(StepCustom1(name="p1s1", description="p1 step s1")).add_step(
+        StepCustom2(name="p1s2", description="p1 step s2")
+    )
+
+    o.create_phase("p2").add_step(StepCustom1(name="p2s1", description="p2 step s1")).add_step(
+        StepCustom2(name="p2s2", description="p2 step s2")
+    )
+
+    ovr = create_validated_orchestrator(o)
+
+    assert ovr.has_result()
+
+    e = OrchestratorExecutor(ovr.result())
+
+    ovb = OrchestratorVisitorConcreteUseVisitBase()
+
+    e.execute(ovb)
+
+    assert ovb.visit_init_count == 1
+    assert ovb.visit_end_count == 1
+
+    assert ovb.phase_init_count == 2
+    assert ovb.phase_end_count == 2
+
+    assert ovb.visited_steps == 4
