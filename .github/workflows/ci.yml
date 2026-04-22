@@ -30,6 +30,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
+          set -o pipefail
           pytest --cov=csorchestrator --cov-branch --cov-report=xml --cov-report=html --cov-report=term-missing | tee coverage.txt
 
       - name: Upload coverage to Codecov
