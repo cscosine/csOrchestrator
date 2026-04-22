@@ -22,10 +22,3 @@ def test_orchestrator_add_phases() -> None:
     assert len(o.phases[0].steps) == 2
     assert len(o.phases[1].steps) == 1
     assert len(o.phases[2].steps) == 3
-
-    # TODO we need smt like oe = OrchestratorExecutor(o, args)
-    # this will first validate the orchestrator (no repeated names etc)
-    # then execute via args
-    # e.g. "dry-run" will print the text description of phases and steps
-    # ideally "--gui" will open the gui (or this could be the default, while "--terminal" will be the text console)
-    # however, let have each command line bind to a OrchestratorExecutor method, e.g. oe.dryrun() will print etc
