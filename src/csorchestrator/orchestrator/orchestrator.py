@@ -1,6 +1,16 @@
 from dataclasses import dataclass, field
+from typing import List
 
 from csorchestrator.orchestrator.phase import Phase
+
+
+@dataclass(frozen=True)
+class PhaseNameWithStepNames:
+    phase_name: str
+    step_names: List[str] = field(default_factory=list)
+
+
+OrchestratorExecutorMinimalDescription = List[PhaseNameWithStepNames]  # a list of phases names and list of step names
 
 
 @dataclass
@@ -23,3 +33,12 @@ class Orchestrator:
         phase = Phase(phase_name)
         self.phases.append(phase)
         return phase
+
+    def extract_minimal_description(self) -> OrchestratorExecutorMinimalDescription:
+        ret: OrchestratorExecutorMinimalDescription = []
+        for phase in self.phases:
+            phase_desc = PhaseNameWithStepNames(phase.name)
+            for step in phase.steps:
+                phase_desc.step_names.append(step.name)
+            ret.append(phase_desc)
+        return ret

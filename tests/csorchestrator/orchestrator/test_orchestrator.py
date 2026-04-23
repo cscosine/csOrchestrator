@@ -22,3 +22,36 @@ def test_orchestrator_add_phases() -> None:
     assert len(o.phases[0].steps) == 2
     assert len(o.phases[1].steps) == 1
     assert len(o.phases[2].steps) == 3
+
+
+# ------------------------------------------------------------------------------------------------
+
+
+def test_orchestrator_executor_minimal_description() -> None:
+    o = Orchestrator()
+
+    o.create_phase("p1").add_step(StepEchoMessage(name="p1s1", description="p1 step s1", message="")).add_step(
+        StepEchoMessage(name="p1s2", description="p1 step s2", message="")
+    ).add_step(StepEchoMessage(name="p1s3", description="p1 step s3", message=""))
+
+    o.create_phase("p2").add_step(StepEchoMessage(name="p2s1", description="p2 step s1", message="")).add_step(
+        StepEchoMessage(name="p2s2", description="p2 step s2", message="")
+    )
+
+    od = o.extract_minimal_description()
+
+    assert len(od) == 2
+
+    # phases
+    assert od[0].phase_name == "p1"
+    assert od[1].phase_name == "p2"
+
+    # steps
+    assert len(od[0].step_names) == 3
+    assert od[0].step_names[0] == "p1s1"
+    assert od[0].step_names[1] == "p1s2"
+    assert od[0].step_names[2] == "p1s3"
+
+    assert len(od[1].step_names) == 2
+    assert od[1].step_names[0] == "p2s1"
+    assert od[1].step_names[1] == "p2s2"

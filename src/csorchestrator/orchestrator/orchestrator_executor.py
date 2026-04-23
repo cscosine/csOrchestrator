@@ -5,13 +5,18 @@ from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.validated_orchestrator import ValidatedOrchestrator
 
-OrchestratorExecutorVisitReports = List[List[Report]]
+OrchestratorExecutorVisitReports = List[List[Report]]  # a list of reports of each step per each phase,
 
 
 @dataclass
 class OrchestratorExecutor:
     validated_orchestrator: ValidatedOrchestrator
 
+    # return OrchestratorExecutorVisitReports, which is a List[List[Report]], i.e.,
+    # - the reports of each step per each phase
+    # - in other words, r[phase_index][step_index]
+    # the size of the outer and the inner list matches the phases and steps if executions completes without errors
+    # in case errors are met, the list is shorter, and the first failing step is the one with the last report
     def execute(self, visitor: OrchestratorVisitorBase) -> OrchestratorExecutorVisitReports:
         visit_complete: bool = True
         visit_reports: OrchestratorExecutorVisitReports = []
