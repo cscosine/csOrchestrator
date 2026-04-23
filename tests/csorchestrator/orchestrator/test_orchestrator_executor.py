@@ -319,7 +319,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
     # complete case
     ovb = OrchestratorVisitorFailStep(-1)
 
-    e.execute(ovb)
+    ovr = e.execute(ovb)
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -331,10 +331,18 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     assert ovb.visited_steps == 4
 
+    assert len(ovr) == 2
+    assert len(ovr[0]) == 2
+    assert not ovr[0][0].has_errors()
+    assert not ovr[0][1].has_errors()
+    assert len(ovr[1]) == 2
+    assert not ovr[1][0].has_errors()
+    assert not ovr[1][1].has_errors()
+
     # fail
     ovb = OrchestratorVisitorFailStep(0)
 
-    e.execute(ovb)
+    ovr = e.execute(ovb)
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -346,9 +354,13 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     assert ovb.visited_steps == 1
 
+    assert len(ovr) == 1
+    assert len(ovr[0]) == 1
+    assert ovr[0][0].has_errors()
+
     ovb = OrchestratorVisitorFailStep(1)
 
-    e.execute(ovb)
+    ovr = e.execute(ovb)
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -360,9 +372,14 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     assert ovb.visited_steps == 2
 
+    assert len(ovr) == 1
+    assert len(ovr[0]) == 2
+    assert not ovr[0][0].has_errors()
+    assert ovr[0][1].has_errors()
+
     ovb = OrchestratorVisitorFailStep(2)
 
-    e.execute(ovb)
+    ovr = e.execute(ovb)
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -374,9 +391,16 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     assert ovb.visited_steps == 3
 
+    assert len(ovr) == 2
+    assert len(ovr[0]) == 2
+    assert not ovr[0][0].has_errors()
+    assert not ovr[0][1].has_errors()
+    assert len(ovr[1]) == 1
+    assert ovr[1][0].has_errors()
+
     ovb = OrchestratorVisitorFailStep(3)
 
-    e.execute(ovb)
+    ovr = e.execute(ovb)
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -387,3 +411,11 @@ def test_orchestrator_executor_base_fail_step() -> None:
     assert not ovb.phase_complete
 
     assert ovb.visited_steps == 4
+
+    assert len(ovr) == 2
+    assert len(ovr[0]) == 2
+    assert not ovr[0][0].has_errors()
+    assert not ovr[0][1].has_errors()
+    assert len(ovr[1]) == 2
+    assert not ovr[1][0].has_errors()
+    assert ovr[1][1].has_errors()
