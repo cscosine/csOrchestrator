@@ -37,7 +37,7 @@ class OrchestratorVisitorDummy(OrchestratorVisitorBase):
     def end_phase(self) -> None:
         pass
 
-    def visit_base(self, step: StepBase) -> None:
+    def visit_step_base(self, step: StepBase) -> None:
         raise NotImplementedError(DUMMY_UNHANDLED_ERROR)
 
 
@@ -90,16 +90,16 @@ class OrchestratorVisitorConcretePerType(OrchestratorVisitorBase):
     def end_phase(self) -> None:
         self.phase_end_count += 1
 
-    def visit_base(self, step: StepBase) -> None:
+    def visit_step_base(self, step: StepBase) -> None:
         raise NotImplementedError(f"Unhandled step type: {type(step).__name__}")
 
-    visit = OrchestratorVisitorBase.create_visit_dispatch()
+    visit_step = OrchestratorVisitorBase.create_visit_dispatch()
 
-    @visit.register
+    @visit_step.register
     def _(self, step: StepCustom1) -> None:
         self.visited_steps_1 += 1
 
-    @visit.register
+    @visit_step.register
     def _(self, step: StepCustom2) -> None:
         self.visited_steps_2 += 1
 
@@ -158,7 +158,7 @@ class OrchestratorVisitorConcreteBaseOnly(OrchestratorVisitorBase):
     def end_phase(self) -> None:
         self.phase_end_count += 1
 
-    def visit_base(self, step: StepBase) -> None:
+    def visit_step_base(self, step: StepBase) -> None:
         self.visited_steps += 1
 
 
@@ -215,14 +215,14 @@ class OrchestratorVisitorConcreteUseVisitBase(OrchestratorVisitorBase):
     def end_phase(self) -> None:
         self.phase_end_count += 1
 
-    def visit_base(self, step: StepBase) -> None:
+    def visit_step_base(self, step: StepBase) -> None:
         self.visited_steps += 1
 
-    # create the visit dispatch but do not register any handler, so all steps fall through to visit_base
+    # create the visit dispatch but do not register any handler, so all steps fall through to visit_step_base
     visit = OrchestratorVisitorBase.create_visit_dispatch()
 
 
-def test_orchestrator_executor_base_only_visitor_use_visit_base() -> None:
+def test_orchestrator_executor_base_only_visitor_use_visit_step_base() -> None:
     o = Orchestrator()
 
     o.create_phase("p1").add_step(StepCustom1(name="p1s1", description="p1 step s1")).add_step(

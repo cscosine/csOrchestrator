@@ -13,6 +13,6 @@ class OrchestratorExecutor:
         for phase in self.validated_orchestrator.orchestrator.phases:
             visitor.begin_phase(phase)
             for step in phase.steps:
-                visitor.visit(step)
+                visitor.visit_step(step)
             visitor.end_phase()
         visitor.end_visit()
