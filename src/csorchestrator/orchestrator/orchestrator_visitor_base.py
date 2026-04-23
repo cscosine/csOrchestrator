@@ -2,24 +2,20 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import singledispatchmethod
 
+from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.step_base import StepBase
 
 
 @dataclass
 class OrchestratorVisitorBase(ABC):
-    VISIT_WITH_STEP_BASE_NOT_IMPL_ERROR: str = (
-        "OrchestratorVisitorBase::visit_step(self, step : StepBase) should never be reached, "
-        "concrete visitors should implement visit via their own singledispatchmethod"
-    )
-
     @abstractmethod
     def init_visit(self) -> None:
         """Called at visit begin"""
         ...
 
     @abstractmethod
-    def end_visit(self) -> None:
+    def end_visit(self, visit_complete: bool) -> None:
         """Called at visit end"""
         ...
 
@@ -29,15 +25,15 @@ class OrchestratorVisitorBase(ABC):
         ...
 
     @abstractmethod
-    def end_phase(self) -> None:
+    def end_phase(self, phase_complete: bool) -> None:
         """Called after processing completely a phase"""
         ...
 
-    def visit_step(self, step: StepBase) -> None:
-        self.visit_step_base(step)
+    def visit_step(self, step: StepBase) -> Report:
+        return self.visit_step_base(step)
 
     @abstractmethod
-    def visit_step_base(self, step: StepBase) -> None:
+    def visit_step_base(self, step: StepBase) -> Report:
         """Called when ``visit_step`` encounters a step type with no registered
         handler.  Concrete visitors **must** implement this to decide the
         policy for unregistered step types (raise, skip, log, etc.)."""
@@ -66,7 +62,7 @@ class OrchestratorVisitorBase(ABC):
         """
 
         @singledispatchmethod
-        def visit_step(self: "OrchestratorVisitorBase", step: StepBase) -> None:
-            self.visit_step_base(step)
+        def visit_step(self: "OrchestratorVisitorBase", step: StepBase) -> Report:
+            return self.visit_step_base(step)
 
         return visit_step

@@ -5,18 +5,27 @@ def test_report_append_and_print(capfd):
     r1 = Report()
     r1.errors.append("fail")
     assert len(r1.errors) == 1
+    assert r1.has_errors()
     assert len(r1.warnings) == 0
+    assert not r1.has_warnings()
     assert len(r1.infos) == 0
+    assert not r1.has_info()
 
     r1.warnings.append("be careful")
     assert len(r1.errors) == 1
+    assert r1.has_errors()
     assert len(r1.warnings) == 1
+    assert r1.has_warnings()
     assert len(r1.infos) == 0
+    assert not r1.has_info()
 
     r1.infos.append("info")
     assert len(r1.errors) == 1
+    assert r1.has_errors()
     assert len(r1.warnings) == 1
+    assert r1.has_warnings()
     assert len(r1.infos) == 1
+    assert r1.has_info()
 
     r2 = Report()
     r2.errors.append("another")

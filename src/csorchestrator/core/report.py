@@ -17,6 +17,15 @@ class Report:
     warnings: List[str] = field(default_factory=list)
     infos: List[str] = field(default_factory=list)
 
+    def has_errors(self) -> bool:
+        return len(self.errors) > 0
+
+    def has_warnings(self) -> bool:
+        return len(self.warnings) > 0
+
+    def has_info(self) -> bool:
+        return len(self.infos) > 0
+
     def append(self, other: "Report") -> None:
         """Merge another report into this one."""
         self.errors.extend(other.errors)
