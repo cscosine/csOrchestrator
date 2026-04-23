@@ -26,7 +26,19 @@ class Report:
     def has_info(self) -> bool:
         return len(self.infos) > 0
 
-    def append(self, other: "Report") -> None:
+    def append_error(self, msg: str) -> "Report":
+        self.errors.append(msg)
+        return self
+
+    def append_warnings(self, msg: str) -> "Report":
+        self.warnings.append(msg)
+        return self
+
+    def append_info(self, msg: str) -> "Report":
+        self.infos.append(msg)
+        return self
+
+    def append_report(self, other: "Report") -> None:
         """Merge another report into this one."""
         self.errors.extend(other.errors)
         self.warnings.extend(other.warnings)

@@ -34,7 +34,7 @@ def test_report_append_and_print(capfd):
     assert len(r2.infos) == 0
 
     # merge reports
-    r1.append(r2)
+    r1.append_report(r2)
     assert len(r1.errors) == 2
     assert len(r1.warnings) == 1
     assert len(r1.infos) == 1
@@ -73,3 +73,10 @@ def test_report_append_and_print(capfd):
     empty.print()
     captured = capfd.readouterr()
     assert captured.out == ""
+
+
+def test_report_append():
+    r = Report().append_error("e").append_info("i").append_warnings("w")
+    assert len(r.errors) == 1
+    assert len(r.warnings) == 1
+    assert len(r.infos) == 1

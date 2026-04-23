@@ -23,14 +23,14 @@ def create_validated_orchestrator(o: Orchestrator) -> ValidatedOrchestratorWithR
     counter_phase_names = Counter(phase_names)
     for name, c in counter_phase_names.items():
         if c > 1:
-            report.errors.append(f"phase named {name} has {c} occurrences")
+            report.append_error(f"phase named {name} has {c} occurrences")
 
     for p in o.phases:
         step_names = [s.name for s in p.steps]
         counter_step_names = Counter(step_names)
         for name, c in counter_step_names.items():
             if c > 1:
-                report.errors.append(f"in phase {p.name}, step named {name} has {c} occurrences")
+                report.append_error(f"in phase {p.name}, step named {name} has {c} occurrences")
 
     if len(report.errors) > 0:
         return ValidatedOrchestratorWithReport.createReport(report)
