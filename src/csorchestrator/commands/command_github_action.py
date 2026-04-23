@@ -1,2 +1,0 @@
-class CommandGithubAction:
-    pass
