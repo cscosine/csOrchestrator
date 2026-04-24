@@ -7,7 +7,7 @@ T = TypeVar("T")
 
 
 @dataclass
-class ResultWithReport(Generic[T]):
+class OptionalResultWithReport(Generic[T]):
     """
     Collects an optional generic result and a report
     """
@@ -27,9 +27,9 @@ class ResultWithReport(Generic[T]):
         return self._result if self._result is not None else default
 
     @classmethod
-    def createResultAndReport(cls, result: T, report: Report) -> "ResultWithReport[T]":
+    def createResultAndReport(cls, result: T, report: Report) -> "OptionalResultWithReport[T]":
         return cls(result, report)
 
     @classmethod
-    def createReport(cls, report: Report) -> "ResultWithReport[T]":
+    def createReport(cls, report: Report) -> "OptionalResultWithReport[T]":
         return cls(None, report)

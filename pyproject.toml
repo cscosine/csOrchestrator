@@ -12,7 +12,9 @@ authors = [
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
-dependencies = []
+dependencies = [
+    "GitPython"
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -27,22 +29,8 @@ dev = [
     "pytest-cov",
     "mypy",
     "ruff",
-    "black",
     "pre-commit"
 ]
-
-# ===============================
-# Black - Code Formatter
-# ===============================
-[tool.black]
-
-# Maximum line length before Black wraps code.
-line-length = 120
-
-# Python versions Black should format for.
-# This enables formatting that is compatible with Python 3.11 syntax.
-target-version = ["py311"]
-
 
 # ===============================
 # Ruff - Linter + Formatter

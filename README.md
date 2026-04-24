@@ -102,7 +102,6 @@ This installs:
 - `pytest` - Testing framework
 - `mypy` - Static type checking
 - `ruff` - Linting and formatting
-- `black` - Code formatter
 - `pre-commit` - Git hook automation
 
 ### Install Pre-Commit Hooks
@@ -139,7 +138,7 @@ Before every commit, the project runs automated checks to guarantee consistency,
 
 The following checks are enforced:
 
-- 🎨 **Code Formatting** – Formats Python code using `black`.
+- 🎨 **Code Formatting** – Formats Python code using `ruff-format`.
 - ⚡ **Linting & Auto-Fix** – Runs `ruff` for style checks, bug detection, and automatic fixes.
 - 🧠 **Type Checking** – Validates static types with `mypy`.
 - 🔒 **Repository Integrity** – Fails if unstaged changes remain after hooks run (`git diff --quiet`).
@@ -157,6 +156,7 @@ The csOrchestrator logic is a installable package in `src/csorchestrator/`. This
 ```
 src/csorchestrator/
 ├── core/                 # Core lib
+TODO 
 ```
 
 **Why src-layout?** It prevents import shadowing (ensures `import csorchestrator` always loads the installed package, not a local directory) and makes the structure explicit.
@@ -184,9 +184,6 @@ The `tests/` directory contains pytest suites for each module (excluded from lin
 ```bash
 # After installation (`pip install -e .`):
 pytest
-
-# Or without installation, manually add src/:
-PYTHONPATH=src pytest
 ```
 
 **How imports work:** A `conftest.py` file at the project root is automatically loaded by pytest before running tests. It adds `src/` to Python's import path, ensuring tests can find and import `csorchestrator` correctly. This is a standard pytest pattern for src-layout projects and requires no special setup.
@@ -195,7 +192,7 @@ All tests pass - the package works independently of the repository structure.
 
 ### Dependencies
 
-- **Runtime:** None (stdlib only)
-- **Development:** `pytest`, `mypy`, `ruff`, `black`, `pre-commit`
+- **Runtime:** `GitPython`
+- **Development:** `pytest`, `mypy`, `ruff`, `pre-commit`
 
 Install all with: `pip install -e .[dev]`
