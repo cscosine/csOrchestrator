@@ -20,7 +20,7 @@ def test_creates_directory(tmp_path) -> None:
 
     assert cr.has_result()
     assert not cr.report.has_errors()
-    assert cr.result() == target.resolve()
+    assert cr.result == target.resolve()
     assert target.exists()
     assert target.is_dir()
 
@@ -33,7 +33,7 @@ def test_local_path(tmp_path, monkeypatch) -> None:
 
     assert cr.has_result()
     assert not cr.report.has_errors()
-    assert cr.result() == tmp_path.resolve()
+    assert cr.result == tmp_path.resolve()
 
 
 def test_relative_path(tmp_path, monkeypatch) -> None:
@@ -44,7 +44,7 @@ def test_relative_path(tmp_path, monkeypatch) -> None:
 
     assert cr.has_result()
     assert not cr.report.has_errors()
-    assert cr.result() == (tmp_path / "relative_dir").resolve()
+    assert cr.result == (tmp_path / "relative_dir").resolve()
 
 
 def test_expand_user_and_env(tmp_path, monkeypatch) -> None:
@@ -54,7 +54,7 @@ def test_expand_user_and_env(tmp_path, monkeypatch) -> None:
 
     assert cr.has_result()
     assert not cr.report.has_errors()
-    assert cr.result() == (tmp_path / "env_dir").resolve()
+    assert cr.result == (tmp_path / "env_dir").resolve()
 
 
 def test_existing_directory(tmp_path) -> None:
@@ -70,7 +70,7 @@ def test_existing_directory(tmp_path) -> None:
     assert cr2.has_result()
     assert not cr2.report.has_errors()
 
-    assert cr1.result() == cr2.result()
+    assert cr1.result == cr2.result
 
 
 def test_path_is_file_dir_creation_fails(tmp_path) -> None:
@@ -104,7 +104,7 @@ def test_directory_is_writable(tmp_path) -> None:
     assert cr.has_result()
     assert not cr.report.has_errors()
 
-    test_file = cr.result() / "test.txt"
+    test_file = cr.result / "test.txt"
     test_file.write_text("hello")
 
     assert test_file.exists()

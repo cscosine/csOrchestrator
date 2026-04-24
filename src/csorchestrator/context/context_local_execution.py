@@ -13,15 +13,15 @@ class ContextLocalExecution:
     base_folder_path: Path
 
 
-ContextLocalExecutionWithReport: TypeAlias = OptionalResultWithReport[ContextLocalExecution]
+OptionalContextLocalExecutionWithReport: TypeAlias = OptionalResultWithReport[ContextLocalExecution]
 
 
-def create_context_local_execution(path: str) -> ContextLocalExecutionWithReport:
+def create_context_local_execution(path: str) -> OptionalContextLocalExecutionWithReport:
     pr = ensure_directory_exists_or_create_and_is_usable(path)
 
-    if pr.has_result():
-        return ContextLocalExecutionWithReport.createResultAndReport(
-            ContextLocalExecution(base_folder_path=pr.result()), pr.report
+    if pr.result is not None:
+        return OptionalContextLocalExecutionWithReport.createResultAndReport(
+            ContextLocalExecution(base_folder_path=pr.result), pr.report
         )
     else:
-        return ContextLocalExecutionWithReport.createReport(pr.report)
+        return OptionalContextLocalExecutionWithReport.createReport(pr.report)

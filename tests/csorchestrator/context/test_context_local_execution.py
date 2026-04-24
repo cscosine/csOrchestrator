@@ -15,4 +15,4 @@ def test_local_path(tmp_path, monkeypatch) -> None:
 
     assert cr.has_result()
     assert not cr.report.has_errors()
-    assert cr.result().base_folder_path == tmp_path.resolve()
+    assert cr.result.base_folder_path == tmp_path.resolve()

@@ -58,7 +58,7 @@ def test_orchestrator_executor_invalid_visitor() -> None:
 
     assert ovr.has_result()
 
-    e = OrchestratorExecutor(ovr.result())
+    e = OrchestratorExecutor(ovr.result)
 
     ovb = OrchestratorVisitorDummy()
 
@@ -123,7 +123,7 @@ def test_orchestrator_executor_valid_visitor() -> None:
 
     assert ovr.has_result()
 
-    e = OrchestratorExecutor(ovr.result())
+    e = OrchestratorExecutor(ovr.result)
 
     ovb = OrchestratorVisitorConcretePerType()
 
@@ -182,7 +182,7 @@ def test_orchestrator_executor_base_only_visitor() -> None:
 
     assert ovr.has_result()
 
-    e = OrchestratorExecutor(ovr.result())
+    e = OrchestratorExecutor(ovr.result)
 
     ovb = OrchestratorVisitorConcreteBaseOnly()
 
@@ -243,7 +243,7 @@ def test_orchestrator_executor_base_only_visitor_use_visit_step_base() -> None:
 
     assert ovr.has_result()
 
-    e = OrchestratorExecutor(ovr.result())
+    e = OrchestratorExecutor(ovr.result)
 
     ovb = OrchestratorVisitorConcreteUseVisitBase()
 
@@ -315,7 +315,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     assert ovr.has_result()
 
-    e = OrchestratorExecutor(ovr.result())
+    e = OrchestratorExecutor(ovr.result)
 
     # complete case
     ovb = OrchestratorVisitorFailStep(-1)

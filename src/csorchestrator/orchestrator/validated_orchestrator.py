@@ -12,10 +12,10 @@ class ValidatedOrchestrator:
     orchestrator: Orchestrator
 
 
-ValidatedOrchestratorWithReport: TypeAlias = OptionalResultWithReport[ValidatedOrchestrator]
+OptionalValidatedOrchestratorWithReport: TypeAlias = OptionalResultWithReport[ValidatedOrchestrator]
 
 
-def create_validated_orchestrator(o: Orchestrator) -> ValidatedOrchestratorWithReport:
+def create_validated_orchestrator(o: Orchestrator) -> OptionalValidatedOrchestratorWithReport:
     report = Report()
 
     # check phases name are unique
@@ -34,5 +34,5 @@ def create_validated_orchestrator(o: Orchestrator) -> ValidatedOrchestratorWithR
                 report.append_error(f"in phase {p.name}, step named {name} has {c} occurrences")
 
     if len(report.errors) > 0:
-        return ValidatedOrchestratorWithReport.createReport(report)
-    return ValidatedOrchestratorWithReport.createResultAndReport(ValidatedOrchestrator(o), report)
+        return OptionalValidatedOrchestratorWithReport.createReport(report)
+    return OptionalValidatedOrchestratorWithReport.createResultAndReport(ValidatedOrchestrator(o), report)

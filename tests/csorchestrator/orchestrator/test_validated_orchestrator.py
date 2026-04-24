@@ -14,7 +14,7 @@ def test_orchestrator_add_phases() -> None:
     )
     vr = create_validated_orchestrator(o)
     assert vr.has_result()
-    assert vr.result().orchestrator == o
+    assert vr.result.orchestrator == o
     assert len(vr.report.errors) == 0
     assert len(vr.report.warnings) == 0
     assert len(vr.report.infos) == 0
