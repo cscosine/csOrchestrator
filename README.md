@@ -52,6 +52,9 @@ pre-commit install
 pre-commit run --all-files
 ```
 
+---
+
+
 ### 🌍 Detailed Setup
 
 If you prefer step-by-step instructions:
@@ -90,6 +93,8 @@ or for PowerShell
 .venv\Scripts\activate.ps1
 ```
 
+---
+
 ### Install Development Dependencies
 
 All development tools are listed as optional dependencies in `pyproject.toml`:
@@ -103,6 +108,9 @@ This installs:
 - `mypy` - Static type checking
 - `ruff` - Linting and formatting
 - `pre-commit` - Git hook automation
+
+
+---
 
 ### Install Pre-Commit Hooks
 
@@ -130,6 +138,9 @@ pre-commit autoupdate --repo https://github.com/pre-commit/mirrors-mypy
 
 to bump version of a specific repo only
 
+
+---
+
 ### 🔍 Run Pre-Commit Manually
 
 ``` bash
@@ -142,7 +153,6 @@ pre-commit run --all-files
 
 -   Formatting → Black
 -   Linting → Ruff
--   Static typing → Mypy
 -   Pre-commit enforcement → pre-commit
 -   CI → GitHub Actions
 
@@ -177,6 +187,8 @@ TODO
 
 **Why src-layout?** It prevents import shadowing (ensures `import csorchestrator` always loads the installed package, not a local directory) and makes the structure explicit.
 
+---
+
 ### Using the package
 
 After installation (`pip install -e .`), you can:
@@ -193,6 +205,8 @@ After installation (`pip install -e .`), you can:
     TODO
     ```
 
+---
+
 ### Running the tests
 
 The `tests/` directory contains pytest suites for each module (excluded from linting/type-checking).
@@ -202,9 +216,36 @@ The `tests/` directory contains pytest suites for each module (excluded from lin
 pytest
 ```
 
-**How imports work:** A `conftest.py` file at the project root is automatically loaded by pytest before running tests. It adds `src/` to Python's import path, ensuring tests can find and import `csorchestrator` correctly. This is a standard pytest pattern for src-layout projects and requires no special setup.
+If you want to check code coverage, use one of 
 
-All tests pass - the package works independently of the repository structure.
+```bash
+    # report to htmlcov/ folder
+    pytest --cov=csorchestrator --cov-branch --cov-report=html
+
+    # report to terminal
+    pytest --cov=csorchestrator --cov-branch --cov-report=term
+
+    # report to terminal with details on uncovered lines/blocks
+    pytest --cov=csorchestrator --cov-branch --cov-report=term-missing
+```
+
+you can also combine multiple `--cov-report=` in the same command line
+
+---
+
+### Continuous Integration
+
+Continuous integration runs
+
+- repo checkout
+- `pre-commit`
+- pytest with coverage
+
+on a matrix of different OS and python versions
+
+check the `.github\workflows\ci.yml` file for details
+
+---
 
 ### Dependencies
 
