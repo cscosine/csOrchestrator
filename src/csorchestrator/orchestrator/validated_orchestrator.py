@@ -25,6 +25,7 @@ def create_validated_orchestrator(o: Orchestrator) -> ValidatedOrchestratorWithR
         if c > 1:
             report.append_error(f"phase named {name} has {c} occurrences")
 
+    # check step names are unique in each phase
     for p in o.phases:
         step_names = [s.name for s in p.steps]
         counter_step_names = Counter(step_names)

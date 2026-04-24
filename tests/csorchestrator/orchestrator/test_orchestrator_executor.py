@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 
 import pytest
+
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor import OrchestratorExecutor

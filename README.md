@@ -114,7 +114,23 @@ Pre-commit hooks run automatically before each commit.
 
 ---
 
-## 🔍 Run Pre-Commit Manually
+### Bump precommit hooks to last version 
+
+``` bash
+pre-commit autoupdate
+```
+
+will update the `rev` version in `.pre-commit-config.yaml`
+
+or
+
+``` bash
+pre-commit autoupdate --repo https://github.com/pre-commit/mirrors-mypy
+```
+
+to bump version of a specific repo only
+
+### 🔍 Run Pre-Commit Manually
 
 ``` bash
 pre-commit run --all-files

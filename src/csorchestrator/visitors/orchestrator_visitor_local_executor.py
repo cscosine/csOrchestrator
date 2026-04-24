@@ -29,8 +29,8 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
             f"OrchestratorVisitorLocalExecutor cannot handle step f{step.name} of type {type(step).__name__}"
         )
 
-    visit_step = OrchestratorVisitorBase.create_visit_dispatch()  # type: ignore[assignment]
+    visit_step = OrchestratorVisitorBase.create_visit_dispatch()
 
-    @visit_step.register  # type: ignore[misc, has-type]
+    @visit_step.register
     def _(self, step: StepGetRepository) -> Report:
         return execute_step_get_repository(step, self.context)

@@ -1,4 +1,5 @@
 import pytest
+
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
 

@@ -25,9 +25,6 @@ jobs:
       - name: Run pre-commit
         run: pre-commit run --all-files
 
-      - name: Static type check
-        run: mypy src/csorchestrator
-
       - name: Run tests with coverage
         run: |
           set -o pipefail
