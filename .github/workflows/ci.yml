@@ -8,14 +8,25 @@ on:
 
 jobs:
   checks:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ["3.11", "3.12", "3.13", "3.14"]
 
     steps:
       - uses: actions/checkout@v6
 
       - uses: actions/setup-python@v6
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"  # ✅ built-in pip cache
+          cache-dependency-path: |
+            pyproject.toml
+            setup.cfg
+            requirements*.txt
 
       - name: Install dependencies
         run: |
@@ -27,27 +38,35 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          set -o pipefail
-          pytest --cov=csorchestrator --cov-branch --cov-report=xml --cov-report=html --cov-report=term-missing | tee coverage.txt
+          pytest \
+            --cov=csorchestrator \
+            --cov-branch \
+            --cov-report=xml:coverage-${{ matrix.os }}-${{ matrix.python-version }}.xml \
+            --cov-report=html:htmlcov-${{ matrix.os }}-${{ matrix.python-version }} \
+            --cov-report=term-missing \
+            | tee coverage-${{ matrix.os }}-${{ matrix.python-version }}.txt
+        shell: bash
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v6
         with:
-          files: coverage.xml
+          files: coverage-${{ matrix.os }}-${{ matrix.python-version }}.xml
+          flags: ${{ matrix.os }}-py${{ matrix.python-version }}
+          name: ${{ matrix.os }}-py${{ matrix.python-version }}
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
-          slug: cscosine/csOrchestrator
 
       - name: Upload coverage HTML as artifact
         uses: actions/upload-artifact@v6
         with:
-          name: coverage-html
-          path: htmlcov          
+          name: coverage-html-${{ matrix.os }}-py${{ matrix.python-version }}
+          path: htmlcov-${{ matrix.os }}-${{ matrix.python-version }}
 
       - name: Add coverage to summary
         run: |
-          echo "## 🧪 Coverage Report" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧪 Coverage (${{ matrix.os }} / Python ${{ matrix.python-version }})" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat coverage.txt >> $GITHUB_STEP_SUMMARY
+          cat coverage-${{ matrix.os }}-${{ matrix.python-version }}.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
+        shell: bash
