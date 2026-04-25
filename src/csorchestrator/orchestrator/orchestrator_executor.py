@@ -2,15 +2,15 @@ from dataclasses import dataclass
 from typing import List
 
 from csorchestrator.core.report import Report
+from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
-from csorchestrator.orchestrator.validated_orchestrator import ValidatedOrchestrator
 
 OrchestratorExecutorVisitReports = List[List[Report]]  # a list of reports of each step per each phase,
 
 
 @dataclass
 class OrchestratorExecutor:
-    validated_orchestrator: ValidatedOrchestrator
+    orchestrator: Orchestrator
 
     # return OrchestratorExecutorVisitReports, which is a List[List[Report]], i.e.,
     # - the reports of each step per each phase
@@ -22,7 +22,7 @@ class OrchestratorExecutor:
         visit_reports: OrchestratorExecutorVisitReports = []
 
         visitor.init_visit()
-        for phase in self.validated_orchestrator.orchestrator.phases:
+        for phase in self.orchestrator.phases:
             phase_reports: List[Report] = []
             phase_complete: bool = True
 

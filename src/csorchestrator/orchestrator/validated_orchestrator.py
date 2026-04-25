@@ -1,18 +1,11 @@
 from collections import Counter
-from dataclasses import dataclass
 from typing import TypeAlias
 
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 
-
-@dataclass(frozen=True)
-class ValidatedOrchestrator:
-    orchestrator: Orchestrator
-
-
-OptionalValidatedOrchestratorWithReport: TypeAlias = OptionalResultWithReport[ValidatedOrchestrator]
+OptionalValidatedOrchestratorWithReport: TypeAlias = OptionalResultWithReport[Orchestrator]
 
 
 def create_validated_orchestrator(o: Orchestrator) -> OptionalValidatedOrchestratorWithReport:
@@ -35,4 +28,4 @@ def create_validated_orchestrator(o: Orchestrator) -> OptionalValidatedOrchestra
 
     if len(report.errors) > 0:
         return OptionalValidatedOrchestratorWithReport.createReport(report)
-    return OptionalValidatedOrchestratorWithReport.createResultAndReport(ValidatedOrchestrator(o), report)
+    return OptionalValidatedOrchestratorWithReport.createResultAndReport(o, report)
