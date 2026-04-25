@@ -30,3 +30,8 @@ def try_parse_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> Op
         return resolved
     else:
         return p.resolve()
+
+
+def resolve_path(path_str: str) -> Path:
+    p = Path(path_str)
+    return p.resolve()

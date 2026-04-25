@@ -1,6 +1,7 @@
 import os  # TODO remove / change
 from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
 from typing import Dict, Optional, Type, TypeVar
 
 from git import GitCommandError, Repo
@@ -8,7 +9,7 @@ from git import GitCommandError, Repo
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.step_base import StepBase
-from csorchestrator.utils.file_system.path import is_clean_relative_path
+from csorchestrator.utils.file_system.path import is_clean_relative_path, resolve_path
 
 
 # base class for extra information that can be provided
@@ -37,6 +38,9 @@ class StepGetRepository(StepBase):
 
     _extras: Dict[type, StepGetRepositoryExtra] = field(default_factory=dict)
 
+    def target_directory_path(self) -> Path:
+        return resolve_path(self.target_directory)
+
     def add_extra(
         self,
         extra: StepGetRepositoryExtra,
@@ -57,7 +61,7 @@ def execute_step_get_repository(step: StepGetRepository, context: ContextLocalEx
         return Report().append_error(f"Unknown repository type {step.repo_type}")
 
 
-def validata_step_get_repository(step: StepGetRepository) -> Report:
+def validate_step_get_repository(step: StepGetRepository) -> Report:
     report = Report()
 
     if not is_clean_relative_path(step.target_directory, avoid_leaving_base=True):

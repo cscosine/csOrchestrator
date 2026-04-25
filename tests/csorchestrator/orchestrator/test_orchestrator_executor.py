@@ -4,7 +4,11 @@ import pytest
 
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
-from csorchestrator.orchestrator.orchestrator_executor import OrchestratorExecutor
+from csorchestrator.orchestrator.orchestrator_executor import (
+    OrchestratorExecutor,
+    OrchestratorExecutorVisitReports,
+    flatten_orchestrator_executor_visit_reports,
+)
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.step_base import StepBase
@@ -420,3 +424,17 @@ def test_orchestrator_executor_base_fail_step() -> None:
     assert len(ovr[1]) == 2
     assert not ovr[1][0].has_errors()
     assert ovr[1][1].has_errors()
+
+
+def test_flatten_orchestrator_executor_visit_reports() -> None:
+
+    oevr: OrchestratorExecutorVisitReports = [
+        [Report().append_warnings("W"), Report().append_error("E")],
+        [Report().append_error("E"), Report().append_info("I"), Report().append_warnings("W")],
+    ]
+
+    rf = flatten_orchestrator_executor_visit_reports(oevr)
+
+    assert rf.errors == ["E", "E"]
+    assert rf.warnings == ["W", "W"]
+    assert rf.infos == ["I"]

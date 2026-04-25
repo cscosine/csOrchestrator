@@ -8,6 +8,14 @@ from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVi
 OrchestratorExecutorVisitReports = List[List[Report]]  # a list of reports of each step per each phase,
 
 
+def flatten_orchestrator_executor_visit_reports(oevr: OrchestratorExecutorVisitReports) -> Report:
+    rl: List[Report] = [report for phase_reports in oevr for report in phase_reports]
+    r = Report()
+    for report in rl:
+        r.append_report(report)
+    return r
+
+
 @dataclass
 class OrchestratorExecutor:
     orchestrator: Orchestrator
