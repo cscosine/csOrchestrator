@@ -16,10 +16,9 @@ def try_parse_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> Op
         return None
 
     if avoid_leaving_base:
-        base = Path(".")
-        base_resolved = base.resolve()
-
         try:
+            base = Path(".")
+            base_resolved = base.resolve()
             resolved = (base_resolved / p).resolve()
         except Exception:
             return None

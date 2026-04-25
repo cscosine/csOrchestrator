@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 import pytest
 
@@ -59,3 +60,17 @@ def test_is_clean_relative_path() -> None:
     # is ok to have a path that tries to leave the base but is actually ok because it doesn't leave the base
     assert is_clean_relative_path("data/../", avoid_leaving_base=True)
     assert try_parse_clean_relative_path("data/../", avoid_leaving_base=True) is not None
+
+
+def test_resolve_exception_try_parse_clean_relative_path(monkeypatch):
+    def boom(self, *args, **kwargs):
+        raise OSError("forced failure")
+
+    monkeypatch.setattr(Path, "resolve", boom)
+
+    result = try_parse_clean_relative_path(
+        "some/path",
+        avoid_leaving_base=True,
+    )
+
+    assert result is None
