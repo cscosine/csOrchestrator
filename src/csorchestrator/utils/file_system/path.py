@@ -2,17 +2,31 @@ from pathlib import Path
 from typing import Optional
 
 
-def is_clean_relative_path(path_str: str) -> bool:
-    op = try_parse_clean_relative_path(path_str)
+def is_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> bool:
+    op = try_parse_clean_relative_path(path_str, avoid_leaving_base)
     if op is not None:
         return True
     return False
 
 
-def try_parse_clean_relative_path(path_str: str) -> Optional[Path]:
+def try_parse_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> Optional[Path]:
     p = Path(path_str)
 
     if p.is_absolute():
         return None
 
-    return p
+    if avoid_leaving_base:
+        base = Path(".")
+        base_resolved = base.resolve()
+
+        try:
+            resolved = (base_resolved / p).resolve()
+        except Exception:
+            return None
+
+        if not resolved.is_relative_to(base_resolved):
+            return None
+
+        return resolved
+    else:
+        return p.resolve()
