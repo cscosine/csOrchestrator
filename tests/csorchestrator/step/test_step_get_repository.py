@@ -5,6 +5,7 @@ from csorchestrator.step.step_get_repository import (
     StepGetRepository,
     StepGetRepositoryExtra,
     StepGetRepositoryExtraAccessToken,
+    validata_step_get_repository,
 )
 
 
@@ -38,3 +39,22 @@ def test_step_get_repository():
     # substitute
     s.add_extra(StepGetRepositoryExtraCustom(52))
     assert s.get_extra(StepGetRepositoryExtraCustom).value == 52
+
+
+def test_validate_step_get_repository() -> None:
+    s = StepGetRepository(
+        repo_type=RepositoryType.GIT,
+        name="get repo",
+        description="get repo desc",
+        target_directory="../dir",
+        repo_url="url://test.git",
+        repo_ref="main",
+    )
+
+    report = validata_step_get_repository(s)
+    assert report.has_errors()
+    assert "Invalid target_directory" in report.errors[0]
+
+    s.target_directory = "dir"
+    report = validata_step_get_repository(s)
+    assert not report.has_errors()

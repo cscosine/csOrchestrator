@@ -8,6 +8,7 @@ from git import GitCommandError, Repo
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.utils.file_system.path import is_clean_relative_path
 
 
 # base class for extra information that can be provided
@@ -54,6 +55,21 @@ def execute_step_get_repository(step: StepGetRepository, context: ContextLocalEx
         return _execute_step_get_repository_git(step, context)
     else:
         return Report().append_error(f"Unknown repository type {step.repo_type}")
+
+
+def validata_step_get_repository(step: StepGetRepository) -> Report:
+    report = Report()
+
+    if not is_clean_relative_path(step.target_directory, avoid_leaving_base=True):
+        report.append_error(
+            f"Invalid target_directory {step.target_directory}, it must be a clean relative path that "
+            "does not leave the base folder"
+        )
+
+    return report
+
+
+# - private helpers functions
 
 
 def _report_git_command_error(report: Report, e: GitCommandError) -> None:
