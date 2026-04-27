@@ -37,8 +37,11 @@ jobs:
         run: pre-commit run --all-files
 
       - name: Run tests with coverage
+        env:
+          ACTIONS_ORG_ACCESS: ${{ secrets.ACTIONS_ORG_ACCESS }}
         run: |
           pytest \
+            --log-cli-level=INFO \
             --cov=csorchestrator \
             --cov-branch \
             --cov-report=xml:coverage-${{ matrix.os }}-${{ matrix.python-version }}.xml \

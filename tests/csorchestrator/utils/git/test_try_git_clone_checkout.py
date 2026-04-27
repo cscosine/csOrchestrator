@@ -1,9 +1,29 @@
+import logging
+import os
 from pathlib import Path
 
 from csorchestrator.utils.git.try_git_clone_checkout import try_git_clone_checkout
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+# if the test is executed on github actions, we need a token to access it
+# "ACTIONS_ORG_ACCESS" needs to be in the secrets of the csOrchestratorTestRepo
+# and in the pytest job config as
+#      - name: Run tests with coverage
+#        env:
+#          ACTIONS_ORG_ACCESS: ${{ secrets.ACTIONS_ORG_ACCESS }}
+#        run: |
+#          pytest [...]
+token = os.getenv("ACTIONS_ORG_ACCESS")
+if token:
+    logger.info("test_try_git_clone_checkout using https access with ACTIONS_ORG_ACCESS token")
+    repo_url = f"https://{token}@github.com/cscosine/csOrchestratorTestRepo.git"
+else:
+    logger.info("test_try_git_clone_checkout using ssh access")
+    repo_url = "git@github.com:cscosine/csOrchestratorTestRepo.git"
+
 ## info for the test repo
-repo_url = "git@github.com:cscosine/csOrchestratorTestRepo.git"
 repo_main_branch = "main"
 repo_origin_main_branch = "origin/main"
 repo_dev_branch = "dev"
