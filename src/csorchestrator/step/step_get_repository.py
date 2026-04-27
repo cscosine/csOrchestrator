@@ -1,4 +1,3 @@
-import os  # TODO remove / change
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
@@ -10,6 +9,7 @@ from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.utils.file_system.path import is_clean_relative_path, resolve_path
+from csorchestrator.utils.git.try_git_clone_checkout import try_git_clone_checkout
 
 
 # base class for extra information that can be provided
@@ -17,12 +17,12 @@ class StepGetRepositoryExtra:
     pass
 
 
+T = TypeVar("T", bound="StepGetRepositoryExtra")
+
+
 @dataclass
 class StepGetRepositoryExtraAccessToken(StepGetRepositoryExtra):
     token_name: str
-
-
-T = TypeVar("T", bound="StepGetRepositoryExtra")
 
 
 class RepositoryType(Enum):
@@ -35,6 +35,11 @@ class StepGetRepository(StepBase):
     repo_url: str
     repo_ref: str
     target_directory: str
+
+    # note, repo_ref can be
+    # - Branch, e.g. "main", "dev"
+    # - Tag, e.g. "v0.0.1"
+    # - Commit hash, e.g. "9f8e7d6c5b4a3210abcd1234ef56789012345678"
 
     _extras: Dict[type, StepGetRepositoryExtra] = field(default_factory=dict)
 
@@ -73,36 +78,29 @@ def validate_step_get_repository(step: StepGetRepository) -> Report:
     return report
 
 
-# - private helpers functions
-
-
-def _report_git_command_error(report: Report, e: GitCommandError) -> None:
-    report.append_error(
-        "Git operation failed:\n"
-        f"- Command: {e.command}\n"
-        f"- Exit code: {getattr(e, 'status', None)}\n"
-        f"- Error output: {e.stderr}\n"
-    )
-
-
 def _execute_step_get_repository_git(repo_step: StepGetRepository, context: ContextLocalExecution) -> Report:
     assert repo_step.repo_type == RepositoryType.GIT  # defensive
 
     report = Report()
 
-    if not os.path.isdir(Path(context.base_folder_path / repo_step.target_directory)):
+    target_full_path = Path(context.base_folder_path / repo_step.target_directory)
+
+    if not target_full_path.is_dir():
+        depth_one = StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(repo_step)
+
         report.append_info(
-            f"Given target_directory does not exists, "
-            f"then clone from {repo_step.repo_url} to {repo_step.target_directory}"
+            f"Clone from {repo_step.repo_url} to {target_full_path} {f'depth one? {depth_one}' if depth_one else ''}"
         )
-        try:
-            repo = Repo.clone_from(repo_step.repo_url, repo_step.target_directory)
-            repo.git.checkout(repo_step.repo_ref)  # works both for branch and tag
-            report.append_info(f"Succesfully cloned from {repo_step.repo_url} to {repo_step.target_directory}")
-        except GitCommandError as e:
-            _report_git_command_error(report, e)
+
+        r_sub = try_git_clone_checkout(
+            repo_url=repo_step.repo_url, repo_ref=repo_step.repo_ref, target_path=target_full_path, depth_one=depth_one
+        )
+
+        report.append_report(r_sub)
 
     else:
+        # TODO: continue with this part
+
         report.append_info(
             f"Given target_directory exists, "
             f"then try pull fast-forward from {repo_step.repo_url} ref {repo_step.repo_ref}"
@@ -127,6 +125,33 @@ def _execute_step_get_repository_git(repo_step: StepGetRepository, context: Cont
                 )
 
         except GitCommandError as e:
-            _report_git_command_error(report, e)
+            report.append_error(
+                "Git operation failed:\n"
+                f"- Command: {e.command}\n"
+                f"- Exit code: {getattr(e, 'status', None)}\n"
+                f"- Error output: {e.stderr}\n"
+            )
 
     return report
+
+
+@dataclass
+class StepGetRepositoryExtraDepthOne(StepGetRepositoryExtra):
+    on_local_checkout: bool
+    on_github_action_checkout: bool
+
+    @classmethod
+    def has_depth_one_on_local_checkout(cls, repo_step: StepGetRepository) -> bool:
+        depth_one_only = False
+        depth_one_exta_opt = repo_step.get_extra(StepGetRepositoryExtraDepthOne)
+        if depth_one_exta_opt is not None:
+            depth_one_only = depth_one_exta_opt.on_local_checkout
+        return depth_one_only
+
+    @classmethod
+    def has_depth_one_on_github_action_checkout(cls, repo_step: StepGetRepository) -> bool:
+        depth_one_only = False
+        depth_one_exta_opt = repo_step.get_extra(StepGetRepositoryExtraDepthOne)
+        if depth_one_exta_opt is not None:
+            depth_one_only = depth_one_exta_opt.on_github_action_checkout
+        return depth_one_only

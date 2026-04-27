@@ -12,8 +12,8 @@ class OptionalResultWithReport(Generic[T]):
     Collects an optional generic result and a report
     """
 
-    result: Optional[T]
     report: Report
+    result: Optional[T] = None
 
     def has_result(self) -> bool:
         return self.result is not None
@@ -23,8 +23,8 @@ class OptionalResultWithReport(Generic[T]):
 
     @classmethod
     def createResultAndReport(cls, result: T, report: Report) -> "OptionalResultWithReport[T]":
-        return cls(result, report)
+        return cls(report, result)
 
     @classmethod
     def createReport(cls, report: Report) -> "OptionalResultWithReport[T]":
-        return cls(None, report)
+        return cls(report)

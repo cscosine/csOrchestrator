@@ -13,6 +13,18 @@ class Expected(Generic[T, E]):
     value: Optional[T] = None
     error: Optional[E] = None
 
+    @classmethod
+    def make_value(cls, result: T) -> "Expected[T,E]":
+        return cls(value=result)
+
+    @classmethod
+    def make_error(cls, error: E) -> "Expected[T,E]":
+        return cls(error=error)
+
+    def __post_init__(self) -> None:
+        if (self.value is None) == (self.error is None):
+            raise ValueError("Expected must have exactly one of value or error")
+
     @property
     def is_ok(self) -> bool:
         return self.error is None

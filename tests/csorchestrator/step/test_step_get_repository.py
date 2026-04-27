@@ -5,6 +5,7 @@ from csorchestrator.step.step_get_repository import (
     StepGetRepository,
     StepGetRepositoryExtra,
     StepGetRepositoryExtraAccessToken,
+    StepGetRepositoryExtraDepthOne,
     validate_step_get_repository,
 )
 
@@ -72,3 +73,33 @@ def test_resolved_target_directory_path() -> None:
 
     target_directory_path = s.resolved_target_directory_path()
     assert str(target_directory_path.name) == "dir"
+
+
+def test_step_get_repository_extra_depth_one() -> None:
+    s = StepGetRepository(
+        repo_type=RepositoryType.GIT,
+        name="get repo",
+        description="get repo desc",
+        target_directory="dir/subdir/..",
+        repo_url="url://test.git",
+        repo_ref="main",
+    )
+
+    assert not StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(s)
+    assert not StepGetRepositoryExtraDepthOne.has_depth_one_on_github_action_checkout(s)
+
+    s.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=False, on_github_action_checkout=False))
+    assert not StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(s)
+    assert not StepGetRepositoryExtraDepthOne.has_depth_one_on_github_action_checkout(s)
+
+    s.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=False))
+    assert StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(s)
+    assert not StepGetRepositoryExtraDepthOne.has_depth_one_on_github_action_checkout(s)
+
+    s.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=False, on_github_action_checkout=True))
+    assert not StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(s)
+    assert StepGetRepositoryExtraDepthOne.has_depth_one_on_github_action_checkout(s)
+
+    s.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
+    assert StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(s)
+    assert StepGetRepositoryExtraDepthOne.has_depth_one_on_github_action_checkout(s)
