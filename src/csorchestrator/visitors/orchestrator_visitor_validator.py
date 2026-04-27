@@ -37,7 +37,7 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
     def _(self, step: StepGetRepository) -> Report:
         r = validate_step_get_repository(step)
         if not r.has_errors():
-            target_directory_path = step.target_directory_path()
+            target_directory_path = step.resolved_target_directory_path()
             if target_directory_path in self._colletected_step_get_repository_target_directories:
                 r.append_error(f"target_directory {str(target_directory_path)} is already used by another step")
             else:

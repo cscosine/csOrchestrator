@@ -60,7 +60,7 @@ def test_validate_step_get_repository() -> None:
     assert not report.has_errors()
 
 
-def test_target_directory_path() -> None:
+def test_resolved_target_directory_path() -> None:
     s = StepGetRepository(
         repo_type=RepositoryType.GIT,
         name="get repo",
@@ -70,5 +70,5 @@ def test_target_directory_path() -> None:
         repo_ref="main",
     )
 
-    target_directory_path = s.target_directory_path()
+    target_directory_path = s.resolved_target_directory_path()
     assert str(target_directory_path.name) == "dir"

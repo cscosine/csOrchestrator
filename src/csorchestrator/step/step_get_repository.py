@@ -38,7 +38,7 @@ class StepGetRepository(StepBase):
 
     _extras: Dict[type, StepGetRepositoryExtra] = field(default_factory=dict)
 
-    def target_directory_path(self) -> Path:
+    def resolved_target_directory_path(self) -> Path:
         return resolve_path(self.target_directory)
 
     def add_extra(
@@ -90,7 +90,7 @@ def _execute_step_get_repository_git(repo_step: StepGetRepository, context: Cont
 
     report = Report()
 
-    if not os.path.isdir(repo_step.target_directory):  # TODO how to manage local / abs path ?
+    if not os.path.isdir(Path(context.base_folder_path / repo_step.target_directory)):
         report.append_info(
             f"Given target_directory does not exists, "
             f"then clone from {repo_step.repo_url} to {repo_step.target_directory}"
