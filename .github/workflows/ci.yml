@@ -41,6 +41,7 @@ jobs:
           ACTIONS_ORG_ACCESS: ${{ secrets.ACTIONS_ORG_ACCESS }}
         run: |
           pytest \
+            --run-all \
             --log-cli-level=INFO \
             --cov=csorchestrator \
             --cov-branch \

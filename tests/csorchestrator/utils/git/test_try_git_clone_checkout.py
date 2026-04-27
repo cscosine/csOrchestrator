@@ -2,6 +2,8 @@ import logging
 import os
 from pathlib import Path
 
+import pytest
+
 from csorchestrator.utils.git.try_git_clone_checkout import try_git_clone_checkout
 
 logging.basicConfig(level=logging.INFO)
@@ -50,6 +52,8 @@ def _check_status(target_path: Path, expected_content: str) -> None:
     assert first_line == expected_content
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_full_depth_branch_main(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = False
@@ -64,6 +68,8 @@ def test_simple_clone_full_depth_branch_main(tmp_path) -> None:
     _check_status(target_path, expected_content_main)
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_depth_one_branch_main(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = True
@@ -78,6 +84,8 @@ def test_simple_clone_depth_one_branch_main(tmp_path) -> None:
     _check_status(target_path, expected_content_main)
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_full_depth_branch_dev(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = False
@@ -92,6 +100,8 @@ def test_simple_clone_full_depth_branch_dev(tmp_path) -> None:
     _check_status(target_path, expected_content_dev)
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_depth_one_branch_dev(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = True
@@ -106,6 +116,8 @@ def test_simple_clone_depth_one_branch_dev(tmp_path) -> None:
     _check_status(target_path, expected_content_dev)
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_full_depth_tag(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = False
@@ -118,6 +130,8 @@ def test_simple_clone_full_depth_tag(tmp_path) -> None:
     _check_status(target_path, expected_content_tag)
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_depth_one_tag(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = True
@@ -130,6 +144,8 @@ def test_simple_clone_depth_one_tag(tmp_path) -> None:
     _check_status(target_path, expected_content_tag)
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_full_depth_sha(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = False
@@ -144,6 +160,8 @@ def test_simple_clone_full_depth_sha(tmp_path) -> None:
     _check_status(target_path, expected_content_initial)
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_depth_one_sha(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = True
@@ -159,6 +177,8 @@ def test_simple_clone_depth_one_sha(tmp_path) -> None:
 
 
 # not allowed cases
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_full_depth_non_existing_ref(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = False
@@ -172,6 +192,8 @@ def test_simple_clone_full_depth_non_existing_ref(tmp_path) -> None:
     assert r.has_errors()
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_depth_one_non_existing_ref(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = True
@@ -185,6 +207,8 @@ def test_simple_clone_depth_one_non_existing_ref(tmp_path) -> None:
     assert r.has_errors()
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_full_depth_branch_origin_main(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = False
@@ -198,6 +222,8 @@ def test_simple_clone_full_depth_branch_origin_main(tmp_path) -> None:
     assert r.has_errors()
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_depth_one_branch_origin_main(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = True
@@ -211,6 +237,8 @@ def test_simple_clone_depth_one_branch_origin_main(tmp_path) -> None:
     assert r.has_errors()
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_full_depth_HEAD(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = False
@@ -222,6 +250,8 @@ def test_simple_clone_full_depth_HEAD(tmp_path) -> None:
     assert r.has_errors()
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_depth_one_HEAD(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = True
@@ -233,6 +263,8 @@ def test_simple_clone_depth_one_HEAD(tmp_path) -> None:
     assert r.has_errors()
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_full_depth_refs_heads_main(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = False
@@ -246,6 +278,8 @@ def test_simple_clone_full_depth_refs_heads_main(tmp_path) -> None:
     assert r.has_errors()
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_depth_one_refs_heads_main(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = True
@@ -259,6 +293,8 @@ def test_simple_clone_depth_one_refs_heads_main(tmp_path) -> None:
     assert r.has_errors()
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_full_depth_repo_refs_remote_origin_main(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = False
@@ -272,6 +308,8 @@ def test_simple_clone_full_depth_repo_refs_remote_origin_main(tmp_path) -> None:
     assert r.has_errors()
 
 
+@pytest.mark.slow
+@pytest.mark.git
 def test_simple_clone_depth_one_repo_refs_remote_origin_main(tmp_path) -> None:
     target_path = tmp_path / destination_folder
     depth_one = True
