@@ -12,7 +12,67 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_local_execution.py \u2192 test_create_context_empty_path_invalid",
+      "name": "\ud83d\udcc1 tests/csorchestrator/context tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83d\udcc1 tests/csorchestrator/core tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/core"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83d\udcc1 tests/csorchestrator/orchestrator tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/orchestrator"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83d\udcc1 tests/csorchestrator/step tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/step"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83d\udcc1 tests/csorchestrator/utils/filesystem tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/filesystem"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83d\udcc1 tests/csorchestrator/utils/git tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_local_execution \u2192 test_create_context_empty_path_invalid",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -22,7 +82,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_local_execution.py \u2192 test_local_path",
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_local_execution \u2192 test_local_path",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -32,7 +92,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/core/test_expected.py \u2192 test_expected_error",
+      "name": "\ud83e\uddea tests/csorchestrator/core/test_expected \u2192 test_expected_error",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -42,7 +102,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/core/test_expected.py \u2192 test_expected_ok",
+      "name": "\ud83e\uddea tests/csorchestrator/core/test_expected \u2192 test_expected_ok",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -52,7 +112,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/core/test_expected.py \u2192 test_expected_raise",
+      "name": "\ud83e\uddea tests/csorchestrator/core/test_expected \u2192 test_expected_raise",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -62,7 +122,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/core/test_optional_result_with_report.py \u2192 test_optional_result_with_report",
+      "name": "\ud83e\uddea tests/csorchestrator/core/test_optional_result_with_report \u2192 test_optional_result_with_report",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -72,7 +132,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/core/test_report.py \u2192 test_report_append",
+      "name": "\ud83e\uddea tests/csorchestrator/core/test_report \u2192 test_report_append",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -82,7 +142,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/core/test_report.py \u2192 test_report_append_and_print",
+      "name": "\ud83e\uddea tests/csorchestrator/core/test_report \u2192 test_report_append_and_print",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -92,7 +152,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator.py \u2192 test_orchestrator_add_phases",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator \u2192 test_orchestrator_add_phases",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -102,7 +162,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator.py \u2192 test_orchestrator_executor_minimal_description",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator \u2192 test_orchestrator_executor_minimal_description",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -112,7 +172,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor.py \u2192 test_flatten_orchestrator_executor_visit_reports",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor \u2192 test_flatten_orchestrator_executor_visit_reports",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -122,7 +182,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor.py \u2192 test_orchestrator_executor_base_fail_step",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor \u2192 test_orchestrator_executor_base_fail_step",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -132,7 +192,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor.py \u2192 test_orchestrator_executor_base_only_visitor",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor \u2192 test_orchestrator_executor_base_only_visitor",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -142,7 +202,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor.py \u2192 test_orchestrator_executor_base_only_visitor_use_visit_step_base",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor \u2192 test_orchestrator_executor_base_only_visitor_use_visit_step_base",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -152,7 +212,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor.py \u2192 test_orchestrator_executor_invalid_visitor",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor \u2192 test_orchestrator_executor_invalid_visitor",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -162,7 +222,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor.py \u2192 test_orchestrator_executor_valid_visitor",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor \u2192 test_orchestrator_executor_valid_visitor",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -172,7 +232,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator.py \u2192 test_orchestrator_invalid_repeated_phase_and_step_names",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator \u2192 test_orchestrator_invalid_repeated_phase_and_step_names",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -182,7 +242,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator.py \u2192 test_orchestrator_invalid_repeated_phase_names",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator \u2192 test_orchestrator_invalid_repeated_phase_names",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -192,7 +252,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator.py \u2192 test_orchestrator_invalid_repeated_step_names",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator \u2192 test_orchestrator_invalid_repeated_step_names",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -202,7 +262,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator.py \u2192 test_orchestrator_invalid_step_duplicate_target_directory",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator \u2192 test_orchestrator_invalid_step_duplicate_target_directory",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -212,7 +272,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator.py \u2192 test_orchestrator_invalid_step_get_repository",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator \u2192 test_orchestrator_invalid_step_get_repository",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -222,7 +282,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator.py \u2192 test_orchestrator_valid",
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator \u2192 test_orchestrator_valid",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -232,7 +292,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository.py \u2192 test_resolved_target_directory_path",
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_resolved_target_directory_path",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -242,7 +302,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository.py \u2192 test_step_get_repository",
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_step_get_repository",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -252,7 +312,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository.py \u2192 test_step_get_repository_extra_depth_one",
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_step_get_repository_extra_depth_one",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -262,7 +322,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository.py \u2192 test_validate_step_get_repository",
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_validate_step_get_repository",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -272,7 +332,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_creates_directory",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_creates_directory",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -282,7 +342,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_directory_is_writable",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_directory_is_writable",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -292,7 +352,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_empty_path_invalid",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_empty_path_invalid",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -302,7 +362,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_existing_directory",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_existing_directory",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -312,7 +372,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_expand_user_and_env",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_expand_user_and_env",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -322,7 +382,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_local_path",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_local_path",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -332,7 +392,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_path_is_file_dir_creation_fails",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_path_is_file_dir_creation_fails",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -342,7 +402,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_path_is_file_dir_creation_patched",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_path_is_file_dir_creation_patched",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -352,7 +412,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_permission_error",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_permission_error",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -362,7 +422,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_relative_path",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_relative_path",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -372,7 +432,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory.py \u2192 test_resolve_failure",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_directory \u2192 test_resolve_failure",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -382,7 +442,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path.py \u2192 test_is_clean_relative_path",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path \u2192 test_is_clean_relative_path",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -392,7 +452,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path.py \u2192 test_is_clean_relative_path_non_win",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path \u2192 test_is_clean_relative_path_non_win",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -402,7 +462,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path.py \u2192 test_is_clean_relative_path_win",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path \u2192 test_is_clean_relative_path_win",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -412,7 +472,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path.py \u2192 test_resolve_exception_try_parse_clean_relative_path",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path \u2192 test_resolve_exception_try_parse_clean_relative_path",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -422,7 +482,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_depth_one_HEAD",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_HEAD",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -432,7 +492,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_depth_one_branch_dev",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_branch_dev",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -442,7 +502,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_depth_one_branch_main",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_branch_main",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -452,7 +512,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_depth_one_branch_origin_main",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_branch_origin_main",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -462,7 +522,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_depth_one_non_existing_ref",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_non_existing_ref",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -472,7 +532,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_depth_one_refs_heads_main",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_refs_heads_main",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -482,7 +542,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_depth_one_repo_refs_remote_origin_main",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_repo_refs_remote_origin_main",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -492,7 +552,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_depth_one_sha",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_sha",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -502,7 +562,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_depth_one_tag",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_tag",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -512,7 +572,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_full_depth_HEAD",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_full_depth_HEAD",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -522,7 +582,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_full_depth_branch_dev",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_full_depth_branch_dev",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -532,7 +592,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_full_depth_branch_main",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_full_depth_branch_main",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -542,7 +602,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_full_depth_branch_origin_main",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_full_depth_branch_origin_main",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -552,7 +612,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_full_depth_non_existing_ref",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_full_depth_non_existing_ref",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -562,7 +622,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_full_depth_refs_heads_main",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_full_depth_refs_heads_main",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -572,7 +632,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_full_depth_repo_refs_remote_origin_main",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_full_depth_repo_refs_remote_origin_main",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -582,7 +642,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_full_depth_sha",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_full_depth_sha",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -592,7 +652,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout.py \u2192 test_simple_clone_full_depth_tag",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_full_depth_tag",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -602,7 +662,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_commit_sha_equal",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_commit_sha_equal",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -612,7 +672,17 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_main_branch_dirty_edit",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_commit_sha_equal_depth_one",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_validate_and_sync_repo.py::test_validate_and_sync_repo_commit_sha_equal_depth_one"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_main_branch_dirty_edit",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -622,7 +692,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_main_branch_dirty_new_file",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_main_branch_dirty_new_file",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -632,7 +702,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_main_branch_ff_succeed",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_main_branch_ff_succeed",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -642,7 +712,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_main_branch_ff_succeed_depth_one",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_main_branch_ff_succeed_depth_one",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -652,7 +722,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_main_branch_no_changes_succeed",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_main_branch_no_changes_succeed",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -662,7 +732,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_main_branch_no_changes_succeed_depth_one",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_main_branch_no_changes_succeed_depth_one",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -672,7 +742,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_main_branch_no_refs_fail",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_main_branch_no_refs_fail",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -682,7 +752,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_main_branch_no_remote_fail",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_main_branch_no_remote_fail",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -692,7 +762,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_ref_differs",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_ref_differs",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -702,7 +772,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_tag_equal",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_tag_equal",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -712,7 +782,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_tag_equal_depth_one",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_tag_equal_depth_one",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
@@ -722,7 +792,7 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo.py \u2192 test_validate_and_sync_repo_url_differs",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_validate_and_sync_repo \u2192 test_validate_and_sync_repo_url_differs",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",

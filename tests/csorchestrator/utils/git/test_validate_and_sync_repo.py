@@ -279,11 +279,25 @@ def test_validate_and_sync_repo_commit_sha_equal(tmp_path: Path, repo_runtime_co
 
     _clone_sha_clean(target_path=target_path, repo_runtime_config=repo_runtime_config, depth_one=False)
 
-    r = validate_and_sync_repo(repo_runtime_config.repo_url, cfg.tag, target_path=target_path)
+    r = validate_and_sync_repo(repo_runtime_config.repo_url, cfg.initial_commit_sha, target_path=target_path)
     assert not r.has_errors()
 
 
-# this does not work, TODO continue
+@pytest.mark.slow
+@pytest.mark.git
+def test_validate_and_sync_repo_commit_sha_equal_depth_one(
+    tmp_path: Path, repo_runtime_config: RepoRuntimeConfig
+) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_sha_clean(target_path=target_path, repo_runtime_config=repo_runtime_config, depth_one=True)
+
+    r = validate_and_sync_repo(repo_runtime_config.repo_url, cfg.initial_commit_sha, target_path=target_path)
+    assert not r.has_errors()
+
+
 # @pytest.mark.slow
 # @pytest.mark.git
 # def test_validate_and_sync_repo_tag_different(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
