@@ -3,7 +3,6 @@ from pathlib import Path
 from git import GitCommandError, Remote, Repo
 
 from csorchestrator.core.report import Report
-from csorchestrator.step.step_get_repository import StepGetRepository
 from csorchestrator.utils.git.try_git_clone_checkout import RefKind, resolve_ref_type
 
 # -------------------------
@@ -38,8 +37,10 @@ def _resolve_default_remote(repo: Repo) -> Remote:
 # -------------------------
 
 
-def validate_and_sync_repo(step: StepGetRepository) -> Report:
-    repo = Repo(Path(step.target_directory))
+def validate_and_sync_repo(repo_url: str, repo_ref: str, target_directory: str) -> Report:
+    # TODO: add a check that repo_url is the same!!
+
+    repo = Repo(Path(target_directory))
 
     # 0. dirty check (fail early)
     if repo.is_dirty(untracked_files=True):
@@ -67,19 +68,19 @@ def validate_and_sync_repo(step: StepGetRepository) -> Report:
         remote.fetch("--update-shallow")
 
         # direct branch reference on remote
-        if step.repo_ref in remote.refs:
-            remote_commit = remote.refs[step.repo_ref].commit.hexsha
+        if repo_ref in remote.refs:
+            remote_commit = remote.refs[repo_ref].commit.hexsha
         else:
             # fallback: tags or direct commit
             repo = remote.repo
-            remote_commit = repo.commit(step.repo_ref).hexsha
+            remote_commit = repo.commit(repo_ref).hexsha
 
     except Exception as e:
         return Report().append_error(f"remote resolution failed: {e}")
 
     # 3. ref consistency (name check)
-    if local_kind.value != RefKind.COMMIT and local_ref != step.repo_ref:
-        return Report().append_error(f"local ref '{local_ref}' != expected '{step.repo_ref}'")
+    if local_kind.value != RefKind.COMMIT and local_ref != repo_ref:
+        return Report().append_error(f"local ref '{local_ref}' != expected '{repo_ref}'")
 
     # -------------------------
     # 4. BRANCH logic
@@ -87,7 +88,7 @@ def validate_and_sync_repo(step: StepGetRepository) -> Report:
     if local_kind.value == RefKind.BRANCH:
         if local_commit != remote_commit:
             try:
-                repo.git.checkout(step.repo_ref)
+                repo.git.checkout(repo_ref)
 
                 if is_shallow:
                     # shallow repos may require deeper fetch for FF safety
@@ -110,7 +111,7 @@ def validate_and_sync_repo(step: StepGetRepository) -> Report:
         # shallow repos may not have full object graph
         if is_shallow:
             try:
-                remote.fetch("--depth=1", step.repo_ref)
+                remote.fetch("--depth=1", repo_ref)
             except Exception:
                 pass
 
