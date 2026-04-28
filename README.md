@@ -151,8 +151,7 @@ pre-commit run --all-files
 
 ## ✅ Toolchain
 
--   Formatting → Black
--   Linting → Ruff
+-   Formatting & Linting → Ruff
 -   Pre-commit enforcement → pre-commit
 -   CI → GitHub Actions
 

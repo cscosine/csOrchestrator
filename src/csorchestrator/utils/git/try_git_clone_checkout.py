@@ -25,16 +25,14 @@ def _report_git_command_error(report: Report, e: GitCommandError) -> None:
     )
 
 
-def _resolve_ref_type(repo: Repo, ref: str) -> Expected[RefKind, str]:
+def resolve_ref_type(repo: Repo, ref: str) -> Expected[RefKind, str]:
 
     # 1. BRANCH
     if ref in repo.heads:
-        commit = repo.commit(ref)
         return Expected[RefKind, str].make_value(RefKind.BRANCH)
 
     # 2. TAG
     if ref in repo.tags:
-        commit = repo.commit(ref)
         return Expected[RefKind, str].make_value(RefKind.TAG)
 
     # 3. COMMIT
@@ -68,7 +66,7 @@ def try_git_clone_checkout(repo_url: str, repo_ref: str, target_path: Path, dept
         # -------------------------
         # TYPE-SAFE RESOLUTION
         # -------------------------
-        ref_kind_expected = _resolve_ref_type(repo, repo_ref)
+        ref_kind_expected = resolve_ref_type(repo, repo_ref)
         if ref_kind_expected.error is not None:
             return Report().append_error(ref_kind_expected.error)
 

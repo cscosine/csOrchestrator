@@ -38,7 +38,6 @@ dev = [
 [tool.ruff]
 
 # Maximum allowed line length for linting.
-# Keep it consistent with Black to avoid conflicts.
 line-length = 120
 
 # Target Python version for rule selection / parsing.

@@ -26,7 +26,7 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
 
     def visit_step_base(self, step: StepBase) -> Report:
         return Report().append_error(
-            f"OrchestratorVisitorLocalExecutor cannot handle step f{step.name} of type {type(step).__name__}"
+            f"OrchestratorVisitorLocalExecutor cannot handle step {step.name} of type {type(step).__name__}"
         )
 
     visit_step = OrchestratorVisitorBase.create_visit_dispatch()

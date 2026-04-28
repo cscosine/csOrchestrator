@@ -12,7 +12,7 @@ from csorchestrator.step.step_get_repository import StepGetRepository, validate_
 
 @dataclass
 class OrchestratorVisitorValidator(OrchestratorVisitorBase):
-    _colletected_step_get_repository_target_directories: Set[Path] = field(default_factory=set)
+    _collected_step_get_repository_target_directories: Set[Path] = field(default_factory=set)
 
     def init_visit(self) -> None:
         pass
@@ -27,8 +27,8 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
         pass
 
     def visit_step_base(self, step: StepBase) -> Report:
-        return Report().append_warnings(
-            f"OrchestratorVisitorValidator cannot handle step f{step.name} of type {type(step).__name__}"
+        return Report().append_warning(
+            f"OrchestratorVisitorValidator cannot handle step {step.name} of type {type(step).__name__}"
         )
 
     visit_step = OrchestratorVisitorBase.create_visit_dispatch()
@@ -38,10 +38,10 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
         r = validate_step_get_repository(step)
         if not r.has_errors():
             target_directory_path = step.resolved_target_directory_path()
-            if target_directory_path in self._colletected_step_get_repository_target_directories:
+            if target_directory_path in self._collected_step_get_repository_target_directories:
                 r.append_error(f"target_directory {str(target_directory_path)} is already used by another step")
             else:
-                self._colletected_step_get_repository_target_directories.add(target_directory_path)
+                self._collected_step_get_repository_target_directories.add(target_directory_path)
         return r
 
     @visit_step.register

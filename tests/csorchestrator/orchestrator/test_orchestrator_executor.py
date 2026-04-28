@@ -429,8 +429,8 @@ def test_orchestrator_executor_base_fail_step() -> None:
 def test_flatten_orchestrator_executor_visit_reports() -> None:
 
     oevr: OrchestratorExecutorVisitReports = [
-        [Report().append_warnings("W"), Report().append_error("E")],
-        [Report().append_error("E"), Report().append_info("I"), Report().append_warnings("W")],
+        [Report().append_warning("W"), Report().append_error("E")],
+        [Report().append_error("E"), Report().append_info("I"), Report().append_warning("W")],
     ]
 
     rf = flatten_orchestrator_executor_visit_reports(oevr)

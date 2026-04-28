@@ -143,15 +143,15 @@ class StepGetRepositoryExtraDepthOne(StepGetRepositoryExtra):
     @classmethod
     def has_depth_one_on_local_checkout(cls, repo_step: StepGetRepository) -> bool:
         depth_one_only = False
-        depth_one_exta_opt = repo_step.get_extra(StepGetRepositoryExtraDepthOne)
-        if depth_one_exta_opt is not None:
-            depth_one_only = depth_one_exta_opt.on_local_checkout
+        depth_one_extra_opt = repo_step.get_extra(StepGetRepositoryExtraDepthOne)
+        if depth_one_extra_opt is not None:
+            depth_one_only = depth_one_extra_opt.on_local_checkout
         return depth_one_only
 
     @classmethod
     def has_depth_one_on_github_action_checkout(cls, repo_step: StepGetRepository) -> bool:
         depth_one_only = False
-        depth_one_exta_opt = repo_step.get_extra(StepGetRepositoryExtraDepthOne)
-        if depth_one_exta_opt is not None:
-            depth_one_only = depth_one_exta_opt.on_github_action_checkout
+        depth_one_extra_opt = repo_step.get_extra(StepGetRepositoryExtraDepthOne)
+        if depth_one_extra_opt is not None:
+            depth_one_only = depth_one_extra_opt.on_github_action_checkout
         return depth_one_only

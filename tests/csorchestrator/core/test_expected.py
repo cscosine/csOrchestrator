@@ -29,7 +29,7 @@ def test_expected_raise() -> None:
     unexpected_success = False
     try:
         _ = Expected()
-        unexpected_success: True
+        unexpected_success = True
     except ValueError:
         assert True
 
@@ -37,7 +37,7 @@ def test_expected_raise() -> None:
 
     try:
         _ = Expected(error=42, value=23)
-        unexpected_success: True
+        unexpected_success = True
     except ValueError:
         assert True
 

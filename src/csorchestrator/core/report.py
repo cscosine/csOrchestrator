@@ -30,7 +30,7 @@ class Report:
         self.errors.append(msg)
         return self
 
-    def append_warnings(self, msg: str) -> "Report":
+    def append_warning(self, msg: str) -> "Report":
         self.warnings.append(msg)
         return self
 

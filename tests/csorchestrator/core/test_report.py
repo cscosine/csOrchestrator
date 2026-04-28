@@ -76,7 +76,7 @@ def test_report_append_and_print(capfd):
 
 
 def test_report_append():
-    r = Report().append_error("e").append_info("i").append_warnings("w")
+    r = Report().append_error("e").append_info("i").append_warning("w")
     assert len(r.errors) == 1
     assert len(r.warnings) == 1
     assert len(r.infos) == 1

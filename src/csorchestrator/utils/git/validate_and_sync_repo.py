@@ -1,11 +1,10 @@
 from pathlib import Path
 
 from git import GitCommandError, Remote, Repo
-from git.util import IterableList
 
 from csorchestrator.core.report import Report
 from csorchestrator.step.step_get_repository import StepGetRepository
-from csorchestrator.utils.git.try_git_clone_checkout import RefKind, _resolve_ref_type
+from csorchestrator.utils.git.try_git_clone_checkout import RefKind, resolve_ref_type
 
 # -------------------------
 # helpers
@@ -24,7 +23,7 @@ def _get_current_ref(repo: Repo) -> tuple[str, str]:
     return repo.active_branch.name, repo.head.commit.hexsha
 
 
-def _resolve_default_remote(repo: Repo) -> IterableList[Remote]:
+def _resolve_default_remote(repo: Repo) -> Remote:
     if len(repo.remotes) == 0:
         raise ValueError("no remotes configured")
 
@@ -49,7 +48,7 @@ def validate_and_sync_repo(step: StepGetRepository) -> Report:
     # 1. local state
     local_ref, local_commit = _get_current_ref(repo)
 
-    local_kind = _resolve_ref_type(repo, local_ref)
+    local_kind = resolve_ref_type(repo, local_ref)
     if local_kind.error is not None:
         return Report().append_error(local_kind.error)
 
