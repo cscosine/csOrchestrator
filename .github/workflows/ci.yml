@@ -15,6 +15,11 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         python-version: ["3.11", "3.12", "3.13", "3.14"]
+        deps: ["latest"]
+        include:
+          - os: ubuntu-latest
+            python-version: "3.11"
+            deps: "minimum"
 
     steps:
       - uses: actions/checkout@v6
@@ -27,11 +32,17 @@ jobs:
             pyproject.toml
             setup.cfg
             requirements*.txt
+            constraints-minimum.txt
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -e .[dev]
+          if [ "${{ matrix.deps }}" = "minimum" ]; then
+            pip install -e .[dev] -c constraints-minimum.txt
+          else
+            pip install -e .[dev]
+          fi
+        shell: bash
 
       - name: Run pre-commit
         run: pre-commit run --all-files
@@ -45,32 +56,32 @@ jobs:
             --log-cli-level=INFO \
             --cov=csorchestrator \
             --cov-branch \
-            --cov-report=xml:coverage-${{ matrix.os }}-${{ matrix.python-version }}.xml \
-            --cov-report=html:htmlcov-${{ matrix.os }}-${{ matrix.python-version }} \
+            --cov-report=xml:coverage-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.deps }}.xml \
+            --cov-report=html:htmlcov-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.deps }} \
             --cov-report=term-missing \
-            | tee coverage-${{ matrix.os }}-${{ matrix.python-version }}.txt
+            | tee coverage-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.deps }}.txt
         shell: bash
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v6
         with:
-          files: coverage-${{ matrix.os }}-${{ matrix.python-version }}.xml
-          flags: ${{ matrix.os }}-py${{ matrix.python-version }}
-          name: ${{ matrix.os }}-py${{ matrix.python-version }}
+          files: coverage-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.deps }}.xml
+          flags: ${{ matrix.os }}-py${{ matrix.python-version }}-${{ matrix.deps }}
+          name: ${{ matrix.os }}-py${{ matrix.python-version }}-${{ matrix.deps }}
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: true
 
       - name: Upload coverage HTML as artifact
         uses: actions/upload-artifact@v6
         with:
-          name: coverage-html-${{ matrix.os }}-py${{ matrix.python-version }}
-          path: htmlcov-${{ matrix.os }}-${{ matrix.python-version }}
+          name: coverage-html-${{ matrix.os }}-py${{ matrix.python-version }}-${{ matrix.deps }}
+          path: htmlcov-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.deps }}
 
       - name: Add coverage to summary
         run: |
-          echo "## 🧪 Coverage (${{ matrix.os }} / Python ${{ matrix.python-version }})" >> $GITHUB_STEP_SUMMARY
+          echo "## 🧪 Coverage (${{ matrix.os }} / Python ${{ matrix.python-version }} / ${{ matrix.deps }})" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-          cat coverage-${{ matrix.os }}-${{ matrix.python-version }}.txt >> $GITHUB_STEP_SUMMARY
+          cat coverage-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.deps }}.txt >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
         shell: bash
