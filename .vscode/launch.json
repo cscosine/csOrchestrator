@@ -2,11 +2,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug pytest",
+      "name": "▶ Debug all tests",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
-      "args": ["-s", "--run-all", "-k tag_diff"],
+      "args": ["-s", "--run-all"],
       "justMyCode": false
     }
   ]
