@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from csorchestrator.core.report import Report
 
@@ -13,7 +13,7 @@ class OptionalResultWithReport(Generic[T]):
     """
 
     report: Report
-    result: Optional[T] = None
+    result: T | None = None
 
     def has_result(self) -> bool:
         return self.result is not None

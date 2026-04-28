@@ -1,6 +1,5 @@
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Set
 
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
@@ -12,7 +11,7 @@ from csorchestrator.step.step_get_repository import StepGetRepository, validate_
 
 @dataclass
 class OrchestratorVisitorValidator(OrchestratorVisitorBase):
-    _collected_step_get_repository_target_directories: Set[Path] = field(default_factory=set)
+    _collected_step_get_repository_target_directories: set[Path] = field(default_factory=set)
 
     def init_visit(self) -> None:
         pass

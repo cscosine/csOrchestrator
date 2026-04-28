@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Dict, Optional, Type, TypeVar
+from typing import TypeVar
 
 from git import GitCommandError, Repo
 
@@ -41,7 +41,7 @@ class StepGetRepository(StepBase):
     # - Tag, e.g. "v0.0.1"
     # - Commit hash, e.g. "9f8e7d6c5b4a3210abcd1234ef56789012345678"
 
-    _extras: Dict[type, StepGetRepositoryExtra] = field(default_factory=dict)
+    _extras: dict[type, StepGetRepositoryExtra] = field(default_factory=dict)
 
     def resolved_target_directory_path(self) -> Path:
         return resolve_path(self.target_directory)
@@ -54,7 +54,7 @@ class StepGetRepository(StepBase):
         self._extras[key] = extra
         return self
 
-    def get_extra(self, t: Type[T]) -> Optional[T]:
+    def get_extra(self, t: type[T]) -> T | None:
         extra = self._extras.get(t)
         return extra if isinstance(extra, t) else None
 

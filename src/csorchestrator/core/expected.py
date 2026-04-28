@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 T = TypeVar("T")
 E = TypeVar("E")
@@ -10,8 +10,8 @@ class Expected(Generic[T, E]):
     """A class that represents a value that can either be
     a success (with a value) or an error (with an error message)."""
 
-    value: Optional[T] = None
-    error: Optional[E] = None
+    value: T | None = None
+    error: E | None = None
 
     @classmethod
     def make_value(cls, result: T) -> "Expected[T,E]":

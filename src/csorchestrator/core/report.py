@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import List
 
 
 @dataclass
@@ -13,9 +12,9 @@ class Report:
         infos: Informational messages for debugging and transparency.
     """
 
-    errors: List[str] = field(default_factory=list)
-    warnings: List[str] = field(default_factory=list)
-    infos: List[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    infos: list[str] = field(default_factory=list)
 
     def has_errors(self) -> bool:
         return len(self.errors) > 0
@@ -65,7 +64,7 @@ class Report:
     def _print_block(
         self,
         label: str,
-        messages: List[str],
+        messages: list[str],
         color: str,
         bold: bool = False,
     ) -> None:

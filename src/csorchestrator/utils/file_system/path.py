@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 
 def is_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> bool:
@@ -9,7 +8,7 @@ def is_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> bool:
     return False
 
 
-def try_parse_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> Optional[Path]:
+def try_parse_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> Path | None:
     p = Path(path_str)
 
     if p.is_absolute():

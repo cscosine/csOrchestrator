@@ -1,15 +1,14 @@
 from dataclasses import dataclass
-from typing import List
 
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 
-OrchestratorExecutorVisitReports = List[List[Report]]  # a list of reports of each step per each phase,
+OrchestratorExecutorVisitReports = list[list[Report]]  # a list of reports of each step per each phase,
 
 
 def flatten_orchestrator_executor_visit_reports(oevr: OrchestratorExecutorVisitReports) -> Report:
-    rl: List[Report] = [report for phase_reports in oevr for report in phase_reports]
+    rl: list[Report] = [report for phase_reports in oevr for report in phase_reports]
     r = Report()
     for report in rl:
         r.append_report(report)
@@ -31,7 +30,7 @@ class OrchestratorExecutor:
 
         visitor.init_visit()
         for phase in self.orchestrator.phases:
-            phase_reports: List[Report] = []
+            phase_reports: list[Report] = []
             phase_complete: bool = True
 
             visitor.begin_phase(phase)
