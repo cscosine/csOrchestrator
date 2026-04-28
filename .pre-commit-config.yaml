@@ -18,7 +18,15 @@ repos:
         exclude: ^tests/
 
   - repo: local
-    hooks:
+    hooks:  
+
+      - id: generate-vscode-launch
+        name: Generate VS Code launch configs
+        entry: python
+        args: ["tools/generate_vscode_launch.py"]
+        language: system
+        pass_filenames: false
+
       - id: no-unstaged-changes
         name: Fail if unstaged changes exist
         entry: git diff --quiet
