@@ -8,18 +8,25 @@ csOrchestrator is a centralized project manager
 
 ```
 csOrchestrator/
-├── src/
-│   └── csorchestrator/         # the csorchestrator package
-│       ├── __init__.py
-│       ├── cli.py              # Command-line interface
-├── tests/                      # Pytest test suites (excluded from linting)
-├── conftest.py                 # Add src/ to python path to execute tests with `pytest`
-├── pyproject.toml              # Project metadata & tool configuration
-├── .pre-commit-config.yaml     # Pre-commit hooks
-├── .github/workflows/ci.yml    # GitHub Actions CI pipeline
-├── .gitignore                  # Git ignore patterns
-├── .gitattributes              # Git attributes for line endings
-└── README.md                   # This file
+├── src/csorchestrator/              # installable package (src-layout)
+│   ├── core/                        # generic building blocks (Report, Expected, etc.)
+│   ├── orchestrator/                # orchestrator engine, phases, steps, visitor base
+│   ├── visitors/                    # concrete visitor implementations (validator, executor)
+│   ├── step/                        # step type definitions (git clone, cmake, echo, etc.)
+│   ├── context/                     # execution context (local, GitHub Actions)
+│   ├── utils/                       # helpers (file-system, git operations)
+│   ├── cli.py                       # command-line entry point
+│   └── py.typed                     # PEP 561 type-annotation marker
+├── tests/                           # pytest suites mirroring src/ (excluded from linting)
+├── .github/workflows/ci.yml         # GitHub Actions CI pipeline
+├── conftest.py                      # pytest custom markers (slow, git) and CLI flags
+├── pyproject.toml                   # project metadata, deps, and tool config (ruff, mypy, pytest)
+├── constraints-minimum.txt          # pinned minimum dependency versions for CI
+├── .pre-commit-config.yaml          # pre-commit hooks (ruff, mypy, unstaged-changes check)
+├── .gitignore                       # git ignore patterns
+├── .gitattributes                   # line-ending normalization
+├── LICENSE                          # MIT license
+└── README.md                        # this file
 ```
 
 ---
@@ -180,8 +187,16 @@ The csOrchestrator logic is a installable package in `src/csorchestrator/`. This
 
 ```
 src/csorchestrator/
-├── core/                 # Core lib
-TODO 
+├── core/                        # generic types: Report, Expected[T,E], OptionalResultWithReport[T]
+├── orchestrator/                # engine: Orchestrator, Phase, StepBase, OrchestratorExecutor, visitor base
+├── visitors/                    # concrete visitors: validator, local executor
+├── step/                        # step definitions: get_repository, cmake, custom_command, echo, etc.
+├── context/                     # execution contexts: local filesystem, GitHub Actions
+├── utils/
+│   ├── file_system/             # path validation, directory creation
+│   └── git/                     # clone/checkout, repo sync helpers
+├── cli.py                       # CLI entry point (registered as console_script)
+└── py.typed                     # PEP 561 marker for downstream type checkers
 ```
 
 **Why src-layout?** It prevents import shadowing (ensures `import csorchestrator` always loads the installed package, not a local directory) and makes the structure explicit.
