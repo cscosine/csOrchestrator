@@ -22,12 +22,9 @@ def _get_current_ref(repo: Repo) -> tuple[str, str]:
     return repo.active_branch.name, repo.head.commit.hexsha
 
 
-def _resolve_default_remote(repo: Repo) -> Remote:
+def _resolve_default_remote(repo: Repo) -> Remote | None:
     if len(repo.remotes) == 0:
-        raise ValueError("no remotes configured")
-
-    if "origin" in repo.remotes:
-        return repo.remotes["origin"]
+        return None
 
     return repo.remotes[0]
 
@@ -37,10 +34,11 @@ def _resolve_default_remote(repo: Repo) -> Remote:
 # -------------------------
 
 
-def validate_and_sync_repo(repo_url: str, repo_ref: str, target_directory: str) -> Report:
-    # TODO: add a check that repo_url is the same!!
-
-    repo = Repo(Path(target_directory))
+def validate_and_sync_repo(repo_url: str, repo_ref: str, target_path: Path) -> Report:
+    try:
+        repo = Repo(target_path)
+    except Exception as e:
+        return Report().append_error(f"{type(e).__name__}: {e}")
 
     # 0. dirty check (fail early)
     if repo.is_dirty(untracked_files=True):
@@ -54,26 +52,22 @@ def validate_and_sync_repo(repo_url: str, repo_ref: str, target_directory: str) 
         return Report().append_error(local_kind.error)
 
     # 2. remote
-    try:
-        remote = _resolve_default_remote(repo)
-    except ValueError as e:
-        return Report().append_error(str(e))
+    remote_opt = _resolve_default_remote(repo)
+    if remote_opt is None:
+        return Report().append_error("Repo in {str(target_path)} has no remote")
+    remote = remote_opt
+
+    is_shallow = repo.git.rev_parse(is_shallow_repository=True).strip() == "true"
 
     try:
-        is_shallow = repo.git.rev_parse("--is-shallow-repository") == "true"
-    except Exception as e:
-        return Report().append_error(str(e))
-
-    try:
-        remote.fetch("--update-shallow")
+        remote.fetch(update_shallow=True)
 
         # direct branch reference on remote
         if repo_ref in remote.refs:
             remote_commit = remote.refs[repo_ref].commit.hexsha
         else:
             # fallback: tags or direct commit
-            repo = remote.repo
-            remote_commit = repo.commit(repo_ref).hexsha
+            remote_commit = remote.repo.commit(repo_ref).hexsha
 
     except Exception as e:
         return Report().append_error(f"remote resolution failed: {e}")
@@ -81,6 +75,10 @@ def validate_and_sync_repo(repo_url: str, repo_ref: str, target_directory: str) 
     # 3. ref consistency (name check)
     if local_kind.value != RefKind.COMMIT and local_ref != repo_ref:
         return Report().append_error(f"local ref '{local_ref}' != expected '{repo_ref}'")
+
+    # 6. is the repo still the same url
+    if remote.url != repo_url:
+        return Report().append_error(f"requested url '{repo_url}' != expected '{remote.url}'")
 
     # -------------------------
     # 4. BRANCH logic
@@ -93,11 +91,11 @@ def validate_and_sync_repo(repo_url: str, repo_ref: str, target_directory: str) 
                 if is_shallow:
                     # shallow repos may require deeper fetch for FF safety
                     try:
-                        repo.git.fetch("--unshallow")
+                        repo.git.fetch(unshallow=True)
                     except GitCommandError:
                         pass  # not always supported
 
-                repo.git.pull("--ff-only")
+                repo.git.pull(ff_only=True)
 
             except GitCommandError as e:
                 return Report().append_error(f"fast-forward failed (shallow={is_shallow}): {e}")
@@ -111,7 +109,7 @@ def validate_and_sync_repo(repo_url: str, repo_ref: str, target_directory: str) 
         # shallow repos may not have full object graph
         if is_shallow:
             try:
-                remote.fetch("--depth=1", repo_ref)
+                remote.fetch(refspec=repo_ref, depth=1)
             except Exception:
                 pass
 

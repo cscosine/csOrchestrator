@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 def _check_status(target_path: Path, expected_content: str) -> None:
-    with open(target_path / "STATUS.txt", "r", encoding="utf-8") as f:
+    cfg = RepoTestData()
+    with open(target_path / cfg.file_to_verify, "r", encoding="utf-8") as f:
         first_line = f.readline().strip()
 
     assert first_line == expected_content
