@@ -1,0 +1,34 @@
+from dataclasses import dataclass
+
+
+@dataclass(frozen=True)
+class RepoTestData:
+    main_branch: str = "main"
+    origin_main_branch: str = "origin/main"
+    dev_branch: str = "dev"
+    tag: str = "v1.0.0"
+    non_existing_ref: str = "ref_does_not_exists"
+    head: str = "HEAD"
+    initial_commit_sha: str = "63219a96b3d39cec4252791b49cfa215002487f2"
+    refs_heads_main: str = "refs/heads/main"
+    refs_remote_origin_main: str = "refs/remotes/origin/main"
+
+    destination_folder: str = "csOrchestratorTestRepo"
+
+    file_to_verify: str = "STATUS.txt"
+    expected_content_main: str = "tag"
+    expected_content_tag: str = "tag"
+    expected_content_dev: str = "dev"
+    expected_content_initial: str = "initial"
+
+    # if the test is executed on github actions, we need a token to access it
+    # "ACTIONS_ORG_ACCESS" needs to be in the secrets of the csOrchestratorTestRepo
+    # and in the pytest job config as
+    #      - name: Run tests with coverage
+    #        env:
+    #          ACTIONS_ORG_ACCESS: ${{ secrets.ACTIONS_ORG_ACCESS }}
+    #        run: |
+    #          pytest [...]
+    token_name: str = "ACTIONS_ORG_ACCESS"
+    https_url_template: str = "https://{token}@github.com/cscosine/csOrchestratorTestRepo.git"
+    ssh_url: str = "git@github.com:cscosine/csOrchestratorTestRepo.git"
