@@ -1,4 +1,11 @@
-# __init__.py
-"""Top-level package for csorchestrator."""
+"""Git utilities: clone, checkout, sync."""
 
-__version__ = "0.1.0"
+from csorchestrator.utils.git.try_git_clone_checkout import RefKind, resolve_ref_type, try_git_clone_checkout
+from csorchestrator.utils.git.validate_and_sync_repo import validate_and_sync_repo
+
+__all__ = [
+    "RefKind",
+    "resolve_ref_type",
+    "try_git_clone_checkout",
+    "validate_and_sync_repo",
+]
