@@ -1,123 +1,111 @@
 from pathlib import Path
+from tempfile import TemporaryDirectory
 
-from git import GitCommandError, Remote, Repo
+from git import GitCommandError, InvalidGitRepositoryError, NoSuchPathError, Repo
 
 from csorchestrator.core.report import Report
-from csorchestrator.utils.git.try_git_clone_checkout import RefKind, resolve_ref_type
-
-# -------------------------
-# helpers
-# -------------------------
-
-
-def _get_current_ref(repo: Repo) -> tuple[str, str]:
-    """
-    Returns (ref_name, commit_sha)
-    If detached HEAD, ref_name is commit SHA.
-    """
-    if repo.head.is_detached:
-        sha = repo.head.commit.hexsha
-        return sha, sha
-
-    return repo.active_branch.name, repo.head.commit.hexsha
-
-
-def _resolve_default_remote(repo: Repo) -> Remote | None:
-    if len(repo.remotes) == 0:
-        return None
-
-    return repo.remotes[0]
-
-
-# -------------------------
-# main logic
-# -------------------------
+from csorchestrator.utils.git.try_git_clone_checkout import RefKind, resolve_ref_type, try_git_clone_checkout
 
 
 def validate_and_sync_repo(repo_url: str, repo_ref: str, target_path: Path) -> Report:
+    report = Report()
+
+    # --- 1. Validate repo exists ---
     try:
         repo = Repo(target_path)
-    except Exception as e:
-        return Report().append_error(f"{type(e).__name__}: {e}")
+    except (InvalidGitRepositoryError, NoSuchPathError):
+        report.append_error(f"{target_path} is not a valid git repository")
+        return report
 
-    # 0. dirty check (fail early)
+    if repo.bare:
+        report.append_error("Repository is bare, expected a working tree")
+        return report
+
+    # --- 2. Check dirty state ---
     if repo.is_dirty(untracked_files=True):
-        return Report().append_error("working tree is dirty (modified or untracked files present)")
+        report.append_error("Repository has uncommitted or untracked changes")
+        return report
 
-    # 1. local state
-    local_ref, local_commit = _get_current_ref(repo)
+    # --- 3. Clone reference repo in temp dir ---
+    with TemporaryDirectory() as tmp_dir:
+        tmp_path = Path(tmp_dir)
 
-    local_kind = resolve_ref_type(repo, local_ref)
-    if local_kind.error is not None:
-        return Report().append_error(local_kind.error)
+        clone_report = try_git_clone_checkout(repo_url, repo_ref, tmp_path, depth_one=True)
+        if clone_report.has_errors():
+            return clone_report
 
-    # 2. remote
-    remote_opt = _resolve_default_remote(repo)
-    if remote_opt is None:
-        return Report().append_error("Repo in {str(target_path)} has no remote")
-    remote = remote_opt
+        tmp_repo = Repo(tmp_path)
 
-    is_shallow = repo.git.rev_parse(is_shallow_repository=True).strip() == "true"
-
-    try:
-        remote.fetch(update_shallow=True)
-
-        # direct branch reference on remote
-        if repo_ref in remote.refs:
-            remote_commit = remote.refs[repo_ref].commit.hexsha
-        else:
-            # fallback: tags or direct commit
-            remote_commit = remote.repo.commit(repo_ref).hexsha
-
-    except Exception as e:
-        return Report().append_error(f"remote resolution failed: {e}")
-
-    # 3. ref consistency (name check)
-    if local_kind.value != RefKind.COMMIT and local_ref != repo_ref:
-        return Report().append_error(f"local ref '{local_ref}' != expected '{repo_ref}'")
-
-    # 6. is the repo still the same url
-    if remote.url != repo_url:
-        return Report().append_error(f"requested url '{repo_url}' != expected '{remote.url}'")
-
-    # -------------------------
-    # 4. BRANCH logic
-    # -------------------------
-    if local_kind.value == RefKind.BRANCH:
-        if local_commit != remote_commit:
+        try:
+            # --- 4. Compare remotes ---
+            tmp_url = next(tmp_repo.remote().urls)
             try:
-                repo.git.checkout(repo_ref)
-
-                if is_shallow:
-                    # shallow repos may require deeper fetch for FF safety
-                    try:
-                        repo.git.fetch(unshallow=True)
-                    except GitCommandError:
-                        pass  # not always supported
-
-                repo.git.pull(ff_only=True)
-
-            except GitCommandError as e:
-                return Report().append_error(f"fast-forward failed (shallow={is_shallow}): {e}")
-
-        return Report().append_info("branch synced")
-
-    # -------------------------
-    # 5. TAG / COMMIT logic
-    # -------------------------
-    if local_kind.value in (RefKind.TAG, RefKind.COMMIT):
-        # shallow repos may not have full object graph
-        if is_shallow:
-            try:
-                remote.fetch(refspec=repo_ref, depth=1)
+                local_url = next(repo.remote().urls)
             except Exception:
-                pass
+                report.append_error("Failed to read remote URL")
+                return report
 
-        if local_commit != remote_commit:
-            return Report().append_error(
-                f"{local_kind.value} mismatch (shallow={is_shallow}): local={local_commit}, remote={remote_commit}"
-            )
+            if local_url != tmp_url:
+                report.append_error(f"Remote URL mismatch: local={local_url}, expected={tmp_url}")
+                return report
 
-        return Report().append_info(f"{local_kind.value} verified")
+            # --- 5. Resolve commits ---
+            try:
+                local_commit = repo.head.commit
+                tmp_commit = tmp_repo.head.commit
+            except Exception:
+                report.append_error("Failed to resolve HEAD commit")
+                return report
 
-    return Report().append_error("unsupported ref type")
+            # --- 6. Detect ref type ---
+
+            ref_type = resolve_ref_type(tmp_repo, repo_ref)
+
+            # --- 7. Compare depending on ref type ---
+            if ref_type == RefKind.COMMIT or ref_type == RefKind.TAG:
+                if local_commit.hexsha != tmp_commit.hexsha:
+                    report.append_error(
+                        f"{ref_type} mismatch: local={local_commit.hexsha}, expected={tmp_commit.hexsha}"
+                    )
+                    return report
+
+            elif ref_type == RefKind.BRANCH:
+                # Check branch names
+                try:
+                    current_branch = repo.active_branch.name
+                    tmp_branch = tmp_repo.active_branch.name
+                except TypeError:
+                    report.append_error("Detached HEAD, expected a branch")
+                    return report
+
+                if current_branch != tmp_branch:
+                    report.append_error(f"Branch mismatch: local={current_branch}, expected={tmp_branch}")
+                    return report
+
+                # --- Fast-forward check ---
+                try:
+                    base = repo.git.merge_base(local_commit.hexsha, tmp_commit.hexsha).strip()
+                except GitCommandError:
+                    report.append_error("Failed to compute merge base")
+                    return report
+
+                if base != local_commit.hexsha:
+                    report.append_error("Local branch is not fast-forwardable")
+                    return report
+
+                # --- Perform fast-forward ---
+                try:
+                    repo.git.merge("--ff-only", tmp_commit.hexsha)
+                except GitCommandError:
+                    report.append_error("Fast-forward merge failed")
+                    return report
+
+            else:
+                report.append_error(f"Unknown ref type for {repo_ref}")
+                return report
+
+        finally:
+            # ensure to close files, important in windows
+            tmp_repo.close()
+
+    return report

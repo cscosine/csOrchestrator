@@ -3,7 +3,6 @@ from pathlib import Path
 
 from git import GitCommandError, Repo
 
-from csorchestrator.core.expected import Expected
 from csorchestrator.core.report import Report
 
 
@@ -25,24 +24,17 @@ def _report_git_command_error(report: Report, e: GitCommandError) -> None:
     )
 
 
-def resolve_ref_type(repo: Repo, ref: str) -> Expected[RefKind, str]:
+def resolve_ref_type(repo: Repo, ref: str) -> RefKind:
 
     # 1. BRANCH
     if ref in repo.heads:
-        return Expected[RefKind, str].make_value(RefKind.BRANCH)
+        return RefKind.BRANCH
 
     # 2. TAG
     if ref in repo.tags:
-        return Expected[RefKind, str].make_value(RefKind.TAG)
+        return RefKind.TAG
 
-    # 3. COMMIT
-    commit = repo.commit(ref)
-    sha = commit.hexsha
-
-    if ref == sha:
-        return Expected[RefKind, str].make_value(RefKind.COMMIT)
-    else:
-        return Expected[RefKind, str].make_error(f"repo reference {ref} differs from expected {sha} commit")
+    return RefKind.COMMIT
 
 
 def try_git_clone_checkout(repo_url: str, repo_ref: str, target_path: Path, depth_one: bool) -> Report:
@@ -66,11 +58,21 @@ def try_git_clone_checkout(repo_url: str, repo_ref: str, target_path: Path, dept
         # -------------------------
         # TYPE-SAFE RESOLUTION
         # -------------------------
-        ref_kind_expected = resolve_ref_type(repo, repo_ref)
-        if ref_kind_expected.error is not None:
-            return Report().append_error(ref_kind_expected.error)
+        ref_kind = resolve_ref_type(repo, repo_ref)
 
-        return Report().append_info(f"Successfully cloned from {repo_url} to {target_path}")
+        # if tag or branch OK, if commit let's check
+        if ref_kind == RefKind.BRANCH or ref_kind == RefKind.TAG:
+            pass
+        elif ref_kind == RefKind.COMMIT:
+            commit = repo.commit(repo_ref)
+            sha = commit.hexsha
+
+            if repo_ref != sha:
+                return Report().append_error(f"repo reference {repo_ref} differs from expected {sha} commit")
+        else:
+            return Report().append_error(f"Unknown ref type for {repo_ref}")
+
+        return Report().append_info(f"Successfully cloned from {repo_url} ref {repo_ref} to {target_path}")
 
     except GitCommandError as e:
         report = Report()
