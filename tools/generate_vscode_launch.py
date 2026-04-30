@@ -1,110 +1,103 @@
 import json
 import subprocess
+import sys
 from collections import defaultdict
 from pathlib import Path, PurePosixPath
 
+LAUNCH_PATH = Path(".vscode/launch.json")
 
-# ----------------------------
-# Normalize EVERYTHING to POSIX
-# ----------------------------
+
 def normalize_nodeid(nodeid: str) -> tuple[str, str]:
+    """Split a pytest node id into (posix_file_stem, test_part)."""
     file_part, test_part = nodeid.split("::", 1)
-
-    # force POSIX separators FIRST (critical)
     file_part = file_part.replace("\\", "/")
-
-    # convert to POSIX path object (never OS-dependent Path here)
     file_clean = str(PurePosixPath(file_part).with_suffix(""))
-
     return file_clean, test_part
 
 
-# ----------------------------
-# Run pytest collection
-# ----------------------------
-result = subprocess.run(["pytest", "--collect-only", "-q"], capture_output=True, text=True)
+def collect_tests() -> list[tuple[str, str, str]]:
+    result = subprocess.run(
+        ["pytest", "--collect-only", "-q"],
+        capture_output=True,
+        text=True,
+    )
+    lines = result.stdout.splitlines()
+    tests = {line.strip() for line in lines if "::" in line and not line.startswith("=")}
 
-lines = result.stdout.splitlines()
+    normalized = []
+    for t in tests:
+        file_clean, test_part = normalize_nodeid(t)
+        normalized.append((file_clean, test_part, t))
 
-tests = {line.strip() for line in lines if "::" in line and not line.startswith("=")}
+    normalized.sort(key=lambda x: (x[0], x[1]))
+    return normalized
 
-# ----------------------------
-# Normalize tests
-# ----------------------------
-normalized = []
 
-for t in tests:
-    file_clean, test_part = normalize_nodeid(t)
-    normalized.append((file_clean, test_part, t))
+def build_configs(normalized: list[tuple[str, str, str]]) -> list[dict[str, object]]:
+    by_folder: dict[str, list[str]] = defaultdict(list)
+    for file_clean, _, raw in normalized:
+        folder = str(PurePosixPath(file_clean).parent)
+        by_folder[folder].append(raw)
 
-# stable cross-platform ordering
-normalized.sort(key=lambda x: (x[0], x[1]))
+    configs: list[dict[str, object]] = []
 
-# ----------------------------
-# Group by folder (POSIX ONLY)
-# ----------------------------
-by_folder = defaultdict(list)
-
-for file_clean, _, raw in normalized:
-    folder = str(PurePosixPath(file_clean).parent)
-    by_folder[folder].append(raw)
-
-# ----------------------------
-# Build configs
-# ----------------------------
-configs = []
-
-# 1. global config
-configs.append(
-    {
-        "name": "▶ Debug all tests",
-        "type": "debugpy",
-        "request": "launch",
-        "module": "pytest",
-        "args": ["-s"],
-        "justMyCode": False,
-    }
-)
-
-# ----------------------------
-# 2. per-folder configs FIRST
-# ----------------------------
-for folder in sorted(by_folder.keys()):
     configs.append(
         {
-            "name": f"📁 {folder} tests",
+            "name": "▶ Debug all tests",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
-            "args": [folder],
+            "args": ["-s"],
             "justMyCode": False,
         }
     )
 
-# ----------------------------
-# 3. per-test configs AFTER
-# ----------------------------
-for file_clean, test_part, raw in normalized:
-    # display MUST stay POSIX (no Path() anywhere here)
-    display_file = file_clean
+    for folder in sorted(by_folder.keys()):
+        configs.append(
+            {
+                "name": f"📁 {folder} tests",
+                "type": "debugpy",
+                "request": "launch",
+                "module": "pytest",
+                "args": [folder],
+                "justMyCode": False,
+            }
+        )
 
-    configs.append(
-        {
-            "name": f"🧪 {display_file} → {test_part}",
-            "type": "debugpy",
-            "request": "launch",
-            "module": "pytest",
-            "args": [raw],
-            "justMyCode": False,
-        }
-    )
+    for file_clean, test_part, raw in normalized:
+        configs.append(
+            {
+                "name": f"🧪 {file_clean} → {test_part}",
+                "type": "debugpy",
+                "request": "launch",
+                "module": "pytest",
+                "args": [raw],
+                "justMyCode": False,
+            }
+        )
 
-# ----------------------------
-# Write launch.json
-# ----------------------------
-Path(".vscode").mkdir(exist_ok=True)
+    return configs
 
-with open(".vscode/launch.json", "w", encoding="utf-8") as f:
-    json.dump({"version": "0.2.0", "configurations": configs}, f, indent=2)
 
-print(f"Generated {len(configs)} debug configurations")
+def main() -> int:
+    normalized = collect_tests()
+    configs = build_configs(normalized)
+
+    new_content = json.dumps({"version": "0.2.0", "configurations": configs}, indent=2)
+
+    LAUNCH_PATH.parent.mkdir(exist_ok=True)
+
+    if LAUNCH_PATH.exists():
+        old_content = LAUNCH_PATH.read_text(encoding="utf-8")
+        if old_content == new_content:
+            print(f"launch.json is up to date ({len(configs)} configurations)")
+            return 0
+
+    LAUNCH_PATH.write_text(new_content, encoding="utf-8")
+    print(f"launch.json was out of date — updated with {len(configs)} configurations.")
+    print("Please stage .vscode/launch.json and re-commit.")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
