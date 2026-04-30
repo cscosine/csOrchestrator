@@ -62,7 +62,7 @@ def test_is_clean_relative_path() -> None:
     assert try_parse_clean_relative_path("data/../", avoid_leaving_base=True) is not None
 
 
-def test_resolve_exception_try_parse_clean_relative_path(monkeypatch):
+def test_resolve_exception_try_parse_clean_relative_path(monkeypatch: pytest.MonkeyPatch) -> None:
     def boom(self, *args, **kwargs):
         raise OSError("forced failure")
 

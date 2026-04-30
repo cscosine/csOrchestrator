@@ -1,3 +1,7 @@
+from pathlib import Path
+
+import pytest
+
 from csorchestrator.context.context_local_execution import create_context_local_execution
 
 
@@ -7,7 +11,7 @@ def test_create_context_empty_path_invalid() -> None:
     assert cr.report.has_errors()
 
 
-def test_local_path(tmp_path, monkeypatch) -> None:
+def test_local_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     # change local directory to tmp_path
     monkeypatch.chdir(tmp_path)
 
@@ -15,4 +19,5 @@ def test_local_path(tmp_path, monkeypatch) -> None:
 
     assert cr.has_result()
     assert not cr.report.has_errors()
+    assert cr.result is not None
     assert cr.result.base_folder_path == tmp_path.resolve()

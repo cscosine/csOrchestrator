@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from csorchestrator.utils.git.try_git_clone_checkout import try_git_clone_checkout
+from tests.csorchestrator.utils.git.conftest import RepoRuntimeConfig
 from tests.csorchestrator.utils.git.repo_config import RepoTestData
 
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +21,7 @@ def _check_status(target_path: Path, expected_content: str) -> None:
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_full_depth_branch_main(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_full_depth_branch_main(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -38,7 +39,7 @@ def test_simple_clone_full_depth_branch_main(tmp_path, repo_runtime_config) -> N
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_depth_one_branch_main(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_depth_one_branch_main(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -56,7 +57,7 @@ def test_simple_clone_depth_one_branch_main(tmp_path, repo_runtime_config) -> No
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_full_depth_branch_dev(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_full_depth_branch_dev(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -77,7 +78,7 @@ def test_simple_clone_full_depth_branch_dev(tmp_path, repo_runtime_config) -> No
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_depth_one_branch_dev(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_depth_one_branch_dev(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -98,7 +99,7 @@ def test_simple_clone_depth_one_branch_dev(tmp_path, repo_runtime_config) -> Non
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_full_depth_tag(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_full_depth_tag(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -116,7 +117,7 @@ def test_simple_clone_full_depth_tag(tmp_path, repo_runtime_config) -> None:
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_depth_one_tag(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_depth_one_tag(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -134,7 +135,7 @@ def test_simple_clone_depth_one_tag(tmp_path, repo_runtime_config) -> None:
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_full_depth_sha(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_full_depth_sha(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -155,7 +156,7 @@ def test_simple_clone_full_depth_sha(tmp_path, repo_runtime_config) -> None:
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_depth_one_sha(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_depth_one_sha(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -177,7 +178,7 @@ def test_simple_clone_depth_one_sha(tmp_path, repo_runtime_config) -> None:
 # not allowed cases
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_full_depth_non_existing_ref(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_full_depth_non_existing_ref(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -197,7 +198,7 @@ def test_simple_clone_full_depth_non_existing_ref(tmp_path, repo_runtime_config)
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_depth_one_non_existing_ref(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_depth_one_non_existing_ref(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -217,7 +218,7 @@ def test_simple_clone_depth_one_non_existing_ref(tmp_path, repo_runtime_config) 
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_full_depth_branch_origin_main(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_full_depth_branch_origin_main(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -237,7 +238,7 @@ def test_simple_clone_full_depth_branch_origin_main(tmp_path, repo_runtime_confi
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_depth_one_branch_origin_main(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_depth_one_branch_origin_main(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -257,7 +258,7 @@ def test_simple_clone_depth_one_branch_origin_main(tmp_path, repo_runtime_config
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_full_depth_HEAD(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_full_depth_HEAD(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -274,7 +275,7 @@ def test_simple_clone_full_depth_HEAD(tmp_path, repo_runtime_config) -> None:
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_depth_one_HEAD(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_depth_one_HEAD(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -291,7 +292,7 @@ def test_simple_clone_depth_one_HEAD(tmp_path, repo_runtime_config) -> None:
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_full_depth_refs_heads_main(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_full_depth_refs_heads_main(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -311,7 +312,7 @@ def test_simple_clone_full_depth_refs_heads_main(tmp_path, repo_runtime_config) 
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_depth_one_refs_heads_main(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_depth_one_refs_heads_main(tmp_path: Path, repo_runtime_config: RepoRuntimeConfig) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -331,7 +332,9 @@ def test_simple_clone_depth_one_refs_heads_main(tmp_path, repo_runtime_config) -
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_full_depth_repo_refs_remote_origin_main(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_full_depth_repo_refs_remote_origin_main(
+    tmp_path: Path, repo_runtime_config: RepoRuntimeConfig
+) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -351,7 +354,9 @@ def test_simple_clone_full_depth_repo_refs_remote_origin_main(tmp_path, repo_run
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_simple_clone_depth_one_repo_refs_remote_origin_main(tmp_path, repo_runtime_config) -> None:
+def test_simple_clone_depth_one_repo_refs_remote_origin_main(
+    tmp_path: Path, repo_runtime_config: RepoRuntimeConfig
+) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder

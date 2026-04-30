@@ -13,7 +13,7 @@ def test_empty_path_invalid() -> None:
     assert cr.report.has_errors()
 
 
-def test_creates_directory(tmp_path) -> None:
+def test_creates_directory(tmp_path: Path) -> None:
     target = tmp_path / "new_dir"
 
     cr = ensure_directory_exists_or_create_and_is_usable(str(target))
@@ -25,7 +25,7 @@ def test_creates_directory(tmp_path) -> None:
     assert target.is_dir()
 
 
-def test_local_path(tmp_path, monkeypatch) -> None:
+def test_local_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     # change local directory to tmp_path
     monkeypatch.chdir(tmp_path)
 
@@ -36,7 +36,7 @@ def test_local_path(tmp_path, monkeypatch) -> None:
     assert cr.result == tmp_path.resolve()
 
 
-def test_relative_path(tmp_path, monkeypatch) -> None:
+def test_relative_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     # change local directory to tmp_path
     monkeypatch.chdir(tmp_path)
 
@@ -47,7 +47,7 @@ def test_relative_path(tmp_path, monkeypatch) -> None:
     assert cr.result == (tmp_path / "relative_dir").resolve()
 
 
-def test_expand_user_and_env(tmp_path, monkeypatch) -> None:
+def test_expand_user_and_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("TEST_DIR", str(tmp_path))
 
     cr = ensure_directory_exists_or_create_and_is_usable("$TEST_DIR/env_dir")
@@ -57,7 +57,7 @@ def test_expand_user_and_env(tmp_path, monkeypatch) -> None:
     assert cr.result == (tmp_path / "env_dir").resolve()
 
 
-def test_existing_directory(tmp_path) -> None:
+def test_existing_directory(tmp_path: Path) -> None:
     target = tmp_path / "existing"
     target.mkdir()
 
@@ -73,7 +73,7 @@ def test_existing_directory(tmp_path) -> None:
     assert cr1.result == cr2.result
 
 
-def test_path_is_file_dir_creation_fails(tmp_path) -> None:
+def test_path_is_file_dir_creation_fails(tmp_path: Path) -> None:
     file_path = tmp_path / "file.txt"
     file_path.write_text("data")
 
@@ -83,7 +83,7 @@ def test_path_is_file_dir_creation_fails(tmp_path) -> None:
     assert "Failed to create directory" in str(cr.report.errors[0])
 
 
-def test_path_is_file_dir_creation_patched(monkeypatch, tmp_path) -> None:
+def test_path_is_file_dir_creation_patched(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     file_path = tmp_path / "file.txt"
     file_path.write_text("data")
 
@@ -99,19 +99,22 @@ def test_path_is_file_dir_creation_patched(monkeypatch, tmp_path) -> None:
     assert "not a directory" in str(cr.report.errors[0])
 
 
-def test_directory_is_writable(tmp_path) -> None:
+def test_directory_is_writable(tmp_path: Path) -> None:
     cr = ensure_directory_exists_or_create_and_is_usable(str(tmp_path / "writable"))
     assert cr.has_result()
     assert not cr.report.has_errors()
 
-    test_file = cr.result / "test.txt"
+    assert cr.result is not None
+    result_path = cr.result
+
+    test_file = result_path / "test.txt"
     test_file.write_text("hello")
 
     assert test_file.exists()
 
 
 @pytest.mark.skipif(os.name == "nt", reason="Permission test unreliable on Windows")
-def test_permission_error(tmp_path) -> None:
+def test_permission_error(tmp_path: Path) -> None:
     target = tmp_path / "restricted"
     target.mkdir()
 
@@ -127,7 +130,7 @@ def test_permission_error(tmp_path) -> None:
 
 
 # test that a a resolution failure with env variable fail is hard, let's do it via mocking
-def test_resolve_failure(monkeypatch) -> None:
+def test_resolve_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     def fake_resolve(self):
         raise RuntimeError("resolution failed")
 

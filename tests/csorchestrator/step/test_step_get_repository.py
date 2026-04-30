@@ -34,12 +34,19 @@ def test_step_get_repository():
     assert s.get_extra(StepGetRepositoryExtra) is None
     assert s.get_extra(StepGetRepositoryExtraNotUsed) is None
 
-    assert s.get_extra(StepGetRepositoryExtraAccessToken).token_name == "THE_TOKEN"
-    assert s.get_extra(StepGetRepositoryExtraCustom).value == 25
+    token_extra = s.get_extra(StepGetRepositoryExtraAccessToken)
+    assert token_extra is not None
+    assert token_extra.token_name == "THE_TOKEN"
+
+    custom_extra = s.get_extra(StepGetRepositoryExtraCustom)
+    assert custom_extra is not None
+    assert custom_extra.value == 25
 
     # substitute
     s.add_extra(StepGetRepositoryExtraCustom(52))
-    assert s.get_extra(StepGetRepositoryExtraCustom).value == 52
+    custom_extra = s.get_extra(StepGetRepositoryExtraCustom)
+    assert custom_extra is not None
+    assert custom_extra.value == 52
 
 
 def test_validate_step_get_repository() -> None:

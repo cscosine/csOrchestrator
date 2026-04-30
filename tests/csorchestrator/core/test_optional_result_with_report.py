@@ -2,13 +2,13 @@ from csorchestrator.core.optional_result_with_report import OptionalResultWithRe
 from csorchestrator.core.report import Report
 
 
-def test_optional_result_with_report():
+def test_optional_result_with_report() -> None:
     report = Report()
     report.errors.append("fail")
     report.warnings.append("be careful")
     report.infos.append("info")
 
-    report_without_result = OptionalResultWithReport.createReport(report)
+    report_without_result: OptionalResultWithReport[int] = OptionalResultWithReport.createReport(report)
     assert not report_without_result.has_result()
 
     assert report_without_result.result_or(33) == 33

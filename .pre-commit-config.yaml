@@ -1,4 +1,4 @@
-fail_fast: true
+fail_fast: false # using true is too annoying in development
 
 repos:
   # run pre-commit autoupdate to update these versions
@@ -38,7 +38,6 @@ repos:
           [
             "--config-file=pyproject.toml",
           ]
-        exclude: ^tests/
 
   - repo: local
     hooks:

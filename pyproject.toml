@@ -77,14 +77,15 @@ strict = true
 # Many libraries don't ship with typing, so this avoids noise.
 ignore_missing_imports = true
 
-# Exclude test files from type checking
-exclude = [
-    "^tests/",
-]
-
 # Treat src/ as a real package root. Do not auto-guess.
 explicit_package_bases = true
 namespace_packages = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
 
 # ===============================
 # pytest - test execution
