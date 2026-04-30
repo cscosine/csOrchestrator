@@ -35,6 +35,25 @@ csOrchestrator/
 
 ### ⚡ Quick Start
 
+#### Fastest Way (Using Setup Scripts)
+
+**Linux/macOS:**
+```bash
+./setup.sh              # Run ONCE to set up venv, deps, and pre-commit hooks
+./open-code.sh         # Open VS Code with venv activated
+```
+
+**Windows (PowerShell):**
+```powershell
+.\\setup.ps1           # Run ONCE to set up venv, deps, and pre-commit hooks
+.\\open-code.ps1      # Open VS Code with venv activated
+```
+
+- **`setup.sh` / `setup.ps1`** _(one-time only)_ – Automates: create venv, install deps, install pre-commit hooks
+- **`open-code.sh` / `open-code.ps1`** _(convenient shortcut)_ – Activates the virtual environment and opens VS Code (useful for subsequent sessions)
+
+#### Manual Step-by-Step
+
 ```bash
 # 1. Clone repository
 git clone git@github.com:cscosine/csOrchestrator.git
@@ -153,6 +172,50 @@ to bump version of a specific repo only
 ``` bash
 pre-commit run --all-files
 ```
+
+---
+
+## 🔧 VS Code Helpers
+
+This project includes VS Code configurations for streamlined development:
+
+### Launch Configurations (Debugging)
+
+The `.vscode/launch.json` file contains pre-configured debug configurations:
+
+- **▶ Debug all tests** – Runs all pytest tests with debugger enabled (`-s` flag for output)
+- **📁 Module-level test suites** – Quick debug access to test directories:
+  - `tests/csorchestrator/context`
+  - `tests/csorchestrator/core`
+  - `tests/csorchestrator/orchestrator`
+  - `tests/csorchestrator/step`
+  - `tests/csorchestrator/utils/filesystem`
+  - `tests/csorchestrator/utils/git`
+- **🧪 Individual test cases** – Auto-generated configurations for specific test functions
+
+**How to use:**
+1. Open the Debug view (Ctrl+Shift+D / Cmd+Shift+D)
+2. Select a configuration from the dropdown
+3. Press F5 or click "Run and Debug"
+
+_Note: `launch.json` is **fully auto-generated** by a tool in `tools/`. It's automatically kept in sync and validated by a pre-commit hook, so you should never edit it manually._
+
+### Build & Development Tasks
+
+The `.vscode/tasks.json` file provides convenient task runners:
+
+- **Create venv** – Creates a Python virtual environment at `.venv`
+- **Install deps** – Installs the package in editable mode with dev dependencies
+- **Pre-commit install** – Sets up git hooks for automatic checks
+- **Pre-commit run (all files)** – Manually trigger all pre-commit checks
+- **Setup Project** – Runs all tasks above in sequence (recommended for initial setup)
+
+**How to use:**
+1. Open the Command Palette (Ctrl+Shift+P / Cmd+Shift+P)
+2. Type "Tasks: Run Task"
+3. Select the task you want to run
+
+Alternatively, use the terminal: `./setup.sh` or `./setup.ps1`.
 
 ---
 
