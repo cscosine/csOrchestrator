@@ -84,6 +84,8 @@ def main() -> int:
     configs = build_configs(normalized)
 
     new_content = json.dumps({"version": "0.2.0", "configurations": configs}, indent=2)
+    # ensure new line at the end
+    new_content += "\n"
 
     LAUNCH_PATH.parent.mkdir(exist_ok=True)
 

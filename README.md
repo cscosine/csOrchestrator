@@ -129,7 +129,7 @@ Pre-commit hooks run automatically before each commit.
 
 ---
 
-### Bump precommit hooks to last version 
+### Bump precommit hooks to last version
 
 ``` bash
 pre-commit autoupdate
@@ -230,7 +230,7 @@ The `tests/` directory contains pytest suites for each module (excluded from lin
 pytest
 ```
 
-If you want to check code coverage, use one of 
+If you want to check code coverage, use one of
 
 ```bash
     # report to htmlcov/ folder
