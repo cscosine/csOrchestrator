@@ -43,6 +43,12 @@ csOrchestrator/
 ./open-code.sh         # Open VS Code with venv activated
 ```
 
+or
+```
+source ./open-code.sh         # Open VS Code with venv activated
+```
+to also keep the terminal with `venv` activated available
+
 **Windows (PowerShell):**
 ```powershell
 .\\setup.ps1           # Run ONCE to set up venv, deps, and pre-commit hooks
