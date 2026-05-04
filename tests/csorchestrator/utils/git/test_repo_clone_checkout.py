@@ -21,7 +21,7 @@ def _check_status(target_path: Path, expected_content: str) -> None:
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_simple_clone_branch_main(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_try_git_clone_checkout_branch_main(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -39,7 +39,7 @@ def test_simple_clone_branch_main(tmp_path: Path, repo_url: str, depth_one: bool
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_simple_clone_branch_dev(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_try_git_clone_checkout_branch_dev(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -60,7 +60,7 @@ def test_simple_clone_branch_dev(tmp_path: Path, repo_url: str, depth_one: bool)
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_simple_clone_tag(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_try_git_clone_checkout_tag(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -76,7 +76,7 @@ def test_simple_clone_tag(tmp_path: Path, repo_url: str, depth_one: bool) -> Non
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_simple_clone_sha(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_try_git_clone_checkout_sha(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -98,7 +98,7 @@ def test_simple_clone_sha(tmp_path: Path, repo_url: str, depth_one: bool) -> Non
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_simple_clone_non_existing_ref(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_try_git_clone_checkout_non_existing_ref(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -118,7 +118,7 @@ def test_simple_clone_non_existing_ref(tmp_path: Path, repo_url: str, depth_one:
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_simple_clone_branch_origin_main(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_try_git_clone_checkout_branch_origin_main(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -138,7 +138,7 @@ def test_simple_clone_branch_origin_main(tmp_path: Path, repo_url: str, depth_on
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_simple_clone_HEAD(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_try_git_clone_checkout_HEAD(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -153,7 +153,7 @@ def test_simple_clone_HEAD(tmp_path: Path, repo_url: str, depth_one: bool) -> No
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_simple_clone_refs_heads_main(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_try_git_clone_checkout_refs_heads_main(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -173,7 +173,7 @@ def test_simple_clone_refs_heads_main(tmp_path: Path, repo_url: str, depth_one: 
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_simple_clone_repo_refs_remote_origin_main(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_try_git_clone_checkout_repo_refs_remote_origin_main(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -194,7 +194,9 @@ def test_simple_clone_repo_refs_remote_origin_main(tmp_path: Path, repo_url: str
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_unknown_ref_type(tmp_path: Path, repo_url: str, depth_one: bool, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_try_git_clone_checkout_unknown_ref_type(
+    tmp_path: Path, repo_url: str, depth_one: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder

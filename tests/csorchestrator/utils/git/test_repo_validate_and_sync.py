@@ -38,6 +38,78 @@ def test_validate_and_sync_repo_main_branch_no_changes_succeed(tmp_path: Path, r
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
+def test_validate_and_sync_repo_tag_no_changes_succeed(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.tag, depth_one=depth_one)
+
+    r = validate_and_sync_repo(repo_url, cfg.tag, target_path=target_path)
+    assert not r.has_errors()
+
+
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_validate_and_sync_repo_commit_no_changes_succeed(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.initial_commit_sha, depth_one=depth_one)
+
+    r = validate_and_sync_repo(repo_url, cfg.initial_commit_sha, target_path=target_path)
+    assert not r.has_errors()
+
+
+@pytest.mark.slow
+@pytest.mark.git
+def test_validate_and_sync_repo_clone_remote_fails(tmp_path: Path, repo_url: str) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=False)
+
+    r = validate_and_sync_repo(repo_url, "wrong-ref", target_path=target_path)
+    assert r.has_errors()
+    assert "Git operation failed" in r.errors[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_validate_and_sync_repo_clone_tag_commit_mismatch(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.tag, depth_one=depth_one)
+
+    r = validate_and_sync_repo(repo_url, cfg.initial_commit_sha, target_path=target_path)
+    assert r.has_errors()
+    assert "RefKind.COMMIT mismatch" in r.errors[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_validate_and_sync_repo_clone_commit_tag_mismatch(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.initial_commit_sha, depth_one=depth_one)
+
+    r = validate_and_sync_repo(repo_url, cfg.tag, target_path=target_path)
+    assert r.has_errors()
+    assert "RefKind.TAG mismatch" in r.errors[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
 def test_validate_and_sync_repo_main_branch_dirty_edit(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
@@ -115,19 +187,122 @@ def test_validate_and_sync_repo_main_branch_no_refs_fail(tmp_path: Path, repo_ur
     assert "is not a valid git repository" in r.errors[0]
 
 
-# coverage for defensive code in case of unknown ref type, which should never happen but let's be defensive anyway
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_unknown_ref_type(tmp_path: Path, repo_url: str, depth_one: bool, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_validate_and_sync_repo_bare_fails(
+    tmp_path: Path, repo_url: str, depth_one: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    if not depth_one:
+        repo = Repo.clone_from(repo_url, target_path, bare=True)
+    else:
+        repo = Repo.clone_from(repo_url, target_path, no_checkout=True, bare=True)
+
+        remote = repo.remotes[0].name
+        repo.git.fetch("--depth", "1", remote, cfg.main_branch)
+
+    r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
+    assert r.has_errors()
+    assert "Repository is bare" in r.errors[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_validate_and_sync_repo_main_branch_wrong_local_url(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
 
     _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
 
-    # monkeypatch the resolve_ref_type to return an unknown type
-    from csorchestrator.utils.git import repo_clone_checkout as mod
+    # change the remote URL to something else
+    repo = Repo(target_path)
+    repo.delete_remote(repo.remotes[0])
+    repo.create_remote("origin", "https://example.com/other/repo.git")
+
+    r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
+    assert r.has_errors()
+    assert "Remote URL mismatch" in r.errors[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_validate_and_sync_repo_main_branch_mismatch(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
+
+    r = validate_and_sync_repo(repo_url, cfg.dev_branch, target_path=target_path)
+    assert r.has_errors()
+    assert "Branch mismatch" in r.errors[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+def test_validate_and_sync_repo_main_branch_failed_to_compute_merge_base(tmp_path: Path, repo_url: str) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    depth_one = True
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
+
+    repo = Repo(target_path)
+    # Set local config
+    with repo.config_writer() as cw:
+        cw.set_value("user", "name", "Test User")
+        cw.set_value("user", "email", "test@example.com")
+    repo.git.commit("--amend", "-m", "New commit message")
+
+    r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
+    assert r.has_errors()
+    assert "Failed to compute merge base" in r.errors[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+def test_validate_and_sync_repo_main_branch_local_branch_is_not_fast_forwardable(tmp_path: Path, repo_url: str) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    depth_one = False
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
+
+    repo = Repo(target_path)
+    # Set local config
+    with repo.config_writer() as cw:
+        cw.set_value("user", "name", "Test User")
+        cw.set_value("user", "email", "test@example.com")
+    repo.git.commit("--amend", "-m", "New commit message")
+
+    r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
+    assert r.has_errors()
+    assert "Local branch is not fast-forwardable" in r.errors[0]
+
+
+# coverage for defensive code in case of unknown ref type, which should never happen but let's be defensive anyway
+# @pytest.mark.slow
+# @pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_validate_and_sync_repo_unknown_ref_type(
+    tmp_path: Path, repo_url: str, depth_one: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
+
+    from csorchestrator.utils.git import repo_validate_and_sync as mod
 
     def mock_resolve_ref_type(repo, ref):
         return "unknown_ref_type"
@@ -136,4 +311,22 @@ def test_unknown_ref_type(tmp_path: Path, repo_url: str, depth_one: bool, monkey
 
     r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
     assert r.has_errors()
-    assert "Unknown ref type for" in r.errors[0]
+    assert "Unknown ref type for temporary cloned repo " in r.errors[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+def test_validate_and_sync_repo_detached_head(tmp_path: Path, repo_url: str) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=False)
+
+    # Checkout to a commit to get detached HEAD
+    repo = Repo(target_path)
+    repo.git.checkout(cfg.initial_commit_sha)
+
+    r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
+    assert r.has_errors()
+    assert "Detached HEAD, expected a branch" in r.errors[0]

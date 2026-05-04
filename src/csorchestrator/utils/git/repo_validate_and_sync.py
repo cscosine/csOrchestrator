@@ -50,15 +50,10 @@ def validate_and_sync_repo(repo_url: str, repo_ref: str, target_path: Path) -> R
                 return report
 
             # --- 5. Resolve commits ---
-            try:
-                local_commit = repo.head.commit
-                tmp_commit = tmp_repo.head.commit
-            except Exception:
-                report.append_error("Failed to resolve HEAD commit")
-                return report
+            local_commit = repo.head.commit
+            tmp_commit = tmp_repo.head.commit
 
             # --- 6. Detect ref type ---
-
             ref_type = resolve_ref_type(tmp_repo, repo_ref)
 
             # --- 7. Compare depending on ref type ---
@@ -94,15 +89,11 @@ def validate_and_sync_repo(repo_url: str, repo_ref: str, target_path: Path) -> R
                     return report
 
                 # --- Perform fast-forward ---
-                try:
-                    repo.git.merge("--ff-only", tmp_commit.hexsha)
-                except GitCommandError:
-                    report.append_error("Fast-forward merge failed")
-                    return report
+                repo.git.merge("--ff-only", tmp_commit.hexsha)
 
             else:
                 # this should never happen, but let's be defensive
-                report.append_error(f"Unknown ref type for {repo_ref}")
+                report.append_error(f"Unknown ref type for temporary cloned repo {repo_ref}")
                 return report
 
         finally:

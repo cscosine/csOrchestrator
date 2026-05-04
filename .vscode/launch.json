@@ -482,222 +482,302 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_HEAD[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_HEAD[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_HEAD[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_HEAD[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_HEAD[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_HEAD[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_HEAD[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_HEAD[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_branch_dev[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_branch_dev[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_branch_dev[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_branch_dev[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_branch_dev[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_branch_dev[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_branch_dev[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_branch_dev[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_branch_main[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_branch_main[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_branch_main[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_branch_main[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_branch_main[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_branch_main[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_branch_main[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_branch_main[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_branch_origin_main[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_branch_origin_main[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_branch_origin_main[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_branch_origin_main[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_branch_origin_main[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_branch_origin_main[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_branch_origin_main[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_branch_origin_main[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_non_existing_ref[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_non_existing_ref[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_non_existing_ref[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_non_existing_ref[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_non_existing_ref[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_non_existing_ref[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_non_existing_ref[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_non_existing_ref[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_refs_heads_main[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_refs_heads_main[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_refs_heads_main[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_refs_heads_main[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_refs_heads_main[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_refs_heads_main[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_refs_heads_main[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_refs_heads_main[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_repo_refs_remote_origin_main[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_repo_refs_remote_origin_main[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_repo_refs_remote_origin_main[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_repo_refs_remote_origin_main[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_repo_refs_remote_origin_main[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_repo_refs_remote_origin_main[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_repo_refs_remote_origin_main[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_repo_refs_remote_origin_main[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_sha[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_sha[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_sha[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_sha[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_sha[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_sha[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_sha[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_sha[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_tag[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_tag[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_tag[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_tag[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_simple_clone_tag[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_tag[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_simple_clone_tag[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_tag[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_unknown_ref_type[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_unknown_ref_type[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_unknown_ref_type[False]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_unknown_ref_type[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_unknown_ref_type[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_clone_checkout \u2192 test_try_git_clone_checkout_unknown_ref_type[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_unknown_ref_type[True]"
+        "tests/csorchestrator/utils/git/test_repo_clone_checkout.py::test_try_git_clone_checkout_unknown_ref_type[True]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_unknown_ref_type[False]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_bare_fails[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_unknown_ref_type[False]"
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_bare_fails[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_unknown_ref_type[True]",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_bare_fails[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_unknown_ref_type[True]"
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_bare_fails[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_clone_commit_tag_mismatch[False]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_clone_commit_tag_mismatch[False]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_clone_commit_tag_mismatch[True]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_clone_commit_tag_mismatch[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_clone_remote_fails",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_clone_remote_fails"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_clone_tag_commit_mismatch[False]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_clone_tag_commit_mismatch[False]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_clone_tag_commit_mismatch[True]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_clone_tag_commit_mismatch[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_commit_no_changes_succeed[False]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_commit_no_changes_succeed[False]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_commit_no_changes_succeed[True]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_commit_no_changes_succeed[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_detached_head",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_detached_head"
       ],
       "justMyCode": false
     },
@@ -738,6 +818,46 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_dirty_new_file[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_failed_to_compute_merge_base",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_failed_to_compute_merge_base"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_local_branch_is_not_fast_forwardable",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_local_branch_is_not_fast_forwardable"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_mismatch[False]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_mismatch[False]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_mismatch[True]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_mismatch[True]"
       ],
       "justMyCode": false
     },
@@ -798,6 +918,66 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_no_remote_fail[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_wrong_local_url[False]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_wrong_local_url[False]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_wrong_local_url[True]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_wrong_local_url[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_tag_no_changes_succeed[False]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_tag_no_changes_succeed[False]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_tag_no_changes_succeed[True]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_tag_no_changes_succeed[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_unknown_ref_type[False]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_unknown_ref_type[False]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_unknown_ref_type[True]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_unknown_ref_type[True]"
       ],
       "justMyCode": false
     },
