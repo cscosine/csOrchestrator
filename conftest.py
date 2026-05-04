@@ -23,8 +23,8 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     skip_git = pytest.mark.skip(reason="need --run-git or --run-all")
 
     for item in items:
-        if "slow" in item.keywords and not run_slow:
+        if item.get_closest_marker("slow") and not run_slow:
             item.add_marker(skip_slow)
 
-        if "git" in item.keywords and not run_git:
+        if item.get_closest_marker("git") and not run_git:
             item.add_marker(skip_git)
