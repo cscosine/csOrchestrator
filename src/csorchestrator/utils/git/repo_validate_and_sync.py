@@ -4,7 +4,7 @@ from tempfile import TemporaryDirectory
 from git import GitCommandError, InvalidGitRepositoryError, NoSuchPathError, Repo
 
 from csorchestrator.core.report import Report
-from csorchestrator.utils.git.try_git_clone_checkout import RefKind, resolve_ref_type, try_git_clone_checkout
+from csorchestrator.utils.git.repo_clone_checkout import RefKind, resolve_ref_type, try_git_clone_checkout
 
 
 def validate_and_sync_repo(repo_url: str, repo_ref: str, target_path: Path) -> Report:
@@ -101,6 +101,7 @@ def validate_and_sync_repo(repo_url: str, repo_ref: str, target_path: Path) -> R
                     return report
 
             else:
+                # this should never happen, but let's be defensive
                 report.append_error(f"Unknown ref type for {repo_ref}")
                 return report
 

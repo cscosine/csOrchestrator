@@ -70,6 +70,7 @@ def try_git_clone_checkout(repo_url: str, repo_ref: str, target_path: Path, dept
             if repo_ref != sha:
                 return Report().append_error(f"repo reference {repo_ref} differs from expected {sha} commit")
         else:
+            # this should never happen, but let's be defensive
             return Report().append_error(f"Unknown ref type for {repo_ref}")
 
         return Report().append_info(f"Successfully cloned from {repo_url} ref {repo_ref} to {target_path}")

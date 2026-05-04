@@ -9,7 +9,7 @@ from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.utils.file_system.path import is_clean_relative_path, resolve_path
-from csorchestrator.utils.git.try_git_clone_checkout import try_git_clone_checkout
+from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 
 
 # base class for extra information that can be provided

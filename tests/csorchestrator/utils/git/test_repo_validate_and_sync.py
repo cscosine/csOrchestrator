@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 from git import Repo
 
-from csorchestrator.utils.git.try_git_clone_checkout import try_git_clone_checkout
-from csorchestrator.utils.git.validate_and_sync_repo import validate_and_sync_repo
+from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
+from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
 from tests.csorchestrator.utils.git.repo_config import RepoTestData
 
 logging.basicConfig(level=logging.INFO)
@@ -113,3 +113,27 @@ def test_validate_and_sync_repo_main_branch_no_refs_fail(tmp_path: Path, repo_ur
     r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
     assert r.has_errors()
     assert "is not a valid git repository" in r.errors[0]
+
+
+# coverage for defensive code in case of unknown ref type, which should never happen but let's be defensive anyway
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_unknown_ref_type(tmp_path: Path, repo_url: str, depth_one: bool, monkeypatch: pytest.MonkeyPatch) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
+
+    # monkeypatch the resolve_ref_type to return an unknown type
+    from csorchestrator.utils.git import repo_clone_checkout as mod
+
+    def mock_resolve_ref_type(repo, ref):
+        return "unknown_ref_type"
+
+    monkeypatch.setattr(mod, "resolve_ref_type", mock_resolve_ref_type)
+
+    r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
+    assert r.has_errors()
+    assert "Unknown ref type for" in r.errors[0]
