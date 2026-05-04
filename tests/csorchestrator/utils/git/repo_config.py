@@ -1,5 +1,8 @@
 from dataclasses import dataclass
 
+# note: the test repo can be regenerated with the tool in tools/regenerate_test_repo.py,
+# after which the sha of the initial_commit_sha variable must be updated in this file accordingly
+
 
 @dataclass(frozen=True)
 class RepoTestData:
@@ -9,7 +12,7 @@ class RepoTestData:
     tag: str = "v1.0.0"
     non_existing_ref: str = "ref_does_not_exists"
     head: str = "HEAD"
-    initial_commit_sha: str = "63219a96b3d39cec4252791b49cfa215002487f2"
+    initial_commit_sha: str = "063ee5ddc414553e32b234170542a717cfe9d087"
     refs_heads_main: str = "refs/heads/main"
     refs_remote_origin_main: str = "refs/remotes/origin/main"
 
