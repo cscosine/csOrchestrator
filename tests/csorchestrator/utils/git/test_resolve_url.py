@@ -1,0 +1,53 @@
+import os
+
+from csorchestrator.utils.git.resolve_url import (
+    RepoUrlSelected,
+    get_token_from_env,
+    select_https_or_ssh_url,
+    select_https_or_ssh_url_resolve_token_name_on_env,
+)
+
+
+def test_get_token_from_env_set():
+    token_name = "TEST_TOKEN_ENV_VAR"
+    token_value = "test_token_value"
+    os.environ[token_name] = token_value
+    assert get_token_from_env(token_name) == token_value
+    del os.environ[token_name]
+
+
+def test_get_token_from_env_not_set():
+    token_name = "TEST_TOKEN_ENV_VAR_NOT_SET"
+    if token_name in os.environ:
+        del os.environ[token_name]
+    assert get_token_from_env(token_name) is None
+
+
+def test_select_https_or_ssh_url_with_token():
+    https_url_template = "https://{token}@github.com/user/repo.git"
+    ssh_url = "git@github.com:user/repo.git"
+    token = "test_token_value"
+    url, sel = select_https_or_ssh_url(https_url_template, ssh_url, token)
+    assert url == https_url_template.format(token=token)
+    assert sel == RepoUrlSelected.HTTPS
+
+
+def test_select_https_or_ssh_url_without_token():
+    https_url_template = "https://{token}@github.com/user/repo.git"
+    ssh_url = "git@github.com:user/repo.git"
+    token = None
+    url, sel = select_https_or_ssh_url(https_url_template, ssh_url, token)
+    assert url == ssh_url
+    assert sel == RepoUrlSelected.SSH
+
+
+def test_select_https_or_ssh_url_resolve_token_name_on_env():
+    https_url_template = "https://{token}@github.com/user/repo.git"
+    ssh_url = "git@github.com:user/repo.git"
+    token_name = "TEST_TOKEN_ENV_VAR"
+    token_value = "test_token_value"
+    os.environ[token_name] = token_value
+    url, sel = select_https_or_ssh_url_resolve_token_name_on_env(https_url_template, ssh_url, token_name)
+    assert url == https_url_template.format(token=token_value)
+    assert sel == RepoUrlSelected.HTTPS
+    del os.environ[token_name]

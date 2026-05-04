@@ -1,31 +1,25 @@
 import logging
-import os
-from dataclasses import dataclass
 
 import pytest
 
+from csorchestrator.utils.git.resolve_url import RepoUrlSelected, select_https_or_ssh_url_resolve_token_name_on_env
 from tests.csorchestrator.utils.git.repo_config import RepoTestData
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass(frozen=True)
-class RepoRuntimeConfig:
-    repo_url: str
-
-
 @pytest.fixture(scope="session")
-def repo_runtime_config() -> RepoRuntimeConfig:
+def repo_url() -> str:
+    # return url
     repo_test_data = RepoTestData()
-    token = os.getenv(repo_test_data.token_name)
-
-    if token:
-        logger.info("using https access with token")
-        return RepoRuntimeConfig(
-            repo_url=repo_test_data.https_url_template.format(token=token),
-        )
-    else:
-        logger.info("using ssh access")
-        return RepoRuntimeConfig(
-            repo_url=repo_test_data.ssh_url,
-        )
+    repo_url, selected_url = select_https_or_ssh_url_resolve_token_name_on_env(
+        https_url_template=repo_test_data.https_url_template,
+        ssh_url=repo_test_data.ssh_url,
+        token_name=repo_test_data.token_name,
+    )
+    match selected_url:
+        case RepoUrlSelected.HTTPS:
+            logger.info("using https access with token")
+        case RepoUrlSelected.SSH:
+            logger.info("using ssh access")
+    return repo_url

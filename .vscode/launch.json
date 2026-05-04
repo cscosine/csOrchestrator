@@ -482,6 +482,56 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_resolve_url \u2192 test_get_token_from_env_not_set",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_resolve_url.py::test_get_token_from_env_not_set"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_resolve_url \u2192 test_get_token_from_env_set",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_resolve_url.py::test_get_token_from_env_set"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_resolve_url \u2192 test_select_https_or_ssh_url_resolve_token_name_on_env",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_resolve_url.py::test_select_https_or_ssh_url_resolve_token_name_on_env"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_resolve_url \u2192 test_select_https_or_ssh_url_with_token",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_resolve_url.py::test_select_https_or_ssh_url_with_token"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_resolve_url \u2192 test_select_https_or_ssh_url_without_token",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/git/test_resolve_url.py::test_select_https_or_ssh_url_without_token"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_try_git_clone_checkout \u2192 test_simple_clone_depth_one_HEAD",
       "type": "debugpy",
       "request": "launch",
