@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
-from tests.csorchestrator.utils.git.repo_config import RepoTestData
+from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

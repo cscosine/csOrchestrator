@@ -3,13 +3,12 @@ from enum import Enum
 from pathlib import Path
 from typing import TypeVar
 
-from git import GitCommandError, Repo
-
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.utils.file_system.path import is_clean_relative_path, resolve_path
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
+from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
 
 
 # base class for extra information that can be provided
@@ -83,7 +82,7 @@ def _execute_step_get_repository_git(repo_step: StepGetRepository, context: Cont
 
     report = Report()
 
-    target_full_path = Path(context.base_folder_path / repo_step.target_directory)
+    target_full_path = context.base_folder_path / repo_step.target_directory
 
     if not target_full_path.is_dir():
         depth_one = StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(repo_step)
@@ -99,38 +98,14 @@ def _execute_step_get_repository_git(repo_step: StepGetRepository, context: Cont
         report.append_report(r_sub)
 
     else:
-        # TODO: continue with this part
-
         report.append_info(
-            f"Given target_directory exists, "
-            f"then try pull fast-forward from {repo_step.repo_url} ref {repo_step.repo_ref}"
+            f"Given target_directory exists, then try to update from {repo_step.repo_url} ref {repo_step.repo_ref}"
         )
-        try:
-            repo = Repo(repo_step.target_directory)
-            git = repo.git
-            branch = repo.active_branch
-            remote = branch.tracking_branch().remote_name
-            ref = branch.name
 
-            if ref == repo_step.repo_ref:
-                git.pull(remote, ref, ff_only=True)
-                report.append_info(
-                    f"Succesfully pull fast-forward from {repo_step.repo_url} "
-                    f"to {repo_step.target_directory} at ref {ref}"
-                )
-            else:
-                report.append_error(
-                    f"Cannot pull fast-forward from {repo_step.repo_url} to {repo_step.target_directory}, "
-                    f"active branch is {ref} instead of {repo_step.repo_ref}"
-                )
-
-        except GitCommandError as e:
-            report.append_error(
-                "Git operation failed:\n"
-                f"- Command: {e.command}\n"
-                f"- Exit code: {getattr(e, 'status', None)}\n"
-                f"- Error output: {e.stderr}\n"
-            )
+        validate_and_sync_report = validate_and_sync_repo(
+            repo_url=repo_step.repo_url, repo_ref=repo_step.repo_ref, target_path=target_full_path
+        )
+        report.append_report(validate_and_sync_report)
 
     return report
 

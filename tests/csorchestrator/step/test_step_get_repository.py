@@ -1,13 +1,19 @@
 from dataclasses import dataclass
+from pathlib import Path
 
+import pytest
+
+from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.step.step_get_repository import (
     RepositoryType,
     StepGetRepository,
     StepGetRepositoryExtra,
     StepGetRepositoryExtraAccessToken,
     StepGetRepositoryExtraDepthOne,
+    execute_step_get_repository,
     validate_step_get_repository,
 )
+from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 
 @dataclass
@@ -110,3 +116,26 @@ def test_step_get_repository_extra_depth_one() -> None:
     s.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
     assert StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(s)
     assert StepGetRepositoryExtraDepthOne.has_depth_one_on_github_action_checkout(s)
+
+
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_execute_step_get_repository(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+    cfg = RepoTestData()
+
+    step = StepGetRepository(
+        repo_type=RepositoryType.GIT,
+        name="get test repo",
+        description="get test repo desc",
+        target_directory=cfg.destination_folder,
+        repo_url=repo_url,
+        repo_ref=cfg.main_branch,
+    )
+
+    if depth_one:
+        step.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
+
+    report = execute_step_get_repository(step=step, context=ContextLocalExecution(base_folder_path=tmp_path))
+
+    assert not report.has_errors()

@@ -3,7 +3,7 @@ import logging
 import pytest
 
 from csorchestrator.utils.git.resolve_url import RepoUrlSelected, select_https_or_ssh_url_resolve_token_name_on_env
-from tests.csorchestrator.utils.git.repo_config import RepoTestData
+from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 logger = logging.getLogger(__name__)
 
