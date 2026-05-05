@@ -121,7 +121,44 @@ def test_step_get_repository_extra_depth_one() -> None:
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_execute_step_get_repository(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+@pytest.mark.parametrize(
+    "repo_ref",
+    [RepoTestData().main_branch, RepoTestData().dev_branch, RepoTestData().initial_commit_sha, RepoTestData().tag],
+)
+def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, depth_one: bool, repo_ref: str) -> None:
+    cfg = RepoTestData()
+
+    step = StepGetRepository(
+        repo_type=RepositoryType.GIT,
+        name="get test repo",
+        description="get test repo desc",
+        target_directory=cfg.destination_folder,
+        repo_url=repo_url,
+        repo_ref=repo_ref,
+    )
+
+    if depth_one:
+        step.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
+
+    # execute the step for the first time, to clone the repo
+    report = execute_step_get_repository(step=step, context=ContextLocalExecution(base_folder_path=tmp_path))
+
+    assert not report.has_errors()
+    assert report.has_info()
+    assert "Clone from" in report.infos[0]
+
+    # and get a second time, to test the "update" logic
+    report = execute_step_get_repository(step=step, context=ContextLocalExecution(base_folder_path=tmp_path))
+
+    assert not report.has_errors()
+    assert report.has_info()
+    assert "Given target_directory exists, then try to update from" in report.infos[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     step = StepGetRepository(
@@ -136,6 +173,35 @@ def test_execute_step_get_repository(tmp_path: Path, repo_url: str, depth_one: b
     if depth_one:
         step.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
+    # execute the step for the first time, to clone the repo
     report = execute_step_get_repository(step=step, context=ContextLocalExecution(base_folder_path=tmp_path))
 
     assert not report.has_errors()
+    assert report.has_info()
+    assert "Clone from" in report.infos[0]
+
+    # and get a second time, to test the "update" logic and that it correctly detect errors
+    step.repo_ref = cfg.dev_branch
+    report = execute_step_get_repository(step=step, context=ContextLocalExecution(base_folder_path=tmp_path))
+
+    assert report.has_errors()
+    assert report.has_info()
+    assert "Given target_directory exists, then try to update from" in report.infos[0]
+    assert "Branch mismatch: local=main, expected=dev" in report.errors[0]
+
+
+def test_execute_step_get_repository_unknown_repository_type(tmp_path: Path) -> None:
+    step = StepGetRepository(
+        repo_type="NOT_AN_EXISTING_TYPE",  # type: ignore
+        name="get repo",
+        description="get repo desc",
+        target_directory="dir",
+        repo_url="url://test.git",
+        repo_ref="main",
+    )
+    context = ContextLocalExecution(base_folder_path=tmp_path)
+
+    report = execute_step_get_repository(step, context)
+
+    assert report.has_errors()
+    assert "Unknown repository type" in report.errors[0]
