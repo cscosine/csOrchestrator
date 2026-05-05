@@ -290,8 +290,8 @@ def test_validate_and_sync_repo_main_branch_local_branch_is_not_fast_forwardable
 
 
 # coverage for defensive code in case of unknown ref type, which should never happen but let's be defensive anyway
-# @pytest.mark.slow
-# @pytest.mark.git
+@pytest.mark.slow
+@pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
 def test_validate_and_sync_repo_unknown_ref_type(
     tmp_path: Path, repo_url: str, depth_one: bool, monkeypatch: pytest.MonkeyPatch

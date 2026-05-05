@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
@@ -9,6 +10,7 @@ from csorchestrator.orchestrator.orchestrator_executor import (
     flatten_orchestrator_executor_visit_reports,
 )
 from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.step.step_get_repository import RepositoryType, StepGetRepository, StepGetRepositoryExtraDepthOne
 from csorchestrator.visitors.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
@@ -17,7 +19,7 @@ from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_orchestrator_visitor_local_executor(tmp_path: Path, repo_url: str) -> None:
+def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: str) -> None:
     cfg = RepoTestData()
 
     step = StepGetRepository(
@@ -55,3 +57,34 @@ def test_orchestrator_visitor_local_executor(tmp_path: Path, repo_url: str) -> N
     flatten_report = flatten_orchestrator_executor_visit_reports(report)
     flatten_report.print()
     assert not flatten_report.has_errors()
+
+
+@dataclass
+class StepCustom1(StepBase):
+    pass
+
+
+def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path, repo_url: str) -> None:
+
+    orchestrator = Orchestrator()
+    orchestrator.add_phase(
+        Phase(name="repos checkout").add_step(StepBase(name="unknown step", description="unknown step description"))
+    )
+
+    orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
+
+    assert orchestratorValidatedOpt.result is not None
+    orchestrator = orchestratorValidatedOpt.result
+    assert orchestrator is not None
+
+    executor = OrchestratorExecutor(orchestrator)
+
+    context = ContextLocalExecution(base_folder_path=tmp_path)
+    ovb = OrchestratorVisitorLocalExecutor(context=context)
+
+    # execute the orchestrator visitor, which will execute the step to clone the repo
+    report = executor.execute(ovb)
+    flatten_report = flatten_orchestrator_executor_visit_reports(report)
+    flatten_report.print()
+    assert flatten_report.has_errors()
+    assert "OrchestratorVisitorLocalExecutor cannot handle step" in flatten_report.errors[0]
