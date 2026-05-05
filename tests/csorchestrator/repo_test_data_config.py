@@ -9,7 +9,7 @@ class RepoTestData:
     main_branch: str = "main"
     origin_main_branch: str = "origin/main"
     dev_branch: str = "dev"
-    tag: str = "v1.0.0"
+    tag: str = "v0.0.1"
     non_existing_ref: str = "ref_does_not_exists"
     head: str = "HEAD"
     initial_commit_sha: str = "063ee5ddc414553e32b234170542a717cfe9d087"

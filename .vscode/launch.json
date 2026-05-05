@@ -352,22 +352,22 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_execute_step_get_repository_success[v1.0.0-False]",
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_execute_step_get_repository_success[v0.0.1-False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/step/test_step_get_repository.py::test_execute_step_get_repository_success[v1.0.0-False]"
+        "tests/csorchestrator/step/test_step_get_repository.py::test_execute_step_get_repository_success[v0.0.1-False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_execute_step_get_repository_success[v1.0.0-True]",
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_execute_step_get_repository_success[v0.0.1-True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/step/test_step_get_repository.py::test_execute_step_get_repository_success[v1.0.0-True]"
+        "tests/csorchestrator/step/test_step_get_repository.py::test_execute_step_get_repository_success[v0.0.1-True]"
       ],
       "justMyCode": false
     },
