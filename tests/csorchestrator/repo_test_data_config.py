@@ -17,6 +17,7 @@ class RepoTestData:
     refs_remote_origin_main: str = "refs/remotes/origin/main"
 
     destination_folder: str = "csOrchestratorTestRepo"
+    repo_name: str = "csOrchestratorTestRepo"
 
     file_to_verify: str = "STATUS.txt"
     expected_content_main: str = "tag"

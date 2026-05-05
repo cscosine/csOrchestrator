@@ -72,6 +72,16 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83d\udcc1 tests/csorchestrator/visitors tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/visitors"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/context/test_context_local_execution \u2192 test_create_context_empty_path_invalid",
       "type": "debugpy",
       "request": "launch",
@@ -1238,6 +1248,16 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/utils/git/test_validate_and_sync_repo.py::test_validate_and_sync_repo_main_branch_no_remote_fail[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/visitors/test_orchestrator_visitor_local_executor \u2192 test_orchestrator_visitor_local_executor",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/visitors/test_orchestrator_visitor_local_executor.py::test_orchestrator_visitor_local_executor"
       ],
       "justMyCode": false
     }
