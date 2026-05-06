@@ -13,8 +13,11 @@ pre-commit install
 echo "Setup complete."
 echo ""
 echo "Next: "
-echo "  source .venv/bin/activate
+echo "  source .venv/bin/activate"
 echo "  code ."
 echo ""
 echo "Or: "
 echo "  ./open-code.sh"
+echo ""
+echo "Or: "
+echo "  source ./open-code.sh"
