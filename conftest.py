@@ -2,9 +2,11 @@ import pytest
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:
-    parser.addoption("--run-all", action="store_true", default=False)
-    parser.addoption("--run-slow", action="store_true", default=False)
-    parser.addoption("--run-git", action="store_true", default=False)
+    parser.addoption(
+        "--run-all", action="store_true", default=False, help="Run all tests, including slow and git-dependent ones"
+    )
+    parser.addoption("--run-slow", action="store_true", default=False, help="Run tests marked as 'slow'")
+    parser.addoption("--run-git", action="store_true", default=False, help="Run tests marked as 'git'")
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:
