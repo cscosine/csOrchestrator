@@ -35,6 +35,24 @@
       ],
       "dependsOrder": "sequence",
       "problemMatcher": []
+    },
+    {
+      "label": "Pytest",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest",
+      "problemMatcher": []
+    },
+    {
+      "label": "Pytest (run-all)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest --run-all",
+      "problemMatcher": []
+    },
+    {
+      "label": "Pytest (coverage)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest --cov=csorchestrator --cov-branch --cov-report=html --run-all",
+      "problemMatcher": []
     }
   ]
 }
