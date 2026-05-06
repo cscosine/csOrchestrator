@@ -5,54 +5,61 @@
       "label": "Create venv",
       "type": "shell",
       "command": "python -m venv .venv",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "#Setup # Create a virtual environment in the project directory"
     },
     {
       "label": "Install deps",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pip install -e .[dev]",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "#Setup # Install development dependencies"
     },
     {
       "label": "Pre-commit install",
       "type": "shell",
       "command": "pre-commit install",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "#Setup # Install pre-commit hooks"
     },
     {
       "label": "Pre-commit run (all files)",
       "type": "shell",
       "command": "pre-commit run --all-files",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "#Pre-Commit # Run pre-commit hooks on all files"
     },
     {
       "label": "Setup Project",
       "dependsOn": [
         "Create venv",
         "Install deps",
-        "Pre-commit install",
-        "Pre-commit run (all files)"
+        "Pre-commit install"
       ],
       "dependsOrder": "sequence",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "#Setup # Do all steps to set up the project (create venv, install dependencies, set up pre-commit hooks)"
     },
     {
       "label": "Pytest",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "#Testing # Run pytest (fast)"
     },
     {
       "label": "Pytest (run-all)",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest --run-all",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "#Testing # Run pytest (all - slow)"
     },
     {
       "label": "Pytest (coverage)",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest --cov=csorchestrator --cov-branch --cov-report=html --run-all",
-      "problemMatcher": []
+      "problemMatcher": [],
+      "detail": "#Testing # Run pytest with coverage"
     }
   ]
 }
