@@ -162,6 +162,36 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_execution \u2192 test_validate_and_execute_orchestrator_fail_pre_execution",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/orchestrator/test_execution.py::test_validate_and_execute_orchestrator_fail_pre_execution"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_execution \u2192 test_validate_and_execute_orchestrator_fail_validation",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/orchestrator/test_execution.py::test_validate_and_execute_orchestrator_fail_validation"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_execution \u2192 test_validate_and_execute_orchestrator_success",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/orchestrator/test_execution.py::test_validate_and_execute_orchestrator_success"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator \u2192 test_orchestrator_add_phases",
       "type": "debugpy",
       "request": "launch",
