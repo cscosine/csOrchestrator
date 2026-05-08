@@ -4,6 +4,7 @@ from csorchestrator.context.context_local_execution import create_context_local_
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator, OrchestratorExecutorMinimalDescription
 from csorchestrator.orchestrator.orchestrator_executor import OrchestratorExecutor, OrchestratorExecutorVisitReports
+from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.visitors.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
 
@@ -19,7 +20,9 @@ class ExecutionResult:
     report_execution: OrchestratorExecutorVisitReports = field(default_factory=list)
 
 
-def validate_and_execute_orchestrator(orchestrator: Orchestrator, target_folder_path: str) -> ExecutionResult:
+def validate_and_execute_orchestrator(
+    orchestrator: Orchestrator, target_folder_path: str, reporter: OrchestratorExecutorReporterBase
+) -> ExecutionResult:
     er = ExecutionResult()
     er.execution_description = orchestrator.extract_minimal_description()
 
@@ -44,6 +47,6 @@ def validate_and_execute_orchestrator(orchestrator: Orchestrator, target_folder_
     executor = OrchestratorExecutor(orchestrator)
 
     # execute the orchestrator visitor, which will execute the step to clone the repo
-    er.report_execution = executor.execute(orchestrator_visitor)
+    er.report_execution = executor.execute(orchestrator_visitor, reporter=reporter)
 
     return er

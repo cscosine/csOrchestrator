@@ -4,6 +4,7 @@ from functools import singledispatchmethod
 
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 
 
@@ -29,11 +30,11 @@ class OrchestratorVisitorBase(ABC):
         """Called after processing completely a phase"""
         ...
 
-    def visit_step(self, step: StepBase) -> Report:
-        return self.visit_step_base(step)
+    def visit_step(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
+        return self.visit_step_base(step, reporter_sink)
 
     @abstractmethod
-    def visit_step_base(self, step: StepBase) -> Report:
+    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         """Called when ``visit_step`` encounters a step type with no registered
         handler.  Concrete visitors **must** implement this to decide the
         policy for unregistered step types (raise, skip, log, etc.)."""
@@ -57,12 +58,12 @@ class OrchestratorVisitorBase(ABC):
                 def _(self, step: SomeStep):
                     ...
 
-                def visit_step_base(self, step: StepBase) -> None:
+                def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> None:
                     raise NotImplementedError(f"Unhandled {type(step)}")
         """
 
         @singledispatchmethod
-        def visit_step(self: "OrchestratorVisitorBase", step: StepBase) -> Report:
-            return self.visit_step_base(step)
+        def visit_step(self: "OrchestratorVisitorBase", step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
+            return self.visit_step_base(step, reporter_sink)
 
         return visit_step

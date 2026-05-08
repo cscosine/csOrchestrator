@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 
 from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.reporters.reporter_sink_dummy import ReporterSinkDummy
 from csorchestrator.step.step_get_repository import (
     RepositoryType,
     StepGetRepository,
@@ -141,14 +142,18 @@ def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, dept
         step.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
     # execute the step for the first time, to clone the repo
-    report = execute_step_get_repository(step=step, context=ContextLocalExecution(base_folder_path=tmp_path))
+    report = execute_step_get_repository(
+        step=step, context=ContextLocalExecution(base_folder_path=tmp_path), reporter_sink=ReporterSinkDummy()
+    )
 
     assert not report.has_errors()
     assert report.has_info()
     assert "Clone from" in report.infos[0]
 
     # and get a second time, to test the "update" logic
-    report = execute_step_get_repository(step=step, context=ContextLocalExecution(base_folder_path=tmp_path))
+    report = execute_step_get_repository(
+        step=step, context=ContextLocalExecution(base_folder_path=tmp_path), reporter_sink=ReporterSinkDummy()
+    )
 
     assert not report.has_errors()
     assert report.has_info()
@@ -174,7 +179,9 @@ def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: str,
         step.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
     # execute the step for the first time, to clone the repo
-    report = execute_step_get_repository(step=step, context=ContextLocalExecution(base_folder_path=tmp_path))
+    report = execute_step_get_repository(
+        step=step, context=ContextLocalExecution(base_folder_path=tmp_path), reporter_sink=ReporterSinkDummy()
+    )
 
     assert not report.has_errors()
     assert report.has_info()
@@ -182,7 +189,9 @@ def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: str,
 
     # and get a second time, to test the "update" logic and that it correctly detect errors
     step.repo_ref = cfg.dev_branch
-    report = execute_step_get_repository(step=step, context=ContextLocalExecution(base_folder_path=tmp_path))
+    report = execute_step_get_repository(
+        step=step, context=ContextLocalExecution(base_folder_path=tmp_path), reporter_sink=ReporterSinkDummy()
+    )
 
     assert report.has_errors()
     assert report.has_info()
@@ -201,7 +210,7 @@ def test_execute_step_get_repository_unknown_repository_type(tmp_path: Path) -> 
     )
     context = ContextLocalExecution(base_folder_path=tmp_path)
 
-    report = execute_step_get_repository(step, context)
+    report = execute_step_get_repository(step, context, reporter_sink=ReporterSinkDummy())
 
     assert report.has_errors()
     assert "Unknown repository type" in report.errors[0]

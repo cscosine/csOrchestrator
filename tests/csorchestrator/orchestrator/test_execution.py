@@ -5,6 +5,7 @@ import pytest
 from csorchestrator.orchestrator.execution import ExecutionResult, validate_and_execute_orchestrator
 from csorchestrator.orchestrator.orchestrator import Orchestrator, PhaseNameWithStepNames
 from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import RepositoryType, StepGetRepository, StepGetRepositoryExtraDepthOne
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
@@ -27,7 +28,9 @@ def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: str
 
     orchestrator.add_phase(Phase(name="repos checkout").add_step(step))
 
-    er: ExecutionResult = validate_and_execute_orchestrator(orchestrator, target_folder_path=str(tmp_path))
+    er: ExecutionResult = validate_and_execute_orchestrator(
+        orchestrator, target_folder_path=str(tmp_path), reporter=OrchestratorExecutorReporterDummy()
+    )
     assert not er.report_pre_execution.has_errors()
     assert er.execution_description == [PhaseNameWithStepNames(phase_name="repos checkout", step_names=[cfg.repo_name])]
     assert len(er.report_execution) == len(er.execution_description)
@@ -45,7 +48,9 @@ def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path, re
 
     orchestrator = Orchestrator()
 
-    er: ExecutionResult = validate_and_execute_orchestrator(orchestrator, target_folder_path=str(file_path))
+    er: ExecutionResult = validate_and_execute_orchestrator(
+        orchestrator, target_folder_path=str(file_path), reporter=OrchestratorExecutorReporterDummy()
+    )
 
     assert er.report_pre_execution.has_errors()
 
@@ -71,6 +76,8 @@ def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_
 
     orchestrator.add_phase(p)
 
-    er: ExecutionResult = validate_and_execute_orchestrator(orchestrator, target_folder_path=str(tmp_path))
+    er: ExecutionResult = validate_and_execute_orchestrator(
+        orchestrator, target_folder_path=str(tmp_path), reporter=OrchestratorExecutorReporterDummy()
+    )
 
     assert er.report_pre_execution.has_errors()

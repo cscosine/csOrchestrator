@@ -42,6 +42,16 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83d\udcc1 tests/csorchestrator/reporters tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83d\udcc1 tests/csorchestrator/step tests",
       "type": "debugpy",
       "request": "launch",
@@ -328,6 +338,56 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/orchestrator/test_validated_orchestrator.py::test_orchestrator_valid"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite \u2192 test_composite_reporter_prints_twice",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite.py::test_composite_reporter_prints_twice"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_reporter_sink_print \u2192 test_orchestrator_executor_reporter_print_failure_flow",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_reporter_sink_print.py::test_orchestrator_executor_reporter_print_failure_flow"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_reporter_sink_print \u2192 test_orchestrator_executor_reporter_print_success_flow",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_reporter_sink_print.py::test_orchestrator_executor_reporter_print_success_flow"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_reporter_sink_print \u2192 test_reporter_sink_print_direct_methods",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_reporter_sink_print.py::test_reporter_sink_print_direct_methods"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_reporter_sink_print \u2192 test_reporter_sink_print_indentation",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_reporter_sink_print.py::test_reporter_sink_print_indentation"
       ],
       "justMyCode": false
     },

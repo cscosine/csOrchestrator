@@ -1,0 +1,39 @@
+from dataclasses import dataclass, field
+
+from csorchestrator.core.report import Report
+from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
+from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.reporters.reporter_sink_composite import ReporterSinkComposite
+
+
+@dataclass
+class OrchestratorExecutorReporterComposite(OrchestratorExecutorReporterBase):
+    reporters: list[OrchestratorExecutorReporterBase] = field(default_factory=list)
+
+    def on_init_visit(self) -> None:
+        for r in self.reporters:
+            r.on_init_visit()
+
+    def on_end_visit(self, visit_complete: bool) -> None:
+        for r in self.reporters:
+            r.on_end_visit(visit_complete)
+
+    def on_begin_phase(self, phase: Phase) -> None:
+        for r in self.reporters:
+            r.on_begin_phase(phase)
+
+    def on_end_phase(self, phase_complete: bool) -> None:
+        for r in self.reporters:
+            r.on_end_phase(phase_complete)
+
+    def create_sink_on_begin_visit_step(self, step: StepBase) -> ReporterSinkBase:
+        sinks: list[ReporterSinkBase] = []
+        for r in self.reporters:
+            sinks.append(r.create_sink_on_begin_visit_step(step))
+        return ReporterSinkComposite(sinks)
+
+    def on_end_visit_step(self, step: StepBase, report: Report) -> None:
+        for r in self.reporters:
+            r.on_end_visit_step(step, report)

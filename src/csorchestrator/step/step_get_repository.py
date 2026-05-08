@@ -5,6 +5,7 @@ from typing import TypeVar
 
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
+from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.utils.file_system.path import is_clean_relative_path, resolve_path
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
@@ -58,9 +59,11 @@ class StepGetRepository(StepBase):
         return extra if isinstance(extra, t) else None
 
 
-def execute_step_get_repository(step: StepGetRepository, context: ContextLocalExecution) -> Report:
+def execute_step_get_repository(
+    step: StepGetRepository, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
+) -> Report:
     if step.repo_type == RepositoryType.GIT:
-        return _execute_step_get_repository_git(step, context)
+        return _execute_step_get_repository_git(step, context, reporter_sink)
     else:
         return Report().append_error(f"Unknown repository type {step.repo_type}")
 
@@ -77,7 +80,9 @@ def validate_step_get_repository(step: StepGetRepository) -> Report:
     return report
 
 
-def _execute_step_get_repository_git(repo_step: StepGetRepository, context: ContextLocalExecution) -> Report:
+def _execute_step_get_repository_git(
+    repo_step: StepGetRepository, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
+) -> Report:
     assert repo_step.repo_type == RepositoryType.GIT  # defensive
 
     report = Report()

@@ -4,6 +4,7 @@ from pathlib import Path
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_echo_message import StepEchoMessage
 from csorchestrator.step.step_get_repository import StepGetRepository, validate_step_get_repository
@@ -25,7 +26,7 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         pass
 
-    def visit_step_base(self, step: StepBase) -> Report:
+    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         return Report().append_warning(
             f"OrchestratorVisitorValidator cannot handle step {step.name} of type {type(step).__name__}"
         )
@@ -33,7 +34,7 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
     visit_step = OrchestratorVisitorBase.create_visit_dispatch()
 
     @visit_step.register
-    def _(self, step: StepGetRepository) -> Report:
+    def _(self, step: StepGetRepository, reporter_sink: ReporterSinkBase) -> Report:
         r = validate_step_get_repository(step)
         if not r.has_errors():
             target_directory_path = step.resolved_target_directory_path()
@@ -44,6 +45,6 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
         return r
 
     @visit_step.register
-    def _(self, step: StepEchoMessage) -> Report:
+    def _(self, step: StepEchoMessage, reporter_sink: ReporterSinkBase) -> Report:
         # for custom message step, there is no validation
         return Report()

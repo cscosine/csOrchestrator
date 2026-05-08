@@ -11,10 +11,12 @@ from csorchestrator.orchestrator.orchestrator_executor import (
 )
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.orchestrator.validated_orchestrator import (
     create_validated_orchestrator,
 )
+from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 
 
 @dataclass
@@ -43,7 +45,7 @@ class OrchestratorVisitorDummy(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         pass
 
-    def visit_step_base(self, step: StepBase) -> Report:
+    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         raise NotImplementedError(DUMMY_UNHANDLED_ERROR)
 
 
@@ -69,7 +71,7 @@ def test_orchestrator_executor_invalid_visitor() -> None:
     ovb = OrchestratorVisitorDummy()
 
     with pytest.raises(NotImplementedError) as exc_info:
-        e.execute(ovb)
+        e.execute(ovb, OrchestratorExecutorReporterDummy())
 
     assert str(exc_info.value) == DUMMY_UNHANDLED_ERROR
 
@@ -98,18 +100,18 @@ class OrchestratorVisitorConcretePerType(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         self.phase_end_count += 1
 
-    def visit_step_base(self, step: StepBase) -> Report:
+    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         raise NotImplementedError(f"Unhandled step type: {type(step).__name__}")
 
     visit_step = OrchestratorVisitorBase.create_visit_dispatch()
 
     @visit_step.register
-    def _(self, step: StepCustom1) -> Report:
+    def _(self, step: StepCustom1, reporter_sink: ReporterSinkBase) -> Report:
         self.visited_steps_1 += 1
         return Report()
 
     @visit_step.register
-    def _(self, step: StepCustom2) -> Report:
+    def _(self, step: StepCustom2, reporter_sink: ReporterSinkBase) -> Report:
         self.visited_steps_2 += 1
         return Report()
 
@@ -135,7 +137,7 @@ def test_orchestrator_executor_valid_visitor() -> None:
 
     ovb = OrchestratorVisitorConcretePerType()
 
-    e.execute(ovb)
+    e.execute(ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -170,7 +172,7 @@ class OrchestratorVisitorConcreteBaseOnly(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         self.phase_end_count += 1
 
-    def visit_step_base(self, step: StepBase) -> Report:
+    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         self.visited_steps += 1
         return Report()
 
@@ -196,7 +198,7 @@ def test_orchestrator_executor_base_only_visitor() -> None:
 
     ovb = OrchestratorVisitorConcreteBaseOnly()
 
-    e.execute(ovb)
+    e.execute(ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -230,7 +232,7 @@ class OrchestratorVisitorConcreteUseVisitBase(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         self.phase_end_count += 1
 
-    def visit_step_base(self, step: StepBase) -> Report:
+    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         self.visited_steps += 1
         return Report()
 
@@ -259,7 +261,7 @@ def test_orchestrator_executor_base_only_visitor_use_visit_step_base() -> None:
 
     ovb = OrchestratorVisitorConcreteUseVisitBase()
 
-    e.execute(ovb)
+    e.execute(ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -301,7 +303,7 @@ class OrchestratorVisitorFailStep(OrchestratorVisitorBase):
         self.phase_complete = phase_complete
         self.phase_end_count += 1
 
-    def visit_step_base(self, step: StepBase) -> Report:
+    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         r = Report()
         if self.failing_step == self.visited_steps:
             r.errors.append("FAIL")
@@ -334,7 +336,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
     # complete case
     ovb = OrchestratorVisitorFailStep(-1)
 
-    visit_reports = e.execute(ovb)
+    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -357,7 +359,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
     # fail
     ovb = OrchestratorVisitorFailStep(0)
 
-    visit_reports = e.execute(ovb)
+    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -375,7 +377,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     ovb = OrchestratorVisitorFailStep(1)
 
-    visit_reports = e.execute(ovb)
+    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -394,7 +396,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     ovb = OrchestratorVisitorFailStep(2)
 
-    visit_reports = e.execute(ovb)
+    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -415,7 +417,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     ovb = OrchestratorVisitorFailStep(3)
 
-    visit_reports = e.execute(ovb)
+    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1

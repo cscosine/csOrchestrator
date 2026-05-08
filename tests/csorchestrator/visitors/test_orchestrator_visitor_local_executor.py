@@ -12,6 +12,7 @@ from csorchestrator.orchestrator.orchestrator_executor import (
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
+from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import RepositoryType, StepGetRepository, StepGetRepositoryExtraDepthOne
 from csorchestrator.visitors.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
 from tests.csorchestrator.repo_test_data_config import RepoTestData
@@ -46,14 +47,14 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: s
     ovb = OrchestratorVisitorLocalExecutor(context=context)
 
     # execute the orchestrator visitor, which will execute the step to clone the repo
-    report = executor.execute(ovb)
+    report = executor.execute(ovb, OrchestratorExecutorReporterDummy())
     flatten_report = flatten_orchestrator_executor_visit_reports(report)
     flatten_report.print()
     assert not flatten_report.has_errors()
 
     # execute the orchestrator visitor a second time, which will execute the step to update the repo,
     # which should succeed without errors
-    report = executor.execute(ovb)
+    report = executor.execute(ovb, OrchestratorExecutorReporterDummy())
     flatten_report = flatten_orchestrator_executor_visit_reports(report)
     flatten_report.print()
     assert not flatten_report.has_errors()
@@ -83,7 +84,7 @@ def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path, r
     ovb = OrchestratorVisitorLocalExecutor(context=context)
 
     # execute the orchestrator visitor, which will execute the step to clone the repo
-    report = executor.execute(ovb)
+    report = executor.execute(ovb, OrchestratorExecutorReporterDummy())
     flatten_report = flatten_orchestrator_executor_visit_reports(report)
     flatten_report.print()
     assert flatten_report.has_errors()
