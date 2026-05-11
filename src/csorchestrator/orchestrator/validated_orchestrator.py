@@ -5,7 +5,7 @@ from csorchestrator.core.optional_result_with_report import OptionalResultWithRe
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor import (
-    OrchestratorExecutor,
+    execute_orchestrator,
     flatten_orchestrator_executor_visit_reports,
 )
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
@@ -34,9 +34,9 @@ def create_validated_orchestrator(o: Orchestrator) -> OptionalValidatedOrchestra
 
     # if so far is validated, use the orchestrator visitor validator to validate the steps, and append the reports
     if len(report.errors) == 0:
-        oe = OrchestratorExecutor(o)
-        ovv = OrchestratorVisitorValidator()
-        visit_report = oe.execute(ovv, reporter=OrchestratorExecutorReporterDummy())
+        visit_report = execute_orchestrator(
+            o, OrchestratorVisitorValidator(), reporter=OrchestratorExecutorReporterDummy()
+        )
         report.append_report(flatten_orchestrator_executor_visit_reports(visit_report))
 
     if len(report.errors) > 0:

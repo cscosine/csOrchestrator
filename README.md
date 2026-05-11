@@ -257,7 +257,7 @@ The csOrchestrator logic is a installable package in `src/csorchestrator/`. This
 ```
 src/csorchestrator/
 ├── core/                        # generic types: Report, Expected[T,E], OptionalResultWithReport[T]
-├── orchestrator/                # engine: Orchestrator, Phase, StepBase, OrchestratorExecutor, visitor base
+├── orchestrator/                # engine: Orchestrator, Phase, StepBase, execute_orchestrator, visitor base
 ├── visitors/                    # concrete visitors: validator, local executor
 ├── step/                        # step definitions: get_repository, cmake, custom_command, echo, etc.
 ├── context/                     # execution contexts: local filesystem, GitHub Actions

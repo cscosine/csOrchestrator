@@ -4,7 +4,7 @@ import pytest
 
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
-from csorchestrator.orchestrator.orchestrator_executor import OrchestratorExecutor
+from csorchestrator.orchestrator.orchestrator_executor import execute_orchestrator
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
@@ -61,9 +61,8 @@ def test_composite_reporter_prints_twice(capsys: pytest.CaptureFixture[str]) -> 
     composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3])
 
     # 3. Execute
-    executor = OrchestratorExecutor(orchestrator)
     visitor = MockVisitor()
-    executor.execute(visitor, composite)
+    execute_orchestrator(orchestrator, visitor, composite)
 
     # 4. Verify Output
     captured = capsys.readouterr().out

@@ -5,8 +5,8 @@ import pytest
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor import (
-    OrchestratorExecutor,
     OrchestratorExecutorVisitReports,
+    execute_orchestrator,
     flatten_orchestrator_executor_visit_reports,
 )
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
@@ -66,12 +66,8 @@ def test_orchestrator_executor_invalid_visitor() -> None:
     orchestrator = ovr.result
     assert orchestrator is not None
 
-    e = OrchestratorExecutor(orchestrator)
-
-    ovb = OrchestratorVisitorDummy()
-
     with pytest.raises(NotImplementedError) as exc_info:
-        e.execute(ovb, OrchestratorExecutorReporterDummy())
+        execute_orchestrator(orchestrator, OrchestratorVisitorDummy(), OrchestratorExecutorReporterDummy())
 
     assert str(exc_info.value) == DUMMY_UNHANDLED_ERROR
 
@@ -133,11 +129,9 @@ def test_orchestrator_executor_valid_visitor() -> None:
     orchestrator = ovr.result
     assert orchestrator is not None
 
-    e = OrchestratorExecutor(orchestrator)
-
     ovb = OrchestratorVisitorConcretePerType()
 
-    e.execute(ovb, OrchestratorExecutorReporterDummy())
+    execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -194,11 +188,9 @@ def test_orchestrator_executor_base_only_visitor() -> None:
     orchestrator = ovr.result
     assert orchestrator is not None
 
-    e = OrchestratorExecutor(orchestrator)
-
     ovb = OrchestratorVisitorConcreteBaseOnly()
 
-    e.execute(ovb, OrchestratorExecutorReporterDummy())
+    execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -257,11 +249,9 @@ def test_orchestrator_executor_base_only_visitor_use_visit_step_base() -> None:
     orchestrator = ovr.result
     assert orchestrator is not None
 
-    e = OrchestratorExecutor(orchestrator)
-
     ovb = OrchestratorVisitorConcreteUseVisitBase()
 
-    e.execute(ovb, OrchestratorExecutorReporterDummy())
+    execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -331,12 +321,10 @@ def test_orchestrator_executor_base_fail_step() -> None:
     orchestrator = ovr.result
     assert orchestrator is not None
 
-    e = OrchestratorExecutor(orchestrator)
-
     # complete case
     ovb = OrchestratorVisitorFailStep(-1)
 
-    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
+    visit_reports = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -359,7 +347,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
     # fail
     ovb = OrchestratorVisitorFailStep(0)
 
-    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
+    visit_reports = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -377,7 +365,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     ovb = OrchestratorVisitorFailStep(1)
 
-    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
+    visit_reports = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -396,7 +384,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     ovb = OrchestratorVisitorFailStep(2)
 
-    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
+    visit_reports = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1
@@ -417,7 +405,7 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     ovb = OrchestratorVisitorFailStep(3)
 
-    visit_reports = e.execute(ovb, OrchestratorExecutorReporterDummy())
+    visit_reports = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
 
     assert ovb.visit_init_count == 1
     assert ovb.visit_end_count == 1

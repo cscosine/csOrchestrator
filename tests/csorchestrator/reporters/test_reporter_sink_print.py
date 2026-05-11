@@ -4,7 +4,7 @@ import pytest
 
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
-from csorchestrator.orchestrator.orchestrator_executor import OrchestratorExecutor
+from csorchestrator.orchestrator.orchestrator_executor import execute_orchestrator
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
@@ -85,17 +85,16 @@ def test_reporter_sink_print_indentation(capsys: pytest.CaptureFixture[str]) -> 
 
 
 def test_orchestrator_executor_reporter_print_success_flow(capsys: pytest.CaptureFixture[str]) -> None:
-    """End-to-end test of the printing reporter via OrchestratorExecutor on success."""
+    """End-to-end test of the printing reporter via execute_orchestrator on success."""
     orchestrator = Orchestrator()
     phase = Phase(name="Setup")
     phase.add_step(MockStep(name="StepA", description=""))
     orchestrator.add_phase(phase)
 
     reporter = OrchestratorExecutorReporterPrint()
-    executor = OrchestratorExecutor(orchestrator)
     visitor = MockVisitor()
 
-    executor.execute(visitor, reporter)
+    execute_orchestrator(orchestrator, visitor, reporter)
 
     captured = capsys.readouterr()
     expected_parts = [
@@ -112,17 +111,16 @@ def test_orchestrator_executor_reporter_print_success_flow(capsys: pytest.Captur
 
 
 def test_orchestrator_executor_reporter_print_failure_flow(capsys: pytest.CaptureFixture[str]) -> None:
-    """End-to-end test of the printing reporter via OrchestratorExecutor on failure."""
+    """End-to-end test of the printing reporter via execute_orchestrator on failure."""
     orchestrator = Orchestrator()
     phase = Phase(name="Execution")
     phase.add_step(MockStep(name="FailingStep", description="", should_fail=True))
     orchestrator.add_phase(phase)
 
     reporter = OrchestratorExecutorReporterPrint()
-    executor = OrchestratorExecutor(orchestrator)
     visitor = MockVisitor()
 
-    executor.execute(visitor, reporter)
+    execute_orchestrator(orchestrator, visitor, reporter)
 
     captured = capsys.readouterr()
     assert "    [error] Failed FailingStep" in captured.out
