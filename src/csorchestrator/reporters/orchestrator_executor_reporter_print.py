@@ -44,4 +44,16 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
             self.reporter_sink.stdout(f"[end step {step.name} OK]")
         else:
             self.reporter_sink.stdout(f"[end step {step.name} FAIL]")
+
+        self.reporter_sink.stdout(f"[{step.name} REPORT]")
+        self.reporter_sink.increase_indentation()
+        for m in report.errors:
+            self.reporter_sink.stdout(f"[ERROR] {m}")
+        for m in report.warnings:
+            self.reporter_sink.stdout(f"[WARNING] {m}")
+        for m in report.infos:
+            self.reporter_sink.stdout(f"[INFO] {m}")
+        self.reporter_sink.decrease_indentation()
+
+        # end step indent
         self.reporter_sink.decrease_indentation()

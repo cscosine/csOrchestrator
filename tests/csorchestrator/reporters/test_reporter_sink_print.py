@@ -38,6 +38,8 @@ class MockVisitor(OrchestratorVisitorBase):
     def visit_step(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         assert isinstance(step, MockStep)
         report = Report()
+        report.append_warning(f"Warning in {step.name}")
+        report.append_info(f"Info in {step.name}")
         reporter_sink.info(f"Executing {step.name}")
         if step.should_fail:
             report.append_error(f"Error in {step.name}")
