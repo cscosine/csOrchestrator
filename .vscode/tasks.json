@@ -48,6 +48,13 @@
       "detail": "#Testing # Run pytest (fast)"
     },
     {
+      "label": "Pytest (coverage)",
+      "type": "shell",
+      "command": "${command:python.interpreterPath} -m pytest --cov=csorchestrator --cov-branch --cov-report=html",
+      "problemMatcher": [],
+      "detail": "#Testing # Run pytest (all) with coverage"
+    },
+    {
       "label": "Pytest (run-all)",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest --run-all",
@@ -55,11 +62,11 @@
       "detail": "#Testing # Run pytest (all - slow)"
     },
     {
-      "label": "Pytest (coverage)",
+      "label": "Pytest (run-all & coverage)",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest --cov=csorchestrator --cov-branch --cov-report=html --run-all",
       "problemMatcher": [],
-      "detail": "#Testing # Run pytest with coverage"
+      "detail": "#Testing # Run pytest (all) with coverage"
     }
   ]
 }
