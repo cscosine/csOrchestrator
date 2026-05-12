@@ -112,6 +112,366 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_arm64_generic[aarch64]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_arm64_generic[aarch64]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_arm64_generic[arm64]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_arm64_generic[arm64]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_arm64_variants[nano-nano]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_arm64_variants[nano-nano]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_arm64_variants[orin-orin]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_arm64_variants[orin-orin]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_arm64_variants[xavier-xavier]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_arm64_variants[xavier-xavier]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_unsupported[armv7l]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_unsupported[armv7l]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_unsupported[i386]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_unsupported[i386]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_unsupported[mips]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_unsupported[mips]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_unsupported[sparc]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_unsupported[sparc]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_x64[amd64]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_x64[amd64]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_x64[x64]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_x64[x64]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_x64[x86_64]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_architecture.py::test_detect_architecture_x64[x86_64]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_arm64_variant \u2192 test_detect_arm64_variant_generic_on_exception",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_arm64_variant.py::test_detect_arm64_variant_generic_on_exception"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_arm64_variant \u2192 test_detect_arm64_variant_generic_unknown_model",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_arm64_variant.py::test_detect_arm64_variant_generic_unknown_model"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_arm64_variant \u2192 test_detect_arm64_variant_generic_when_file_missing",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_arm64_variant.py::test_detect_arm64_variant_generic_when_file_missing"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_arm64_variant \u2192 test_detect_arm64_variant_nano",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_arm64_variant.py::test_detect_arm64_variant_nano"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_arm64_variant \u2192 test_detect_arm64_variant_orin",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_arm64_variant.py::test_detect_arm64_variant_orin"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_arm64_variant \u2192 test_detect_arm64_variant_xavier",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_arm64_variant.py::test_detect_arm64_variant_xavier"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_context_os_architecture \u2192 test_detect_context_os_architecture_architecture_error",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_context_os_architecture.py::test_detect_context_os_architecture_architecture_error"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_context_os_architecture \u2192 test_detect_context_os_architecture_none_distro_values",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_context_os_architecture.py::test_detect_context_os_architecture_none_distro_values"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_context_os_architecture \u2192 test_detect_context_os_architecture_os_error",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_context_os_architecture.py::test_detect_context_os_architecture_os_error"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_context_os_architecture \u2192 test_detect_context_os_architecture_success",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_context_os_architecture.py::test_detect_context_os_architecture_success"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_linux_missing_both_id_and_version",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_linux_missing_both_id_and_version"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_linux_missing_id",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_linux_missing_id"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_linux_missing_version_id",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_linux_missing_version_id"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_linux_without_os_release",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_linux_without_os_release"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_mock_linux_from_macos",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_mock_linux_from_macos"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_mock_linux_from_windows",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_mock_linux_from_windows"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_mock_macos_from_linux",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_mock_macos_from_linux"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_mock_macos_from_windows",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_mock_macos_from_windows"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_mock_windows_from_linux",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_mock_windows_from_linux"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_mock_windows_from_macos",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_mock_windows_from_macos"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_real_linux",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_real_linux"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_real_macos",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_real_macos"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_real_windows",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_real_windows"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_os \u2192 test_detect_os_unsupported",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_detect_os.py::test_detect_os_unsupported"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/core/test_expected \u2192 test_expected_error",
       "type": "debugpy",
       "request": "launch",
