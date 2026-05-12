@@ -92,6 +92,186 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_detect_compiler_version_run_exception",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_detect_compiler_version_run_exception"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_detect_compiler_version_run_failure_returncode",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_detect_compiler_version_run_failure_returncode"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_invalid_apple_clang_output",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_invalid_apple_clang_output"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_invalid_clang_output",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_invalid_clang_output"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_invalid_gcc_output",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_invalid_gcc_output"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_invalid_msvc_output",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_invalid_msvc_output"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_linux_clang_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_linux_clang_real"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_linux_gcc_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_linux_gcc_real"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_macos_apple_clang_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_macos_apple_clang_real"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_mocked_apple_clang",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_mocked_apple_clang"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_mocked_clang",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_mocked_clang"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_mocked_gcc",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_mocked_gcc"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_mocked_msvc",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_mocked_msvc"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_mocked_msvc_142",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_mocked_msvc_142"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_mocked_msvc_fallback_version",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_mocked_msvc_fallback_version"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_unsupported_compiler",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_unsupported_compiler"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_windows_clang_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_windows_clang_real"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_compiler_generator \u2192 test_windows_msvc_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_compiler_generator.py::test_windows_msvc_real"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/context/test_context_local_execution \u2192 test_create_context_empty_path_invalid",
       "type": "debugpy",
       "request": "launch",

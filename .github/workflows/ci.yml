@@ -34,6 +34,10 @@ jobs:
             requirements*.txt
             constraints-minimum.txt
 
+      - name: Setup MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
