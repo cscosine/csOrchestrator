@@ -23,8 +23,7 @@ def test_detect_context_os_architecture_success():
                 (
                     OS.LINUX,
                     "6.8.0",
-                    "ubuntu",
-                    "24.04",
+                    "ubuntu-24.04",
                 )
             ),
         ),
@@ -45,8 +44,7 @@ def test_detect_context_os_architecture_success():
     assert result.value == ContextOsArchitecture(
         os=OS.LINUX,
         os_version="6.8.0",
-        os_distro="ubuntu",
-        os_distro_version="24.04",
+        os_distro="ubuntu-24.04",
         architecture=Architecture.ARM64,
         architecture_variant="orin",
     )
@@ -81,8 +79,7 @@ def test_detect_context_os_architecture_architecture_error():
                 (
                     OS.LINUX,
                     "6.8.0",
-                    "ubuntu",
-                    "24.04",
+                    "ubuntu-24.04",
                 )
             ),
         ),
@@ -111,7 +108,6 @@ def test_detect_context_os_architecture_none_distro_values():
                     OS.WINDOWS,
                     "11",
                     None,
-                    None,
                 )
             ),
         ),
@@ -133,7 +129,6 @@ def test_detect_context_os_architecture_none_distro_values():
         os=OS.WINDOWS,
         os_version="11",
         os_distro="",
-        os_distro_version="",
         architecture=Architecture.X64,
         architecture_variant="generic",
     )
