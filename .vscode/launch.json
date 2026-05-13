@@ -152,26 +152,6 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_distro_is_included_only_when_present",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_distro_is_included_only_when_present"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_empty_distro_is_skipped",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_empty_distro_is_skipped"
-      ],
-      "justMyCode": false
-    },
-    {
       "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_lowercasing_behavior",
       "type": "debugpy",
       "request": "launch",
@@ -388,16 +368,6 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/context/test_detect_context_os_architecture.py::test_detect_context_os_architecture_architecture_error"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_context_os_architecture \u2192 test_detect_context_os_architecture_none_distro_values",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_detect_context_os_architecture.py::test_detect_context_os_architecture_none_distro_values"
       ],
       "justMyCode": false
     },

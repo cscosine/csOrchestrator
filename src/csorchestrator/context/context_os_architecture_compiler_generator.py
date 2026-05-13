@@ -1,5 +1,5 @@
 from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
-from csorchestrator.context.context_os_architecture import OS, ContextOsArchitecture
+from csorchestrator.context.context_os_architecture import ContextOsArchitecture
 
 cs_orchestrator_schema_version = "csv1"
 
@@ -14,8 +14,8 @@ def create_context_os_architecture_compiler_generator_string(
     Examples:
 
         csv1-linux-ubuntu24.04-arm64-orin-clang-ninja
-        csv1-windows11-x64-generic-msvc-vs2022
-        csv1-macos14-arm64-generic-appleclang-ninjamulticonfig
+        csv1-windows-11-x64-generic-msvc-vs2022
+        csv1-macos-14-arm64-generic-appleclang-ninjamulticonfig
     """
 
     parts: list[str] = []
@@ -32,23 +32,11 @@ def create_context_os_architecture_compiler_generator_string(
 
     os_name = context_os_architecture.os.value.lower()
 
-    # windows11
-    # macos14
-    if context_os_architecture.os != OS.LINUX:
-        os_version = context_os_architecture.os_version.lower()
-        parts.append(f"{os_name}{os_version}")
-    else:
-        parts.append(f"{os_name}")  # skip os version for linux, contains kernel version
-
-    # =====================================================
-    # DISTRO
-    # =====================================================
-
-    if context_os_architecture.os_distro:
-        distro = context_os_architecture.os_distro.lower()
-
-        # ubuntu24.04
-        parts.append(f"{distro}")
+    # windows-11
+    # macos-14
+    # linux-ubuntu22.04
+    os_version = context_os_architecture.os_version.lower()
+    parts.append(f"{os_name}-{os_version}")
 
     # =====================================================
     # ARCHITECTURE

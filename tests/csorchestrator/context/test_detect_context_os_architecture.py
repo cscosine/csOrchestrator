@@ -20,8 +20,7 @@ def test_detect_context_os_architecture_success():
             return_value=Expected.make_value(
                 (
                     OS.LINUX,
-                    "6.8.0",
-                    "ubuntu-24.04",
+                    "ubuntu24.04",
                 )
             ),
         ),
@@ -41,8 +40,7 @@ def test_detect_context_os_architecture_success():
 
     assert result.value == ContextOsArchitecture(
         os=OS.LINUX,
-        os_version="6.8.0",
-        os_distro="ubuntu-24.04",
+        os_version="ubuntu24.04",
         architecture=Architecture.ARM64,
         architecture_variant="orin",
     )
@@ -76,8 +74,7 @@ def test_detect_context_os_architecture_architecture_error():
             return_value=Expected.make_value(
                 (
                     OS.LINUX,
-                    "6.8.0",
-                    "ubuntu-24.04",
+                    "ubuntu24.04",
                 )
             ),
         ),
@@ -90,43 +87,3 @@ def test_detect_context_os_architecture_architecture_error():
 
     assert result.value is None
     assert result.error == "Unsupported architecture"
-
-
-# =========================================================
-# NONE DISTRO VALUES -> EMPTY STRINGS
-# =========================================================
-
-
-def test_detect_context_os_architecture_none_distro_values():
-    with (
-        patch(
-            "csorchestrator.context.context_os_architecture.detect_os",
-            return_value=Expected.make_value(
-                (
-                    OS.WINDOWS,
-                    "11",
-                    None,
-                )
-            ),
-        ),
-        patch(
-            "csorchestrator.context.context_os_architecture.detect_architecture",
-            return_value=Expected.make_value(
-                (
-                    Architecture.X64,
-                    "generic",
-                )
-            ),
-        ),
-    ):
-        result = detect_context_os_architecture()
-
-    assert result.error is None
-
-    assert result.value == ContextOsArchitecture(
-        os=OS.WINDOWS,
-        os_version="11",
-        os_distro="",
-        architecture=Architecture.X64,
-        architecture_variant="generic",
-    )

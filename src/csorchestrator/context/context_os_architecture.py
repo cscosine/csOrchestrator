@@ -22,7 +22,6 @@ class Architecture(Enum):
 class ContextOsArchitecture:
     os: OS
     os_version: str
-    os_distro: str
 
     architecture: Architecture
     architecture_variant: str  # generic orin xavier nano
@@ -33,8 +32,8 @@ class ContextOsArchitecture:
 # =========================================================
 
 
-# return the os name if not supported
-def detect_os() -> Expected[tuple[OS, str, str | None], str]:
+# return the os name if not supported in the expected
+def detect_os() -> Expected[tuple[OS, str], str]:
 
     system = platform.system().lower()
 
@@ -45,15 +44,13 @@ def detect_os() -> Expected[tuple[OS, str, str | None], str]:
     if system == "windows":
         version = platform.release()
 
-        return Expected[tuple[OS, str, str | None], str].make_value((OS.WINDOWS, version, None))
+        return Expected[tuple[OS, str], str].make_value((OS.WINDOWS, "v" + version))
 
     # -----------------------------------------------------
     # LINUX
     # -----------------------------------------------------
 
     if system == "linux":
-        distro = None
-
         os_release = Path("/etc/os-release")
 
         if os_release.exists():
@@ -63,16 +60,16 @@ def detect_os() -> Expected[tuple[OS, str, str | None], str]:
             version_match = re.search(r'^VERSION_ID="?([^"\n]+)"?', content, re.MULTILINE)
 
             if distro_match and version_match:
-                distro = distro_match.group(1).lower() + "-" + version_match.group(1).lower()
-
-        kernel_version = platform.release()
-
-        return Expected[tuple[OS, str, str | None], str].make_value((OS.LINUX, kernel_version, distro))
+                distro = distro_match.group(1).lower() + version_match.group(1).lower()
+                return Expected[tuple[OS, str], str].make_value((OS.LINUX, distro))
+            else:
+                return Expected[tuple[OS, str], str].make_error(f"Unsupported linux with /etc/os-release: {content}")
 
     if system == "darwin":
-        return Expected[tuple[OS, str, str | None], str].make_value((OS.MACOS, platform.mac_ver()[0], None))
+        version = platform.mac_ver()[0]
+        return Expected[tuple[OS, str], str].make_value((OS.MACOS, "v" + version))
 
-    return Expected[tuple[OS, str, str | None], str].make_error(f"Unsupported OS: {system}")
+    return Expected[tuple[OS, str], str].make_error(f"Unsupported OS: {system}")
 
 
 def detect_architecture() -> Expected[tuple[Architecture, str], str]:
@@ -109,7 +106,6 @@ def detect_arm64_variant() -> str:
     if model_file.exists():
         try:
             model = model_file.read_text().lower()
-            print(f"@@@@@@@@@@@@@@@@@@@@@@@@@@@@ Detected ARM64 model: {model}")
 
             if "orin" in model:
                 return "orin"
@@ -138,7 +134,7 @@ def detect_context_os_architecture() -> Expected[ContextOsArchitecture, str]:
         return Expected[ContextOsArchitecture, str].make_error(os_result.error)
 
     assert os_result.value is not None  # to make mypy happy need to check for None explicitly
-    os_value, os_version, distro = os_result.value
+    os_value, os_version = os_result.value
 
     arch_result = detect_architecture()
     if arch_result.error is not None:
@@ -151,7 +147,6 @@ def detect_context_os_architecture() -> Expected[ContextOsArchitecture, str]:
         ContextOsArchitecture(
             os=os_value,
             os_version=os_version,
-            os_distro=distro if distro is not None else "",
             architecture=arch,
             architecture_variant=arch_variant,
         )

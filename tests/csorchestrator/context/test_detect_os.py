@@ -17,11 +17,10 @@ def test_detect_os_real_windows():
     assert result.error is None
     assert result.value is not None
 
-    detected_os, version, distro = result.value
+    detected_os, version = result.value
 
     assert detected_os == OS.WINDOWS
-    assert isinstance(version, str)
-    assert distro is None
+    assert version[0] == "v"
 
 
 @pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
@@ -40,7 +39,7 @@ VERSION_ID="22.04"
         result = detect_os()
 
     assert result.error is None
-    assert result.value == (OS.LINUX, "6.8.0", "ubuntu-22.04")
+    assert result.value == (OS.LINUX, "ubuntu22.04")
 
 
 @pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
@@ -52,7 +51,7 @@ def test_detect_os_mock_macos_from_windows():
         result = detect_os()
 
     assert result.error is None
-    assert result.value == (OS.MACOS, "14.5", None)
+    assert result.value == (OS.MACOS, "v14.5")
 
 
 # =========================================================
@@ -67,11 +66,10 @@ def test_detect_os_real_linux():
     assert result.error is None
     assert result.value is not None
 
-    detected_os, kernel_version, distro = result.value
+    detected_os, distro = result.value
 
     assert detected_os == OS.LINUX
-    assert isinstance(kernel_version, str)
-    assert distro is None or isinstance(distro, str)
+    assert distro != ""
 
 
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
@@ -83,7 +81,7 @@ def test_detect_os_mock_windows_from_linux():
         result = detect_os()
 
     assert result.error is None
-    assert result.value == (OS.WINDOWS, "11", None)
+    assert result.value == (OS.WINDOWS, "v11")
 
 
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
@@ -95,7 +93,7 @@ def test_detect_os_mock_macos_from_linux():
         result = detect_os()
 
     assert result.error is None
-    assert result.value == (OS.MACOS, "14.5", None)
+    assert result.value == (OS.MACOS, "v14.5")
 
 
 # =========================================================
@@ -110,11 +108,10 @@ def test_detect_os_real_macos():
     assert result.error is None
     assert result.value is not None
 
-    detected_os, version, distro = result.value
+    detected_os, version = result.value
 
     assert detected_os == OS.MACOS
-    assert isinstance(version, str)
-    assert distro is None
+    assert version[0] == "v"
 
 
 @pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-only test")
@@ -126,7 +123,7 @@ def test_detect_os_mock_windows_from_macos():
         result = detect_os()
 
     assert result.error is None
-    assert result.value == (OS.WINDOWS, "11", None)
+    assert result.value == (OS.WINDOWS, "v11")
 
 
 @pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-only test")
@@ -145,7 +142,7 @@ VERSION_ID="24.04"
         result = detect_os()
 
     assert result.error is None
-    assert result.value == (OS.LINUX, "6.8.0", "ubuntu-24.04")
+    assert result.value == (OS.LINUX, "ubuntu24.04")
 
 
 # =========================================================
@@ -174,12 +171,7 @@ def test_detect_os_linux_without_os_release():
     ):
         result = detect_os()
 
-    assert result.error is None
-    assert result.value == (
-        OS.LINUX,
-        "6.8.0",
-        None,
-    )
+    assert result.error is not None
 
 
 def test_detect_os_linux_missing_version_id():
@@ -195,12 +187,7 @@ ID=ubuntu
     ):
         result = detect_os()
 
-    assert result.error is None
-    assert result.value == (
-        OS.LINUX,
-        "6.8.0",
-        None,
-    )
+    assert result.error is not None
 
 
 def test_detect_os_linux_missing_both_id_and_version():
@@ -217,9 +204,4 @@ PRETTY_NAME="Ubuntu 24.04"
     ):
         result = detect_os()
 
-    assert result.error is None
-    assert result.value == (
-        OS.LINUX,
-        "6.8.0",
-        None,
-    )
+    assert result.error is not None
