@@ -41,9 +41,9 @@ def create_context_id(
 
     Examples:
 
-        csv1-linux-ubuntu24.04-arm64-orin-clang18-ninja
-        csv1-windows11-x64-generic-msvc143-vs17
-        csv1-macos14-arm64-generic-appleclang16-ninjamulticonfig
+        csv1-linux-ubuntu24.04-arm64-orin-clang-ninja
+        csv1-windows11-x64-generic-msvc-vs2022
+        csv1-macos14-arm64-generic-appleclang-ninjamulticonfig
     """
 
     parts: list[str] = []
@@ -94,12 +94,7 @@ def create_context_id(
 
     compiler_name = context_compiler_generator.compiler_family.value.lower()
 
-    compiler_version = context_compiler_generator.compiler_version.lower()
-
-    # clang18
-    # gcc13
-    # msvc143
-    parts.append(f"{compiler_name}{compiler_version}")
+    parts.append(f"{compiler_name}")
 
     # =====================================================
     # GENERATOR

@@ -4,8 +4,8 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from csorchestrator.context.context_compiler_generator import (
-    Compiler,
+from csorchestrator.context.context_compiler_generator import Compiler
+from csorchestrator.utils.compilers.compiler_generator import (
     detect_compiler_version,
     detect_compiler_version_run,
 )
