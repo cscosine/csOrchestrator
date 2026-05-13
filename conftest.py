@@ -7,6 +7,12 @@ def pytest_addoption(parser: pytest.Parser) -> None:
     )
     parser.addoption("--run-slow", action="store_true", default=False, help="Run tests marked as 'slow'")
     parser.addoption("--run-git", action="store_true", default=False, help="Run tests marked as 'git'")
+    parser.addoption(
+        "--requires-mandatory",
+        action="store_true",
+        default=False,
+        help="Fail tests instead of skipping when required tools are missing",
+    )
 
 
 def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]) -> None:

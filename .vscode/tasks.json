@@ -59,7 +59,7 @@
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest --run-all",
       "problemMatcher": [],
-      "detail": "#Testing # Run pytest (all - slow)"
+      "detail": "#Testing # Run pytest (all)"
     },
     {
       "label": "Pytest (run-all & coverage)",

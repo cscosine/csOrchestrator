@@ -1,5 +1,4 @@
 import platform
-from shutil import which
 from unittest.mock import Mock, patch
 
 import pytest
@@ -16,9 +15,9 @@ from csorchestrator.utils.compilers.compiler_generator import (
 
 
 @pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
+@pytest.mark.requires("cl")  # if run-all this will be forced to run, all tests will run in the continuous integration.
+# on local execution, without run-all, will be allowed to skip if the compiler is not installed
 def test_windows_msvc_real():
-
-    assert which("cl") is not None
 
     result = detect_compiler_version(Compiler.MSVC)
 
@@ -28,9 +27,11 @@ def test_windows_msvc_real():
 
 
 @pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
+@pytest.mark.requires(
+    "clang++"
+)  # if run-all this will be forced to run, all tests will run in the continuous integration.
+# on local execution, without run-all, will be allowed to skip if the compiler is not installed
 def test_windows_clang_real():
-
-    assert which("clang++") is not None
 
     result = detect_compiler_version(Compiler.CLANG)
 
@@ -45,9 +46,9 @@ def test_windows_clang_real():
 
 
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
+@pytest.mark.requires("g++")  # if run-all this will be forced to run, all tests will run in the continuous integration.
+# on local execution, without run-all, will be allowed to skip if the compiler is not installed
 def test_linux_gcc_real():
-
-    assert which("g++") is not None
 
     result = detect_compiler_version(Compiler.GCC)
 
@@ -57,9 +58,11 @@ def test_linux_gcc_real():
 
 
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
+@pytest.mark.requires(
+    "clang++"
+)  # if run-all this will be forced to run, all tests will run in the continuous integration.
+# on local execution, without run-all, will be allowed to skip if the compiler is not installed
 def test_linux_clang_real():
-
-    assert which("clang++") is not None
 
     result = detect_compiler_version(Compiler.CLANG)
 
@@ -74,9 +77,11 @@ def test_linux_clang_real():
 
 
 @pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-only test")
+@pytest.mark.requires(
+    "clang++"
+)  # if run-all this will be forced to run, all tests will run in the continuous integration.
+# on local execution, without run-all, will be allowed to skip if the compiler is not installed
 def test_macos_apple_clang_real():
-
-    assert which("clang++") is not None
 
     result = detect_compiler_version(Compiler.APPLE_CLANG)
 

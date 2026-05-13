@@ -96,4 +96,5 @@ disallow_untyped_decorators = false
 markers = [
   "slow: slow tests",
   "git: requires git access to a remote repo",
+  "requires: test requires external tool or dependency (e.g. `requires(\"clang++\")` )",
 ]
