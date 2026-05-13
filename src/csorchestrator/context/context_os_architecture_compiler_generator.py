@@ -62,11 +62,9 @@ def create_context_os_architecture_compiler_generator_string(
     # GENERATOR
     # =====================================================
 
-    generator_name = context_compiler_generator.build_generator.value.lower()
+    generator = context_compiler_generator.build_generator.value.lower()
 
-    generator_version = context_compiler_generator.build_generator_version.lower()
-
-    parts.append(f"{generator_name}{generator_version}")
+    parts.append(f"{generator}")
 
     # =====================================================
     # FINAL

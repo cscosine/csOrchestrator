@@ -16,12 +16,11 @@ def test_basic_linux_ninja_clang():
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.CLANG,
         build_generator=Generator.NINJA,
-        build_generator_version="1.0",
     )
 
     result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
-    assert result == "csv1-linux-ubuntu24.04-arm64-orin-clang-ninja1.0"
+    assert result == "csv1-linux-ubuntu24.04-arm64-orin-clang-ninja"
 
 
 def test_windows_msvc_vs_generator():
@@ -34,8 +33,7 @@ def test_windows_msvc_vs_generator():
 
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.MSVC,
-        build_generator=Generator.VS,
-        build_generator_version="2022",
+        build_generator=Generator.VS_17_2022,
     )
 
     result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
@@ -54,12 +52,11 @@ def test_macos_appleclang_ninja_multiconfig():
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.APPLE_CLANG,
         build_generator=Generator.NINJA_MULTI,
-        build_generator_version="3",
     )
 
     result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
-    assert result == "csv1-macos-v14-arm64-generic-appleclang-ninjamulticonfig3"
+    assert result == "csv1-macos-v14-arm64-generic-appleclang-ninjamulticonfig"
 
 
 def test_lowercasing_behavior():
@@ -73,12 +70,11 @@ def test_lowercasing_behavior():
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.CLANG,
         build_generator=Generator.NINJA,
-        build_generator_version="X.Y",
     )
 
     result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
-    assert result == "csv1-linux-ubuntu24.04-arm64-orin-clang-ninjax.y"
+    assert result == "csv1-linux-ubuntu24.04-arm64-orin-clang-ninja"
 
 
 def test_all_generators_supported():
@@ -92,12 +88,12 @@ def test_all_generators_supported():
     for gen, expected in [
         (Generator.NINJA, "ninja"),
         (Generator.NINJA_MULTI, "ninjamulticonfig"),
-        (Generator.VS, "vs"),
+        (Generator.VS_17_2022, "vs2022"),
+        (Generator.VS_18_2026, "vs2026"),
     ]:
         context_compiler = ContextCompilerGenerator(
             compiler_family=Compiler.GCC,
             build_generator=gen,
-            build_generator_version="1",
         )
 
         result = create_context_os_architecture_compiler_generator_string(base_os, context_compiler)

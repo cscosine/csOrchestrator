@@ -12,7 +12,8 @@ class Compiler(Enum):
 class Generator(Enum):
     NINJA = "ninja"
     NINJA_MULTI = "ninjamulticonfig"
-    VS = "vs"  # generator visual studio sln, to be decorated with 2022, 2026
+    VS_17_2022 = "vs2022"
+    VS_18_2026 = "vs2026"
 
 
 @dataclass(frozen=True)
@@ -20,4 +21,3 @@ class ContextCompilerGenerator:
     compiler_family: Compiler
 
     build_generator: Generator
-    build_generator_version: str
