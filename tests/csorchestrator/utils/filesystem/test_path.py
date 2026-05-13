@@ -1,4 +1,4 @@
-import os
+import platform
 from pathlib import Path
 
 import pytest
@@ -7,14 +7,14 @@ from csorchestrator.utils.file_system.path import is_clean_relative_path, try_pa
 
 
 # run on windows
-@pytest.mark.skipif(os.name != "nt", reason="Windows absolute path test")
+@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
 def test_is_clean_relative_path_win() -> None:
     assert not is_clean_relative_path("C:\\Users\\file.txt", avoid_leaving_base=False)  # Windows absolute
     assert try_parse_clean_relative_path("C:\\Users\\file.txt", avoid_leaving_base=False) is None
 
 
 # run on linux/macOS
-@pytest.mark.skipif(os.name == "nt", reason="Windows absolute path test")
+@pytest.mark.skipif(platform.system() == "Windows", reason="Windows absolute path test")
 def test_is_clean_relative_path_non_win() -> None:
     assert not is_clean_relative_path("/", avoid_leaving_base=False)
     assert not is_clean_relative_path("/home/user/file.txt", avoid_leaving_base=False)  # Linux/macOS absolute

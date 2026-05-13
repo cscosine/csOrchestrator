@@ -1,4 +1,4 @@
-import os
+import platform
 import stat
 from pathlib import Path
 
@@ -113,7 +113,7 @@ def test_directory_is_writable(tmp_path: Path) -> None:
     assert test_file.exists()
 
 
-@pytest.mark.skipif(os.name == "nt", reason="Permission test unreliable on Windows")
+@pytest.mark.skipif(platform.system() == "Windows", reason="Permission test unreliable on Windows")
 def test_permission_error(tmp_path: Path) -> None:
     target = tmp_path / "restricted"
     target.mkdir()

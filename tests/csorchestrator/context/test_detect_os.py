@@ -1,4 +1,4 @@
-import os
+import platform
 from unittest.mock import patch
 
 import pytest
@@ -10,7 +10,7 @@ from csorchestrator.context.context_os_architecture import OS, detect_os
 # =========================================================
 
 
-@pytest.mark.skipif(os.name != "nt", reason="Runs only on Windows")
+@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
 def test_detect_os_real_windows():
     result = detect_os()
 
@@ -24,7 +24,7 @@ def test_detect_os_real_windows():
     assert distro is None
 
 
-@pytest.mark.skipif(os.name != "nt", reason="Runs only on Windows")
+@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
 def test_detect_os_mock_linux_from_windows():
     os_release_content = """
 ID=ubuntu
@@ -43,7 +43,7 @@ VERSION_ID="22.04"
     assert result.value == (OS.LINUX, "6.8.0", "ubuntu-22.04")
 
 
-@pytest.mark.skipif(os.name != "nt", reason="Runs only on Windows")
+@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
 def test_detect_os_mock_macos_from_windows():
     with (
         patch("platform.system", return_value="Darwin"),
@@ -60,11 +60,7 @@ def test_detect_os_mock_macos_from_windows():
 # =========================================================
 
 
-@pytest.mark.skipif(os.name != "posix", reason="Runs only on Linux/macOS")
-@pytest.mark.skipif(
-    __import__("platform").system().lower() != "linux",
-    reason="Runs only on Linux",
-)
+@pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
 def test_detect_os_real_linux():
     result = detect_os()
 
@@ -78,10 +74,7 @@ def test_detect_os_real_linux():
     assert distro is None or isinstance(distro, str)
 
 
-@pytest.mark.skipif(
-    __import__("platform").system().lower() != "linux",
-    reason="Runs only on Linux",
-)
+@pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
 def test_detect_os_mock_windows_from_linux():
     with (
         patch("platform.system", return_value="Windows"),
@@ -93,10 +86,7 @@ def test_detect_os_mock_windows_from_linux():
     assert result.value == (OS.WINDOWS, "11", None)
 
 
-@pytest.mark.skipif(
-    __import__("platform").system().lower() != "linux",
-    reason="Runs only on Linux",
-)
+@pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
 def test_detect_os_mock_macos_from_linux():
     with (
         patch("platform.system", return_value="Darwin"),
@@ -113,10 +103,7 @@ def test_detect_os_mock_macos_from_linux():
 # =========================================================
 
 
-@pytest.mark.skipif(
-    __import__("platform").system().lower() != "darwin",
-    reason="Runs only on macOS",
-)
+@pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-only test")
 def test_detect_os_real_macos():
     result = detect_os()
 
@@ -130,10 +117,7 @@ def test_detect_os_real_macos():
     assert distro is None
 
 
-@pytest.mark.skipif(
-    __import__("platform").system().lower() != "darwin",
-    reason="Runs only on macOS",
-)
+@pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-only test")
 def test_detect_os_mock_windows_from_macos():
     with (
         patch("platform.system", return_value="Windows"),
@@ -145,10 +129,7 @@ def test_detect_os_mock_windows_from_macos():
     assert result.value == (OS.WINDOWS, "11", None)
 
 
-@pytest.mark.skipif(
-    __import__("platform").system().lower() != "darwin",
-    reason="Runs only on macOS",
-)
+@pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-only test")
 def test_detect_os_mock_linux_from_macos():
     os_release_content = """
 ID=ubuntu

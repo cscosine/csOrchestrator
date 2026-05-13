@@ -11,28 +11,11 @@ from csorchestrator.utils.compilers.compiler_generator import (
 )
 
 # =========================================================
-# PLATFORM HELPERS
-# =========================================================
-
-
-def is_windows() -> bool:
-    return platform.system().lower() == "windows"
-
-
-def is_linux() -> bool:
-    return platform.system().lower() == "linux"
-
-
-def is_macos() -> bool:
-    return platform.system().lower() == "darwin"
-
-
-# =========================================================
 # WINDOWS TESTS
 # =========================================================
 
 
-@pytest.mark.skipif(not is_windows(), reason="Windows-only test")
+@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
 def test_windows_msvc_real():
 
     assert which("cl") is not None
@@ -44,7 +27,7 @@ def test_windows_msvc_real():
     assert result.value.isdigit()
 
 
-@pytest.mark.skipif(not is_windows(), reason="Windows-only test")
+@pytest.mark.skipif(platform.system() != "Windows", reason="Windows-only test")
 def test_windows_clang_real():
 
     assert which("clang++") is not None
@@ -61,7 +44,7 @@ def test_windows_clang_real():
 # =========================================================
 
 
-@pytest.mark.skipif(not is_linux(), reason="Linux-only test")
+@pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
 def test_linux_gcc_real():
 
     assert which("g++") is not None
@@ -73,7 +56,7 @@ def test_linux_gcc_real():
     assert result.value.isdigit()
 
 
-@pytest.mark.skipif(not is_linux(), reason="Linux-only test")
+@pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
 def test_linux_clang_real():
 
     assert which("clang++") is not None
@@ -90,7 +73,7 @@ def test_linux_clang_real():
 # =========================================================
 
 
-@pytest.mark.skipif(not is_macos(), reason="macOS-only test")
+@pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-only test")
 def test_macos_apple_clang_real():
 
     assert which("clang++") is not None
