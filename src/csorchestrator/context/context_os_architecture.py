@@ -131,7 +131,7 @@ def detect_arm64_variant() -> str:
 # =========================================================
 
 
-def detectContextOsArchitecture() -> Expected[ContextOsArchitecture, str]:
+def detect_context_os_architecture() -> Expected[ContextOsArchitecture, str]:
 
     os_result = detect_os()
     if os_result.error is not None:

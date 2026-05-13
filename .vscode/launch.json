@@ -102,76 +102,6 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_architecture_compiler \u2192 test_all_generators_supported",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_context_architecture_compiler.py::test_all_generators_supported"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_architecture_compiler \u2192 test_basic_linux_ninja_clang",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_context_architecture_compiler.py::test_basic_linux_ninja_clang"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_architecture_compiler \u2192 test_distro_is_included_only_when_present",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_context_architecture_compiler.py::test_distro_is_included_only_when_present"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_architecture_compiler \u2192 test_empty_distro_is_skipped",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_context_architecture_compiler.py::test_empty_distro_is_skipped"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_architecture_compiler \u2192 test_lowercasing_behavior",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_context_architecture_compiler.py::test_lowercasing_behavior"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_architecture_compiler \u2192 test_macos_appleclang_ninja_multiconfig",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_context_architecture_compiler.py::test_macos_appleclang_ninja_multiconfig"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_architecture_compiler \u2192 test_windows_msvc_vs_generator",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/context/test_context_architecture_compiler.py::test_windows_msvc_vs_generator"
-      ],
-      "justMyCode": false
-    },
-    {
       "name": "\ud83e\uddea tests/csorchestrator/context/test_context_local_execution \u2192 test_create_context_empty_path_invalid",
       "type": "debugpy",
       "request": "launch",
@@ -182,12 +112,92 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_local_execution \u2192 test_create_context_invalid_detect_context_os_architecture",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_local_execution.py::test_create_context_invalid_detect_context_os_architecture"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/context/test_context_local_execution \u2192 test_local_path",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
         "tests/csorchestrator/context/test_context_local_execution.py::test_local_path"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_all_generators_supported",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_all_generators_supported"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_basic_linux_ninja_clang",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_basic_linux_ninja_clang"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_distro_is_included_only_when_present",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_distro_is_included_only_when_present"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_empty_distro_is_skipped",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_empty_distro_is_skipped"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_lowercasing_behavior",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_lowercasing_behavior"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_macos_appleclang_ninja_multiconfig",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_macos_appleclang_ninja_multiconfig"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_windows_msvc_vs_generator",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_windows_msvc_vs_generator"
       ],
       "justMyCode": false
     },

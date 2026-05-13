@@ -26,7 +26,7 @@ def validate_and_execute_orchestrator(
     er = ExecutionResult()
     er.execution_description = orchestrator.extract_minimal_description()
 
-    contextWithReport = create_context_local_execution(path=target_folder_path)
+    contextWithReport = create_context_local_execution(base_folder_path=target_folder_path)
     er.report_pre_execution.append_report(contextWithReport.report)
 
     if contextWithReport.result is None:

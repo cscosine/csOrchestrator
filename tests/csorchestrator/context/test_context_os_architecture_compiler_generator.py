@@ -1,6 +1,8 @@
-from csorchestrator.context.context_architecture_compiler import create_context_architecture_compiler_string
 from csorchestrator.context.context_compiler_generator import Compiler, ContextCompilerGenerator, Generator
 from csorchestrator.context.context_os_architecture import OS, Architecture, ContextOsArchitecture
+from csorchestrator.context.context_os_architecture_compiler_generator import (
+    create_context_os_architecture_compiler_generator_string,
+)
 
 
 def test_basic_linux_ninja_clang():
@@ -18,7 +20,7 @@ def test_basic_linux_ninja_clang():
         build_generator_version="1.0",
     )
 
-    result = create_context_architecture_compiler_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
     assert result == "csv1-linux-ubuntu24.04-arm64-orin-clang-ninja1.0"
 
@@ -38,7 +40,7 @@ def test_windows_msvc_vs_generator():
         build_generator_version="2022",
     )
 
-    result = create_context_architecture_compiler_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
     assert result == "csv1-windows11-x64-generic-msvc-vs2022"
 
@@ -58,7 +60,7 @@ def test_macos_appleclang_ninja_multiconfig():
         build_generator_version="3",
     )
 
-    result = create_context_architecture_compiler_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
     assert result == "csv1-macos14-arm64-generic-appleclang-ninjamulticonfig3"
 
@@ -78,7 +80,7 @@ def test_distro_is_included_only_when_present():
         build_generator_version="2.0",
     )
 
-    result = create_context_architecture_compiler_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
     # distro must appear in output
     assert "ubuntu24.04" in result
@@ -100,7 +102,7 @@ def test_empty_distro_is_skipped():
         build_generator_version="2026",
     )
 
-    result = create_context_architecture_compiler_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
     # ensure no double hyphen from empty distro
     assert "--" not in result
@@ -122,7 +124,7 @@ def test_lowercasing_behavior():
         build_generator_version="X.Y",
     )
 
-    result = create_context_architecture_compiler_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
     assert result == "csv1-linux-ubuntu-arm64-orin-clang-ninjax.y"
 
@@ -147,6 +149,6 @@ def test_all_generators_supported():
             build_generator_version="1",
         )
 
-        result = create_context_architecture_compiler_string(base_os, context_compiler)
+        result = create_context_os_architecture_compiler_generator_string(base_os, context_compiler)
 
         assert expected in result

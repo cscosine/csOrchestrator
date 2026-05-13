@@ -1,12 +1,10 @@
-# tests/test_detect_context_os_architecture.py
-
 from unittest.mock import patch
 
 from csorchestrator.context.context_os_architecture import (
     OS,
     Architecture,
     ContextOsArchitecture,
-    detectContextOsArchitecture,
+    detect_context_os_architecture,
 )
 from csorchestrator.core.expected import Expected
 
@@ -37,7 +35,7 @@ def test_detect_context_os_architecture_success():
             ),
         ),
     ):
-        result = detectContextOsArchitecture()
+        result = detect_context_os_architecture()
 
     assert result.error is None
 
@@ -60,7 +58,7 @@ def test_detect_context_os_architecture_os_error():
         "csorchestrator.context.context_os_architecture.detect_os",
         return_value=Expected.make_error("Unsupported OS"),
     ):
-        result = detectContextOsArchitecture()
+        result = detect_context_os_architecture()
 
     assert result.value is None
     assert result.error == "Unsupported OS"
@@ -88,7 +86,7 @@ def test_detect_context_os_architecture_architecture_error():
             return_value=Expected.make_error("Unsupported architecture"),
         ),
     ):
-        result = detectContextOsArchitecture()
+        result = detect_context_os_architecture()
 
     assert result.value is None
     assert result.error == "Unsupported architecture"
@@ -121,7 +119,7 @@ def test_detect_context_os_architecture_none_distro_values():
             ),
         ),
     ):
-        result = detectContextOsArchitecture()
+        result = detect_context_os_architecture()
 
     assert result.error is None
 

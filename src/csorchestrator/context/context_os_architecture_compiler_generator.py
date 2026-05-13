@@ -4,7 +4,7 @@ from csorchestrator.context.context_os_architecture import OS, ContextOsArchitec
 cs_orchestrator_schema_version = "csv1"
 
 
-def create_context_architecture_compiler_string(
+def create_context_os_architecture_compiler_generator_string(
     context_os_architecture: ContextOsArchitecture,
     context_compiler_generator: ContextCompilerGenerator,
 ) -> str:
