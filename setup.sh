@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
+if [[ "${BASH_SOURCE[0]}" != "${0}" ]]; then
+  echo "Do not source this script. Run: ./setup.sh"
+  return 1
+fi
 python3 -m venv .venv
 
 source .venv/bin/activate
