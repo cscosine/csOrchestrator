@@ -4,6 +4,7 @@ from enum import Enum
 
 class Compiler(Enum):
     MSVC = "msvc"
+    MSVC_CLANG = "msvcclang"
     CLANG = "clang"
     GCC = "gcc"
     APPLE_CLANG = "appleclang"
