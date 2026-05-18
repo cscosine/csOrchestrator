@@ -92,6 +92,16 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83d\udcc1 tests/csorchestrator/utils/presets tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/presets"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83d\udcc1 tests/csorchestrator/visitors tests",
       "type": "debugpy",
       "request": "launch",
@@ -1948,6 +1958,26 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/utils/git/test_validate_and_sync_repo.py::test_validate_and_sync_repo_main_branch_no_remote_fail[True]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_get_supported_context_os_architecture_list",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/presets/test_supported_variants.py::test_get_supported_context_os_architecture_list"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_get_supported_context_os_architecture_list_string",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/presets/test_supported_variants.py::test_get_supported_context_os_architecture_list_string"
       ],
       "justMyCode": false
     },
