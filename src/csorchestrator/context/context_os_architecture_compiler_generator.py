@@ -14,7 +14,7 @@ def create_context_os_architecture_compiler_generator_string(
     Examples:
 
         csv1-linux-ubuntu24.04-arm64-orin-clang-ninja
-        csv1-windows-11-x64-generic-msvc-vs2022
+        csv1-windows-11-x64-generic-msvc-msvc2022
         csv1-macos-14-arm64-generic-appleclang-ninjamulticonfig
     """
 

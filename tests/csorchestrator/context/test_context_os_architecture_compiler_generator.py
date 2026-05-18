@@ -33,12 +33,12 @@ def test_windows_msvc_vs_generator():
 
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.MSVC,
-        build_generator=Generator.VS_17_2022,
+        build_generator=Generator.MSVC_17_2022,
     )
 
     result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
 
-    assert result == "csv1-windows-v11-x64-generic-msvc-vs2022"
+    assert result == "csv1-windows-v11-x64-generic-msvc-msvc2022"
 
 
 def test_macos_appleclang_ninja_multiconfig():
@@ -88,8 +88,8 @@ def test_all_generators_supported():
     for gen, expected in [
         (Generator.NINJA, "ninja"),
         (Generator.NINJA_MULTI, "ninjamulticonfig"),
-        (Generator.VS_17_2022, "vs2022"),
-        (Generator.VS_18_2026, "vs2026"),
+        (Generator.MSVC_17_2022, "msvc2022"),
+        (Generator.MSVC_18_2026, "msvc2026"),
     ]:
         context_compiler = ContextCompilerGenerator(
             compiler_family=Compiler.GCC,
