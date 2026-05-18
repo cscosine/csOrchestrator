@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from csorchestrator.context.context_os_architecture import Architecture, detect_architecture
+from csorchestrator.context.context_os_architecture import Architecture, ContextOsArchitecture, detect_architecture
 
 # =========================================================
 # X64
@@ -24,7 +24,7 @@ def test_detect_architecture_x64(machine):
         result = detect_architecture()
 
     assert result.error is None
-    assert result.value == (Architecture.X64, "generic")
+    assert result.value == (Architecture.X64, ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC)
 
 
 # =========================================================
@@ -42,12 +42,15 @@ def test_detect_architecture_x64(machine):
 def test_detect_architecture_arm64_generic(machine):
     with (
         patch("platform.machine", return_value=machine),
-        patch("csorchestrator.context.context_os_architecture.detect_arm64_variant", return_value="generic"),
+        patch(
+            "csorchestrator.context.context_os_architecture.detect_arm64_variant",
+            return_value=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
+        ),
     ):
         result = detect_architecture()
 
     assert result.error is None
-    assert result.value == (Architecture.ARM64, "generic")
+    assert result.value == (Architecture.ARM64, ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC)
 
 
 @pytest.mark.parametrize(

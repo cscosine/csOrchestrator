@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from csorchestrator.context.context_os_architecture import detect_arm64_variant
+from csorchestrator.context.context_os_architecture import ContextOsArchitecture, detect_arm64_variant
 
 # =========================================================
 # NVIDIA JETSON VARIANTS
@@ -55,7 +55,7 @@ def test_detect_arm64_variant_generic_when_file_missing():
     with patch("pathlib.Path.exists", return_value=False):
         result = detect_arm64_variant()
 
-    assert result == "generic"
+    assert result == ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC
 
 
 def test_detect_arm64_variant_generic_unknown_model():
@@ -68,7 +68,7 @@ def test_detect_arm64_variant_generic_unknown_model():
     ):
         result = detect_arm64_variant()
 
-    assert result == "generic"
+    assert result == ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC
 
 
 def test_detect_arm64_variant_generic_on_exception():
@@ -78,4 +78,4 @@ def test_detect_arm64_variant_generic_on_exception():
     ):
         result = detect_arm64_variant()
 
-    assert result == "generic"
+    assert result == ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC

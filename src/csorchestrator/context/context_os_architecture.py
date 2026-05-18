@@ -26,6 +26,8 @@ class ContextOsArchitecture:
     architecture: Architecture
     architecture_variant: str  # generic orin xavier nano
 
+    ARCHITECTURE_VARIANT_GENERIC: str = "generic"
+
 
 # =========================================================
 # OS / ARCH DETECTION
@@ -81,7 +83,9 @@ def detect_architecture() -> Expected[tuple[Architecture, str], str]:
     # -----------------------------------------------------
 
     if machine in ["amd64", "x86_64", "x64"]:
-        return Expected[tuple[Architecture, str], str].make_value((Architecture.X64, "generic"))
+        return Expected[tuple[Architecture, str], str].make_value(
+            (Architecture.X64, ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC)
+        )
 
     # -----------------------------------------------------
     # ARM64
@@ -119,7 +123,7 @@ def detect_arm64_variant() -> str:
         except Exception:
             pass
 
-    return "generic"
+    return ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC
 
 
 # =========================================================

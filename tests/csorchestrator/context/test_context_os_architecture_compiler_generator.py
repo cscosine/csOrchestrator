@@ -1,7 +1,14 @@
-from csorchestrator.context.context_compiler_generator import Compiler, ContextCompilerGenerator, Generator
+from csorchestrator.context.context_compiler_generator import (
+    Compiler,
+    ContextCompilerGenerator,
+    Generator,
+    GeneratorType,
+)
 from csorchestrator.context.context_os_architecture import OS, Architecture, ContextOsArchitecture
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
+    get_supported_context_os_architecture_list,
+    get_supported_context_os_architecture_list_string,
 )
 
 
@@ -28,7 +35,7 @@ def test_windows_msvc_vs_generator():
         os=OS.WINDOWS,
         os_version="v11",
         architecture=Architecture.X64,
-        architecture_variant="generic",
+        architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
     )
 
     context_compiler = ContextCompilerGenerator(
@@ -46,7 +53,7 @@ def test_macos_appleclang_ninja_multiconfig():
         os=OS.MACOS,
         os_version="v14",
         architecture=Architecture.ARM64,
-        architecture_variant="generic",
+        architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
     )
 
     context_compiler = ContextCompilerGenerator(
@@ -82,7 +89,7 @@ def test_all_generators_supported():
         os=OS.LINUX,
         os_version="5.0",
         architecture=Architecture.X64,
-        architecture_variant="generic",
+        architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
     )
 
     for gen, expected in [
@@ -99,3 +106,47 @@ def test_all_generators_supported():
         result = create_context_os_architecture_compiler_generator_string(base_os, context_compiler)
 
         assert expected in result
+
+
+def test_get_supported_context_os_architecture_list():
+    supported_list = get_supported_context_os_architecture_list()
+    n_all = len(supported_list)
+    assert n_all > 0
+
+    supported_list = get_supported_context_os_architecture_list(GeneratorType.SINGLE_CONFIG)
+    n_single = len(supported_list)
+
+    assert n_single > 0
+    assert n_single < n_all
+
+    supported_list = get_supported_context_os_architecture_list(GeneratorType.MULTI_CONFIG)
+    n_multi = len(supported_list)
+
+    assert n_multi > 0
+    assert n_multi < n_all
+
+    supported_list = get_supported_context_os_architecture_list("INVALID")  # type: ignore[arg-type]
+    n_invalid = len(supported_list)
+    assert n_invalid == 0
+
+
+def test_get_supported_context_os_architecture_list_string():
+    supported_list = get_supported_context_os_architecture_list_string()
+    n_all = len(supported_list)
+    assert n_all > 0
+
+    supported_list = get_supported_context_os_architecture_list_string(GeneratorType.SINGLE_CONFIG)
+    n_single = len(supported_list)
+
+    assert n_single > 0
+    assert n_single < n_all
+
+    supported_list = get_supported_context_os_architecture_list_string(GeneratorType.MULTI_CONFIG)
+    n_multi = len(supported_list)
+
+    assert n_multi > 0
+    assert n_multi < n_all
+
+    supported_list = get_supported_context_os_architecture_list_string("INVALID")  # type: ignore[arg-type]
+    n_invalid = len(supported_list)
+    assert n_invalid == 0

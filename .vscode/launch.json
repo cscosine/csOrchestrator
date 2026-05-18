@@ -152,6 +152,26 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_get_supported_context_os_architecture_list",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_get_supported_context_os_architecture_list"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_get_supported_context_os_architecture_list_string",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_get_supported_context_os_architecture_list_string"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_lowercasing_behavior",
       "type": "debugpy",
       "request": "launch",
