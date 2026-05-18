@@ -6,6 +6,7 @@ from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVi
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, execute_step_cmake_workflow
 from csorchestrator.step.step_get_repository import StepGetRepository, execute_step_get_repository
 
 
@@ -35,3 +36,7 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
     @visit_step.register
     def _(self, step: StepGetRepository, reporter_sink: ReporterSinkBase) -> Report:
         return execute_step_get_repository(step, self.context, reporter_sink)
+
+    @visit_step.register
+    def _(self, step: StepCMakeWorkflow, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_cmake_workflow(step, self.context, reporter_sink)

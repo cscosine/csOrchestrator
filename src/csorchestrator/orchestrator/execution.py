@@ -26,6 +26,7 @@ def validate_and_execute_orchestrator(
     er = ExecutionResult()
     er.execution_description = orchestrator.extract_minimal_description()
 
+    # TODO support reporter also in this phase, at least as report
     contextWithReport = create_context_local_execution(base_folder_path=target_folder_path)
     er.report_pre_execution.append_report(contextWithReport.report)
 
@@ -34,6 +35,7 @@ def validate_and_execute_orchestrator(
 
     context = contextWithReport.result
 
+    # TODO support reporter also in this phase, at least as report
     orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
     er.report_pre_execution.append_report(orchestratorValidatedOpt.report)
 

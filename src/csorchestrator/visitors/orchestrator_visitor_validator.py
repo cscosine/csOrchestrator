@@ -6,6 +6,7 @@ from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVi
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, validate_step_cmake_workflow
 from csorchestrator.step.step_echo_message import StepEchoMessage
 from csorchestrator.step.step_get_repository import StepGetRepository, validate_step_get_repository
 
@@ -43,6 +44,10 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
             else:
                 self._collected_step_get_repository_target_directories.add(target_directory_path)
         return r
+
+    @visit_step.register
+    def _(self, step: StepCMakeWorkflow, reporter_sink: ReporterSinkBase) -> Report:
+        return validate_step_cmake_workflow(step)
 
     @visit_step.register
     def _(self, step: StepEchoMessage, reporter_sink: ReporterSinkBase) -> Report:
