@@ -72,6 +72,7 @@ def test_reporter_sink_print_indentation(capsys: pytest.CaptureFixture[str]) -> 
     sink.stdout("level 1")
     sink.increase_indentation()
     sink.stdout("level 2")
+    sink.stdout("level 2b\nmultiline")
     sink.decrease_indentation()
     sink.stdout("back to 1")
     sink.reset_indentation()
@@ -82,8 +83,10 @@ def test_reporter_sink_print_indentation(capsys: pytest.CaptureFixture[str]) -> 
     assert lines[0] == "[cout] level 0"
     assert lines[1] == "  [cout] level 1"
     assert lines[2] == "    [cout] level 2"
-    assert lines[3] == "  [cout] back to 1"
-    assert lines[4] == "[cout] back to 0"
+    assert lines[3] == "    [cout] level 2b"
+    assert lines[4] == "           multiline"
+    assert lines[5] == "  [cout] back to 1"
+    assert lines[6] == "[cout] back to 0"
 
 
 def test_orchestrator_executor_reporter_print_success_flow(capsys: pytest.CaptureFixture[str]) -> None:
