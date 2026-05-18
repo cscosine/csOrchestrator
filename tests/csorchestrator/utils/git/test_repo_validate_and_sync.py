@@ -2,8 +2,9 @@ import logging
 import shutil
 from pathlib import Path
 
+import git
 import pytest
-from git import Repo
+from git import GitCommandError, Repo
 
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
@@ -265,6 +266,32 @@ def test_validate_and_sync_repo_main_branch_fail_pull_ff(tmp_path: Path, repo_ur
     r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
     assert r.has_errors()
     assert "Failed to pull local repo" in r.errors[0]
+
+
+@pytest.mark.slow
+@pytest.mark.git
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_validate_and_sync_repo_main_branch_fail_fetch_ff(
+    tmp_path: Path, repo_url: str, depth_one: bool, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cfg = RepoTestData()
+
+    target_path = tmp_path / cfg.destination_folder
+
+    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
+
+    target_path_str = str(target_path)
+
+    def raise_fetch(self, *args, **kwargs):
+        if str(self.working_dir) == target_path_str:
+            raise GitCommandError("fetch", "fetch failed")
+        return git.cmd.Git.__getattr__(self, "fetch")(*args, **kwargs)
+
+    monkeypatch.setattr(git.cmd.Git, "fetch", raise_fetch, raising=False)
+
+    r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
+    assert r.has_errors()
+    assert "Failed to fetch local repo" in r.errors[0]
 
 
 # coverage for defensive code in case of unknown ref type, which should never happen but let's be defensive anyway
