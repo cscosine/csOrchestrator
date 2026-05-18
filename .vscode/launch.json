@@ -132,6 +132,56 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_all_generators_supported",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_all_generators_supported"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_basic_linux_ninja_clang",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_basic_linux_ninja_clang"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_lowercasing_behavior",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_lowercasing_behavior"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_macos_appleclang_ninja_multiconfig",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_macos_appleclang_ninja_multiconfig"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/context/test_context_os_architecture_compiler_generator \u2192 test_windows_msvc_vs_generator",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/context/test_context_os_architecture_compiler_generator.py::test_windows_msvc_vs_generator"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/context/test_detect_architecture \u2192 test_detect_architecture_arm64_generic[aarch64]",
       "type": "debugpy",
       "request": "launch",
