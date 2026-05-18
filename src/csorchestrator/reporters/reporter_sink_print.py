@@ -17,17 +17,29 @@ class ReporterSinkPrint(ReporterSinkBase):
         # slicing is safe
         self.indentation = self.indentation[:-2]
 
+    def _print(self, prefix: str, text: str) -> None:
+        prefix_str = f"{self.indentation}{prefix} "
+        padding = " " * len(prefix_str)
+
+        lines = text.splitlines() or [""]
+
+        for i, line in enumerate(lines):
+            if i == 0:
+                print(f"{prefix_str}{line}")
+            else:
+                print(f"{padding}{line}")
+
     def stdout(self, text: str) -> None:
-        print(f"{self.indentation}[cout] {text}")
+        self._print("[cout]", text)
 
     def stderr(self, text: str) -> None:
-        print(f"{self.indentation}[cerr] {text}")
+        self._print("[cerr]", text)
 
     def info(self, text: str) -> None:
-        print(f"{self.indentation}[info] {text}")
+        self._print("[info]", text)
 
     def warning(self, text: str) -> None:
-        print(f"{self.indentation}[warning] {text}")
+        self._print("[warning]", text)
 
     def error(self, text: str) -> None:
-        print(f"{self.indentation}[error] {text}")
+        self._print("[error]", text)
