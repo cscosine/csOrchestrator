@@ -1622,22 +1622,22 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_failed_to_compute_merge_base",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_fail_pull_ff[False]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_failed_to_compute_merge_base"
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_fail_pull_ff[False]"
       ],
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_local_branch_is_not_fast_forwardable",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/git/test_repo_validate_and_sync \u2192 test_validate_and_sync_repo_main_branch_fail_pull_ff[True]",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_local_branch_is_not_fast_forwardable"
+        "tests/csorchestrator/utils/git/test_repo_validate_and_sync.py::test_validate_and_sync_repo_main_branch_fail_pull_ff[True]"
       ],
       "justMyCode": false
     },

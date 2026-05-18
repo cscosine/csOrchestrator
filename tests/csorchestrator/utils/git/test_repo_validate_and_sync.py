@@ -247,12 +247,12 @@ def test_validate_and_sync_repo_main_branch_mismatch(tmp_path: Path, repo_url: s
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_validate_and_sync_repo_main_branch_failed_to_compute_merge_base(tmp_path: Path, repo_url: str) -> None:
+@pytest.mark.parametrize("depth_one", [True, False])
+def test_validate_and_sync_repo_main_branch_fail_pull_ff(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
 
-    depth_one = True
     _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
 
     repo = Repo(target_path)
@@ -264,29 +264,7 @@ def test_validate_and_sync_repo_main_branch_failed_to_compute_merge_base(tmp_pat
 
     r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
     assert r.has_errors()
-    assert "Failed to compute merge base" in r.errors[0]
-
-
-@pytest.mark.slow
-@pytest.mark.git
-def test_validate_and_sync_repo_main_branch_local_branch_is_not_fast_forwardable(tmp_path: Path, repo_url: str) -> None:
-    cfg = RepoTestData()
-
-    target_path = tmp_path / cfg.destination_folder
-
-    depth_one = False
-    _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
-
-    repo = Repo(target_path)
-    # Set local config
-    with repo.config_writer() as cw:
-        cw.set_value("user", "name", "Test User")
-        cw.set_value("user", "email", "test@example.com")
-    repo.git.commit("--amend", "-m", "New commit message")
-
-    r = validate_and_sync_repo(repo_url, cfg.main_branch, target_path=target_path)
-    assert r.has_errors()
-    assert "Local branch is not fast-forwardable" in r.errors[0]
+    assert "Failed to pull local repo" in r.errors[0]
 
 
 # coverage for defensive code in case of unknown ref type, which should never happen but let's be defensive anyway

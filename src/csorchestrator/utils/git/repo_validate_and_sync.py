@@ -77,19 +77,21 @@ def validate_and_sync_repo(repo_url: str, repo_ref: str, target_path: Path) -> R
                     report.append_error(f"Branch mismatch: local={current_branch}, expected={tmp_branch}")
                     return report
 
-                # --- Fast-forward check ---
+                # fetch local repo
                 try:
-                    base = repo.git.merge_base(local_commit.hexsha, tmp_commit.hexsha).strip()
-                except GitCommandError:
-                    report.append_error("Failed to compute merge base")
+                    fetch_out = repo.git.fetch()
+                    report.append_info(f"Fetched local repo: {fetch_out or 'OK'}")
+                except GitCommandError as e:
+                    report.append_error(f"Failed to fetch local repo: {e}")
                     return report
 
-                if base != local_commit.hexsha:
-                    report.append_error("Local branch is not fast-forwardable")
+                # --- Fast-forward pull only ---
+                try:
+                    pull_out = repo.git.pull("--ff-only")
+                    report.append_info(f"Pulled local repo: {pull_out or 'OK'}")
+                except GitCommandError as e:
+                    report.append_error(f"Failed to pull local repo: {e}")
                     return report
-
-                # --- Perform fast-forward ---
-                repo.git.merge("--ff-only", tmp_commit.hexsha)
 
             else:
                 # this should never happen, but let's be defensive
