@@ -17,11 +17,6 @@ class Generator(Enum):
     MSVC_18_2026 = "msvc2026"
 
 
-class GeneratorType(Enum):
-    SINGLE_CONFIG = "singleconfig"
-    MULTI_CONFIG = "multiconfig"
-
-
 @dataclass(frozen=True)
 class ContextCompilerGenerator:
     compiler_family: Compiler
