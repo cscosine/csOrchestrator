@@ -1972,16 +1972,6 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_get_supported_context_os_architecture_list_string",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/presets/test_supported_variants.py::test_get_supported_context_os_architecture_list_string"
-      ],
-      "justMyCode": false
-    },
-    {
       "name": "\ud83e\uddea tests/csorchestrator/visitors/test_orchestrator_visitor_local_executor \u2192 test_orchestrator_visitor_local_executor_fail_unknown_step",
       "type": "debugpy",
       "request": "launch",

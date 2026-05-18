@@ -88,17 +88,6 @@ def get_supported_context_os_architecture_list(
     return retList
 
 
-def get_supported_context_os_architecture_list_string(generator_type: GeneratorType | None = None) -> list[str]:
-    retlist: list[str] = []
-    for ccg in get_supported_context_os_architecture_list(generator_type):
-        retlist.append(
-            create_context_os_architecture_compiler_generator_string(
-                ccg.context_os_architecture, ccg.context_compiler_generator
-            )
-        )
-    return retlist
-
-
 class BuildConfig(Enum):
     DEBUG = "debug"
     RELEASE = "release"
@@ -133,13 +122,16 @@ def get_supported_combined_workflow_for_multi_config_generators(configs: Iterabl
 
 def get_all_supported_workflow_names_list(configs: Iterable[BuildConfig]) -> Expected[list[str], str]:
     workflow_names: list[str] = []
-    for supported_build_config in get_supported_context_os_architecture_list_string(GeneratorType.SINGLE_CONFIG):
+    for supported_build_config in get_supported_context_os_architecture_list(GeneratorType.SINGLE_CONFIG):
         for config in configs:
             config_string = config.value
-            workflow_name = f"workflow-{supported_build_config}-{config_string}"
+            supported_build_config_string = create_context_os_architecture_compiler_generator_string(
+                supported_build_config.context_os_architecture, supported_build_config.context_compiler_generator
+            )
+            workflow_name = f"workflow-{supported_build_config_string}-{config_string}"
             workflow_names.append(workflow_name)
 
-    for supported_build_config in get_supported_context_os_architecture_list_string(GeneratorType.MULTI_CONFIG):
+    for supported_build_config in get_supported_context_os_architecture_list(GeneratorType.MULTI_CONFIG):
         config_string_expected = get_supported_combined_workflow_for_multi_config_generators(configs)
         if config_string_expected.error is not None:
             return Expected[list[str], str].make_error(config_string_expected.error)
@@ -147,7 +139,11 @@ def get_all_supported_workflow_names_list(configs: Iterable[BuildConfig]) -> Exp
         assert config_string_expected.value is not None
         config_string = config_string_expected.value
 
-        workflow_name = f"workflow-{supported_build_config}-{config_string}"
+        supported_build_config_string = create_context_os_architecture_compiler_generator_string(
+            supported_build_config.context_os_architecture, supported_build_config.context_compiler_generator
+        )
+
+        workflow_name = f"workflow-{supported_build_config_string}-{config_string}"
         workflow_names.append(workflow_name)
 
     return Expected[list[str], str].make_value(workflow_names)
