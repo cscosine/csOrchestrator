@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from csorchestrator.core.report import Report
+from csorchestrator.orchestrator.orchestrator import OrchestratorExecutorMinimalDescription
+from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
@@ -37,4 +39,19 @@ class OrchestratorExecutorReporterBase(ABC):
     @abstractmethod
     def on_end_visit_step(self, step: StepBase, report: Report) -> None:
         """Called after processing completely a step"""
+        ...
+
+    @abstractmethod
+    def report_execution_description(self, execution_description: OrchestratorExecutorMinimalDescription) -> None:
+        """Called after extracting the execution description from the orchestrator, with the execution description"""
+        ...
+
+    @abstractmethod
+    def report_pre_execution_report(self, report: Report) -> None:
+        """Called after the pre-execution phase, with the report of the pre-execution phase"""
+        ...
+
+    @abstractmethod
+    def report_execution_report(self, report: OrchestratorExecutorVisitReports) -> None:
+        """Called after the execution phase, with the report of the execution phase"""
         ...

@@ -1,7 +1,9 @@
 from dataclasses import dataclass
 
 from csorchestrator.core.report import Report
+from csorchestrator.orchestrator.orchestrator import OrchestratorExecutorMinimalDescription
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
+from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
@@ -26,4 +28,13 @@ class OrchestratorExecutorReporterDummy(OrchestratorExecutorReporterBase):
         return ReporterSinkDummy()
 
     def on_end_visit_step(self, step: StepBase, report: Report) -> None:
+        pass
+
+    def report_execution_description(self, execution_description: OrchestratorExecutorMinimalDescription) -> None:
+        pass
+
+    def report_pre_execution_report(self, report: Report) -> None:
+        pass
+
+    def report_execution_report(self, report: OrchestratorExecutorVisitReports) -> None:
         pass

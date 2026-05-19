@@ -1,9 +1,10 @@
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
-from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
-
-OrchestratorExecutorVisitReports = list[list[Report]]  # a list of reports of each step per each phase,
+from csorchestrator.orchestrator.orchestrator_visitor_base import (
+    OrchestratorExecutorVisitReports,
+    OrchestratorVisitorBase,
+)
 
 
 def flatten_orchestrator_executor_visit_reports(oevr: OrchestratorExecutorVisitReports) -> Report:

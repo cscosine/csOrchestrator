@@ -5,11 +5,13 @@ import pytest
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor import (
-    OrchestratorExecutorVisitReports,
     execute_orchestrator,
     flatten_orchestrator_executor_visit_reports,
 )
-from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
+from csorchestrator.orchestrator.orchestrator_visitor_base import (
+    OrchestratorExecutorVisitReports,
+    OrchestratorVisitorBase,
+)
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
