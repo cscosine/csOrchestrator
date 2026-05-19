@@ -1,6 +1,4 @@
-import pytest
-
-from csorchestrator.orchestrator.orchestrator import Orchestrator, print_orchestrator_executor_minimal_description
+from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.step.step_echo_message import StepEchoMessage
 
@@ -29,7 +27,7 @@ def test_orchestrator_add_phases() -> None:
 # ------------------------------------------------------------------------------------------------
 
 
-def test_orchestrator_executor_minimal_description(capsys: pytest.CaptureFixture[str]) -> None:
+def test_orchestrator_executor_minimal_description() -> None:
     o = Orchestrator()
 
     o.create_phase("p1").add_step(StepEchoMessage(name="p1s1", description="p1 step s1", message="")).add_step(
@@ -57,9 +55,3 @@ def test_orchestrator_executor_minimal_description(capsys: pytest.CaptureFixture
     assert len(od[1].step_names) == 2
     assert od[1].step_names[0] == "p2s1"
     assert od[1].step_names[1] == "p2s2"
-
-    print_orchestrator_executor_minimal_description(od)
-
-    captured = capsys.readouterr()
-
-    assert captured.out.strip() != ""
