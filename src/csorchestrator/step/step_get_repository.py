@@ -80,6 +80,24 @@ def validate_step_get_repository(step: StepGetRepository) -> Report:
     return report
 
 
+@dataclass
+class StepGetRepositoryValidator:
+    _collected_step_get_repository_target_directories: set[Path] = field(default_factory=set)
+
+    def clear(self) -> None:
+        self._collected_step_get_repository_target_directories.clear()
+
+    def validate_step_get_repository(self, step: StepGetRepository) -> Report:
+        r = validate_step_get_repository(step)
+        if not r.has_errors():
+            target_directory_path = step.resolved_target_directory_path()
+            if target_directory_path in self._collected_step_get_repository_target_directories:
+                r.append_error(f"target_directory {str(target_directory_path)} is already used by another step")
+            else:
+                self._collected_step_get_repository_target_directories.add(target_directory_path)
+        return r
+
+
 def _execute_step_get_repository_git(
     repo_step: StepGetRepository, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
 ) -> Report:

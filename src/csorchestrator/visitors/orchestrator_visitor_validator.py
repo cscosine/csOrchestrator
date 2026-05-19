@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from pathlib import Path
 
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
@@ -8,17 +7,18 @@ from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, validate_step_cmake_workflow
 from csorchestrator.step.step_echo_message import StepEchoMessage
-from csorchestrator.step.step_get_repository import StepGetRepository, validate_step_get_repository
+from csorchestrator.step.step_get_repository import (
+    StepGetRepository,
+    StepGetRepositoryValidator,
+)
 
 
 @dataclass
 class OrchestratorVisitorValidator(OrchestratorVisitorBase):
-    # TODO delegate this to a dedicated class,
-    #      so that we do not pollute this with logic from StepGetRepository validation
-    _collected_step_get_repository_target_directories: set[Path] = field(default_factory=set)
+    step_validator: StepGetRepositoryValidator = field(default_factory=StepGetRepositoryValidator)
 
     def init_visit(self) -> None:
-        pass
+        self.step_validator.clear()
 
     def end_visit(self, visit_complete: bool) -> None:
         pass
@@ -38,14 +38,7 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
 
     @visit_step.register
     def _(self, step: StepGetRepository, reporter_sink: ReporterSinkBase) -> Report:
-        r = validate_step_get_repository(step)
-        if not r.has_errors():
-            target_directory_path = step.resolved_target_directory_path()
-            if target_directory_path in self._collected_step_get_repository_target_directories:
-                r.append_error(f"target_directory {str(target_directory_path)} is already used by another step")
-            else:
-                self._collected_step_get_repository_target_directories.add(target_directory_path)
-        return r
+        return self.step_validator.validate_step_get_repository(step)
 
     @visit_step.register
     def _(self, step: StepCMakeWorkflow, reporter_sink: ReporterSinkBase) -> Report:
