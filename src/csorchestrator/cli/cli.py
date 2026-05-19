@@ -14,7 +14,9 @@ from csorchestrator.core.optional_result_with_report import OptionalResultWithRe
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.execution import validate_and_execute_orchestrator
 from csorchestrator.orchestrator.orchestrator import Orchestrator
+from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
+from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
 
 CreateOrchestratorFn = Callable[[], OptionalResultWithReport[Orchestrator]]
 
@@ -49,9 +51,10 @@ def assert_create_orchestrator(module: ModuleType) -> Expected[CreateOrchestrato
     return Expected[CreateOrchestratorFn, str].make_value(module.create_orchestrator)
 
 
-def execute_project_script(script_path: Path, target_folder: Path | None) -> int:
+def execute_project_script(
+    script_path: Path, target_folder: Path | None, reporter: OrchestratorExecutorReporterBase
+) -> int:
     """Load and execute a project script's create_orchestrator() function."""
-    reporter = OrchestratorExecutorReporterPrint()
 
     module_or_error = load_project_module(script_path)
     if module_or_error.error is not None:
@@ -99,7 +102,8 @@ def execute_project_script(script_path: Path, target_folder: Path | None) -> int
 )  # type: ignore[untyped-decorator]
 def run(script_path: Path, target_folder: Path | None) -> int:
     """Load a Python project script and execute its create_orchestrator() result."""
-    return execute_project_script(script_path, target_folder)
+    reporter = OrchestratorExecutorReporterPrint(reporter_sink=ReporterSinkColoredPrint())
+    return execute_project_script(script_path, target_folder, reporter)
 
 
 def orchestrator_main_with_default_run(script_path: str, argv: Sequence[str] | None) -> int:

@@ -14,7 +14,7 @@ from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
 
 @dataclass
 class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
-    reporter_sink: ReporterSinkPrint = field(default_factory=ReporterSinkPrint)
+    reporter_sink: ReporterSinkBase = field(default_factory=ReporterSinkPrint)
 
     def on_init_visit(self) -> None:
         self.reporter_sink.reset_indentation()
