@@ -28,6 +28,14 @@ class ContextOsArchitecture:
 
     ARCHITECTURE_VARIANT_GENERIC: str = "generic"
 
+    def is_equal_to(self, other: "ContextOsArchitecture") -> bool:
+        return (
+            self.os == other.os
+            and self.os_version == other.os_version
+            and self.architecture == other.architecture
+            and self.architecture_variant == other.architecture_variant
+        )
+
 
 # =========================================================
 # OS / ARCH DETECTION

@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Callable, TextIO
 
 from csorchestrator.context.context_local_execution import ContextLocalExecution
-from csorchestrator.context.context_os_architecture import OS, Architecture
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
@@ -26,21 +25,9 @@ def execute_step_cmake_workflow(
 ) -> Report:
     report = Report()
 
-    os: OS = context.os_architecture.os
-    os_version: str = context.os_architecture.os_version
-    architecture: Architecture = context.os_architecture.architecture
-    architecture_variant: str = context.os_architecture.architecture_variant
-
     workflow_name = workflow_name_from_description(step.workflow_description)
 
-    # TODO generalize this logic in some common function
-    match = (
-        os == step.workflow_description.context_os_architecture.os
-        and os_version == step.workflow_description.context_os_architecture.os_version
-        and architecture == step.workflow_description.context_os_architecture.architecture
-        and architecture_variant == step.workflow_description.context_os_architecture.architecture_variant
-    )
-
+    match = step.workflow_description.context_os_architecture.is_equal_to(context.os_architecture)
     if not match:
         report.append_info(f"Skip '{workflow_name}', not compatible with the current context")
         return report
