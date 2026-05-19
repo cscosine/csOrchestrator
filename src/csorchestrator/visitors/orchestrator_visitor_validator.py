@@ -13,6 +13,8 @@ from csorchestrator.step.step_get_repository import StepGetRepository, validate_
 
 @dataclass
 class OrchestratorVisitorValidator(OrchestratorVisitorBase):
+    # TODO delegate this to a dedicated class,
+    #      so that we do not pollute this with logic from StepGetRepository validation
     _collected_step_get_repository_target_directories: set[Path] = field(default_factory=set)
 
     def init_visit(self) -> None:

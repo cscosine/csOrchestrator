@@ -5,15 +5,20 @@ from pathlib import Path
 from typing import Callable, TextIO
 
 from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.context.context_os_architecture import OS, Architecture
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.utils.presets.supported_variants import (
+    ContextOsArchitectureCompilerGeneratorConfig,
+    workflow_name_from_description,
+)
 
 
 @dataclass
 class StepCMakeWorkflow(StepBase):
     source_dir: str
-    workflow_name: str
+    workflow_description: ContextOsArchitectureCompilerGeneratorConfig
 
 
 def execute_step_cmake_workflow(
@@ -21,12 +26,31 @@ def execute_step_cmake_workflow(
 ) -> Report:
     report = Report()
 
+    os: OS = context.os_architecture.os
+    os_version: str = context.os_architecture.os_version
+    architecture: Architecture = context.os_architecture.architecture
+    architecture_variant: str = context.os_architecture.architecture_variant
+
+    workflow_name = workflow_name_from_description(step.workflow_description)
+
+    # TODO generalize this logic in some common function
+    match = (
+        os == step.workflow_description.context_os_architecture.os
+        and os_version == step.workflow_description.context_os_architecture.os_version
+        and architecture == step.workflow_description.context_os_architecture.architecture
+        and architecture_variant == step.workflow_description.context_os_architecture.architecture_variant
+    )
+
+    if not match:
+        report.append_info(f"Skip '{workflow_name}', not compatible with the current context")
+        return report
+
     target_full_path: Path = context.base_folder_path / step.source_dir
     cmd = [
         "cmake",
         "--workflow",
         "--preset",
-        step.workflow_name,
+        workflow_name,
     ]
 
     process = subprocess.Popen(
@@ -75,7 +99,7 @@ def execute_step_cmake_workflow(
     stderr_thread.join()
 
     if return_code != 0:
-        report.append_error(f"CMake workflow '{step.workflow_name}' failed with exit code {return_code}")
+        report.append_error(f"CMake workflow '{workflow_name}' failed with exit code {return_code}")
     # success => empty report
     return report
 

@@ -12,6 +12,13 @@ class PhaseNameWithStepNames:
 OrchestratorExecutorMinimalDescription = list[PhaseNameWithStepNames]  # a list of phases names and list of step names
 
 
+def print_orchestrator_executor_minimal_description(description: OrchestratorExecutorMinimalDescription) -> None:
+    for phase_desc in description:
+        print(f"Phase: {phase_desc.phase_name}")
+        for step_name in phase_desc.step_names:
+            print(f"  Step: {step_name}")
+
+
 @dataclass
 class Orchestrator:
     # - create phase (e.g. setup / config / build)
