@@ -58,6 +58,17 @@ class ContextOsArchitectureCompilerGeneratorConfig:
     config: BuildConfig
 
 
+def get_supported_os_version_list(os: OS) -> list[str]:
+    if os == OS.LINUX:
+        return ["ubuntu24.04"]
+    elif os == OS.WINDOWS:
+        return ["v10", "v11"]
+    elif os == OS.MACOS:
+        return []  # TODO add macos support
+    else:
+        return []
+
+
 def get_supported_context_os_architecture_list(
     generator_type: GeneratorType | None = None,
 ) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
@@ -65,7 +76,7 @@ def get_supported_context_os_architecture_list(
     retList: list[ContextOsArchitectureCompilerGeneratorConfig] = []
 
     ## LINUX
-    for os_version in ["ubuntu24.04"]:  # TODO add "ubuntu22.04" and/or "ubuntu26.04",
+    for os_version in get_supported_os_version_list(OS.LINUX):
         linux_ubuntu2404_x64_generic = ContextOsArchitecture(
             os=OS.LINUX,
             os_version=os_version,
@@ -99,8 +110,7 @@ def get_supported_context_os_architecture_list(
                     )
 
     ## WINDOWS
-
-    for os_version in ["v10", "v11"]:
+    for os_version in get_supported_os_version_list(OS.WINDOWS):
         windows_x64_generic = ContextOsArchitecture(
             os=OS.WINDOWS,
             os_version=os_version,
@@ -130,6 +140,9 @@ def get_supported_context_os_architecture_list(
                             context_os_architecture=windows_x64_generic, context_compiler_generator=ccg, config=config
                         )
                     )
+    ## MACOS
+    for os_version in get_supported_os_version_list(OS.MACOS):
+        _ = os_version  # TODO add macos support
 
     return retList
 

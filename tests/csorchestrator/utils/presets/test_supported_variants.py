@@ -1,8 +1,10 @@
+from csorchestrator.context.context_os_architecture import OS
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
     GeneratorType,
     get_all_supported_workflow_descriptions,
     get_supported_context_os_architecture_list,
+    get_supported_os_version_list,
     is_config_selected_multi_config_generator,
     is_config_selected_single_config_generator,
     workflow_name_from_description,
@@ -129,3 +131,20 @@ def test_workflow_name_from_description() -> None:
         name = workflow_name_from_description(desc)
         assert name.startswith("workflow-")
         assert name.endswith("-debug")
+
+
+def test_get_supported_os_version_list() -> None:
+    linux_versions = get_supported_os_version_list(OS.LINUX)
+    assert len(linux_versions) > 0
+    assert "ubuntu24.04" in linux_versions
+
+    windows_versions = get_supported_os_version_list(OS.WINDOWS)
+    assert len(windows_versions) > 0
+    assert "v10" in windows_versions
+    assert "v11" in windows_versions
+
+    macos_versions = get_supported_os_version_list(OS.MACOS)
+    assert len(macos_versions) == 0  # TODO add macos support
+
+    invalid_versions = get_supported_os_version_list("INVALID")  # type: ignore
+    assert len(invalid_versions) == 0

@@ -1982,6 +1982,16 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_get_supported_os_version_list",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/presets/test_supported_variants.py::test_get_supported_os_version_list"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_is_config_selected_multi_config_generator",
       "type": "debugpy",
       "request": "launch",
