@@ -87,3 +87,28 @@ def test_detect_context_os_architecture_architecture_error():
 
     assert result.value is None
     assert result.error == "Unsupported architecture"
+
+
+# test equal
+def test_context_os_architecture_equal():
+    a1 = ContextOsArchitecture(
+        os=OS.LINUX,
+        os_version="ubuntu24.04",
+        architecture=Architecture.ARM64,
+        architecture_variant="orin",
+    )
+    a2 = ContextOsArchitecture(
+        os=OS.LINUX,
+        os_version="ubuntu24.04",
+        architecture=Architecture.ARM64,
+        architecture_variant="orin",
+    )
+    a3 = ContextOsArchitecture(
+        os=OS.LINUX,
+        os_version="ubuntu24.04",
+        architecture=Architecture.ARM64,
+        architecture_variant="xavier",
+    )
+
+    assert a1.is_equal_to(a2)
+    assert not a1.is_equal_to(a3)
