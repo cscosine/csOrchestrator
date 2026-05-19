@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 
 
@@ -12,36 +13,48 @@ class Report:
         infos: Informational messages for debugging and transparency.
     """
 
-    errors: list[str] = field(default_factory=list)
-    warnings: list[str] = field(default_factory=list)
-    infos: list[str] = field(default_factory=list)
+    _errors: list[str] = field(default_factory=list, init=False, repr=False)
+    _warnings: list[str] = field(default_factory=list, init=False, repr=False)
+    _infos: list[str] = field(default_factory=list, init=False, repr=False)
+
+    @property
+    def errors(self) -> Sequence[str]:
+        return tuple(self._errors)
+
+    @property
+    def warnings(self) -> Sequence[str]:
+        return tuple(self._warnings)
+
+    @property
+    def infos(self) -> Sequence[str]:
+        return tuple(self._infos)
 
     def has_errors(self) -> bool:
-        return len(self.errors) > 0
+        return len(self._errors) > 0
 
     def has_warnings(self) -> bool:
-        return len(self.warnings) > 0
+        return len(self._warnings) > 0
 
     def has_info(self) -> bool:
-        return len(self.infos) > 0
+        return len(self._infos) > 0
 
     def append_error(self, msg: str) -> "Report":
-        self.errors.append(msg)
+        self._errors.append(msg)
         return self
 
     def append_warning(self, msg: str) -> "Report":
-        self.warnings.append(msg)
+        self._warnings.append(msg)
         return self
 
     def append_info(self, msg: str) -> "Report":
-        self.infos.append(msg)
+        self._infos.append(msg)
         return self
 
     def append_report(self, other: "Report") -> None:
         """Merge another report into this one."""
-        self.errors.extend(other.errors)
-        self.warnings.extend(other.warnings)
-        self.infos.extend(other.infos)
+        self._errors.extend(other.errors)
+        self._warnings.extend(other.warnings)
+        self._infos.extend(other.infos)
 
     # ANSI styling for terminal output
     _RED = "\033[31m"
@@ -52,13 +65,13 @@ class Report:
 
     def print(self) -> None:
         """Pretty-print the report with colors."""
-        if not (self.errors or self.warnings or self.infos):
+        if not (self._errors or self._warnings or self._infos):
             return
 
         print(f"{self._YELLOW}{self._BOLD}---------- REPORT ----------{self._RESET}")
-        self._print_block("ERROR", self.errors, self._RED, bold=True)
-        self._print_block("WARNING", self.warnings, self._YELLOW, bold=True)
-        self._print_block("INFO", self.infos, self._BLUE)
+        self._print_block("ERROR", self._errors, self._RED, bold=True)
+        self._print_block("WARNING", self._warnings, self._YELLOW, bold=True)
+        self._print_block("INFO", self._infos, self._BLUE)
         print(f"{self._YELLOW}{self._BOLD}----------------------------{self._RESET}")
 
     def _print_block(

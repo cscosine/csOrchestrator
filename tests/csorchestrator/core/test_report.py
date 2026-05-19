@@ -3,7 +3,7 @@ from csorchestrator.core.report import Report
 
 def test_report_append_and_print(capfd):
     r1 = Report()
-    r1.errors.append("fail")
+    r1.append_error("fail")
     assert len(r1.errors) == 1
     assert r1.has_errors()
     assert len(r1.warnings) == 0
@@ -11,7 +11,7 @@ def test_report_append_and_print(capfd):
     assert len(r1.infos) == 0
     assert not r1.has_info()
 
-    r1.warnings.append("be careful")
+    r1.append_warning("be careful")
     assert len(r1.errors) == 1
     assert r1.has_errors()
     assert len(r1.warnings) == 1
@@ -19,7 +19,7 @@ def test_report_append_and_print(capfd):
     assert len(r1.infos) == 0
     assert not r1.has_info()
 
-    r1.infos.append("info")
+    r1.append_info("info")
     assert len(r1.errors) == 1
     assert r1.has_errors()
     assert len(r1.warnings) == 1
@@ -28,7 +28,7 @@ def test_report_append_and_print(capfd):
     assert r1.has_info()
 
     r2 = Report()
-    r2.errors.append("another")
+    r2.append_error("another")
     assert len(r2.errors) == 1
     assert len(r2.warnings) == 0
     assert len(r2.infos) == 0

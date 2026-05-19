@@ -4,9 +4,9 @@ from csorchestrator.core.report import Report
 
 def test_optional_result_with_report() -> None:
     report = Report()
-    report.errors.append("fail")
-    report.warnings.append("be careful")
-    report.infos.append("info")
+    report.append_error("fail")
+    report.append_warning("be careful")
+    report.append_info("info")
 
     report_without_result: OptionalResultWithReport[int] = OptionalResultWithReport.createReport(report)
     assert not report_without_result.has_result()

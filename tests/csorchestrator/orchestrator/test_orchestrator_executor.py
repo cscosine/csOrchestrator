@@ -298,7 +298,7 @@ class OrchestratorVisitorFailStep(OrchestratorVisitorBase):
     def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         r = Report()
         if self.failing_step == self.visited_steps:
-            r.errors.append("FAIL")
+            r.append_error("FAIL")
         self.visited_steps += 1
         return r
 
@@ -437,6 +437,6 @@ def test_flatten_orchestrator_executor_visit_reports() -> None:
 
     rf = flatten_orchestrator_executor_visit_reports(oevr)
 
-    assert rf.errors == ["E", "E"]
-    assert rf.warnings == ["W", "W"]
-    assert rf.infos == ["I"]
+    assert rf.errors == ("E", "E")
+    assert rf.warnings == ("W", "W")
+    assert rf.infos == ("I",)
