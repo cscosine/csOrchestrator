@@ -48,14 +48,12 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: s
     # execute the orchestrator visitor, which will execute the step to clone the repo
     report = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
     flatten_report = flatten_orchestrator_executor_visit_reports(report)
-    flatten_report.print()
     assert not flatten_report.has_errors()
 
     # execute the orchestrator visitor a second time, which will execute the step to update the repo,
     # which should succeed without errors
     report = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
     flatten_report = flatten_orchestrator_executor_visit_reports(report)
-    flatten_report.print()
     assert not flatten_report.has_errors()
 
 
@@ -84,6 +82,6 @@ def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path, r
     # execute the orchestrator visitor, which will execute the step to clone the repo
     report = report = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
     flatten_report = flatten_orchestrator_executor_visit_reports(report)
-    flatten_report.print()
+
     assert flatten_report.has_errors()
     assert "OrchestratorVisitorLocalExecutor cannot handle step" in flatten_report.errors[0]

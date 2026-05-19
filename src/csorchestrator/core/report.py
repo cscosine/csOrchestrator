@@ -71,36 +71,3 @@ class Report:
         self._warnings.extend(other.warnings)
         self._infos.extend(other.infos)
         self._messages.extend(other.messages)
-
-    # ANSI styling for terminal output
-    _RED = "\033[31m"
-    _YELLOW = "\033[33m"
-    _BLUE = "\033[34m"
-    _RESET = "\033[0m"
-    _BOLD = "\033[1m"
-
-    def print(self) -> None:
-        """Pretty-print the report with colors."""
-        if not (self._errors or self._warnings or self._infos):
-            return
-
-        print(f"{self._YELLOW}{self._BOLD}---------- REPORT ----------{self._RESET}")
-        self._print_block("ERROR", self._errors, self._RED, bold=True)
-        self._print_block("WARNING", self._warnings, self._YELLOW, bold=True)
-        self._print_block("INFO", self._infos, self._BLUE)
-        print(f"{self._YELLOW}{self._BOLD}----------------------------{self._RESET}")
-
-    def _print_block(
-        self,
-        label: str,
-        messages: list[str],
-        color: str,
-        bold: bool = False,
-    ) -> None:
-        """Print a block of messages under a category."""
-        if not messages:
-            return
-
-        style = self._BOLD if bold else ""
-        for msg in messages:
-            print(f"{color}{style}[{label}]{self._RESET} {msg}")

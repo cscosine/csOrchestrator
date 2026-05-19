@@ -60,40 +60,10 @@ def test_report_append_and_print(capfd):
     assert len(r2.infos) == 0
     assert len(r2.messages) == 1
 
-    # capture output
-    r1.print()
-    captured = capfd.readouterr()
-    text = captured.out
-    # remove ANSI escapes for easier assertions
-    import re
-
-    clean = re.sub(r"\x1b\[[0-9;]*m", "", text)
-
-    assert "[ERROR] fail" in clean
-    assert "[ERROR] another" in clean
-    assert "[WARNING] be careful" in clean
-    assert "[INFO] info" in clean
-
-    # capture output
-    r2.print()
-    captured = capfd.readouterr()
-    text = captured.out
-    # remove ANSI escapes for easier assertions
-    import re
-
-    clean = re.sub(r"\x1b\[[0-9;]*m", "", text)
-
-    assert "[ERROR] another" in clean
-
-    # printing empty report should be silent
-    empty = Report()
-    empty.print()
-    captured = capfd.readouterr()
-    assert captured.out == ""
-
 
 def test_report_append():
     r = Report().append_error("e").append_info("i").append_warning("w")
     assert len(r.errors) == 1
     assert len(r.warnings) == 1
     assert len(r.infos) == 1
+    assert len(r.messages) == 3

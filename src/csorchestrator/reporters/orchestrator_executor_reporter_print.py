@@ -8,6 +8,7 @@ from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorEx
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.reporters.report_reporter import repo_to_reporter_sink
 from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
 
 
@@ -50,12 +51,7 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
 
         self.reporter_sink.stdout(f"[{step.name} REPORT]")
         self.reporter_sink.increase_indentation()
-        for m in report.errors:
-            self.reporter_sink.stdout(f"[ERROR] {m}")
-        for m in report.warnings:
-            self.reporter_sink.stdout(f"[WARNING] {m}")
-        for m in report.infos:
-            self.reporter_sink.stdout(f"[INFO] {m}")
+        repo_to_reporter_sink(report, self.reporter_sink)
         self.reporter_sink.decrease_indentation()
 
         # end step indent
@@ -64,12 +60,7 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
     def report_orchestrator_creation_report(self, report: Report) -> None:
         self.reporter_sink.stdout("[Creation Report]")
         self.reporter_sink.increase_indentation()
-        for m in report.errors:
-            self.reporter_sink.stdout(f"[ERROR] {m}")
-        for m in report.warnings:
-            self.reporter_sink.stdout(f"[WARNING] {m}")
-        for m in report.infos:
-            self.reporter_sink.stdout(f"[INFO] {m}")
+        repo_to_reporter_sink(report, self.reporter_sink)
         self.reporter_sink.decrease_indentation()
 
     def report_execution_description(self, execution_description: OrchestratorExecutorMinimalDescription) -> None:
@@ -81,22 +72,12 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
     def report_pre_execution_report(self, report: Report) -> None:
         self.reporter_sink.stdout("[Pre-Execution Report]")
         self.reporter_sink.increase_indentation()
-        for m in report.errors:
-            self.reporter_sink.stdout(f"[ERROR] {m}")
-        for m in report.warnings:
-            self.reporter_sink.stdout(f"[WARNING] {m}")
-        for m in report.infos:
-            self.reporter_sink.stdout(f"[INFO] {m}")
+        repo_to_reporter_sink(report, self.reporter_sink)
         self.reporter_sink.decrease_indentation()
 
     def report_execution_report(self, reportVisit: OrchestratorExecutorVisitReports) -> None:
         self.reporter_sink.stdout("[Execution Report]")
         self.reporter_sink.increase_indentation()
         report = flatten_orchestrator_executor_visit_reports(reportVisit)
-        for m in report.errors:
-            self.reporter_sink.stdout(f"[ERROR] {m}")
-        for m in report.warnings:
-            self.reporter_sink.stdout(f"[WARNING] {m}")
-        for m in report.infos:
-            self.reporter_sink.stdout(f"[INFO] {m}")
+        repo_to_reporter_sink(report, self.reporter_sink)
         self.reporter_sink.decrease_indentation()

@@ -129,9 +129,9 @@ def test_composite_reporter_report_pre_execution_report(capsys: pytest.CaptureFi
     # Every message from the print reporter should appear exactly twice
     # because the composite delegates to both rep1 and rep2.
     expected_messages = [
-        "  [cout] [ERROR] Error",
-        "  [cout] [WARNING] Warning",
-        "  [cout] [INFO] Info",
+        "  [error] Error",
+        "  [warning] Warning",
+        "  [info] Info",
     ]
 
     for msg in expected_messages:
@@ -158,9 +158,9 @@ def test_composite_reporter_report_orchestrator_creation_report(capsys: pytest.C
     # Every message from the print reporter should appear exactly twice
     # because the composite delegates to both rep1 and rep2.
     expected_messages = [
-        "  [cout] [ERROR] Error",
-        "  [cout] [WARNING] Warning",
-        "  [cout] [INFO] Info",
+        "  [error] Error",
+        "  [warning] Warning",
+        "  [info] Info",
     ]
 
     for msg in expected_messages:
@@ -193,9 +193,9 @@ def test_composite_reporter_report_execution_report(capsys: pytest.CaptureFixtur
     # Every message from the print reporter should appear exactly twice
     # because the composite delegates to both rep1 and rep2.
     expected_messages = [
-        " [cout] [INFO] Visiting Compile [I]",
-        " [cout] [WARNING] Visiting Compile [W]",
-        " [cout] [ERROR] Visiting Compile [E]",
+        " [info] Visiting Compile [I]",
+        " [warning] Visiting Compile [W]",
+        " [error] Visiting Compile [E]",
     ]
 
     for msg in expected_messages:

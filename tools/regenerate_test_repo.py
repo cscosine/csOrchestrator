@@ -6,6 +6,7 @@ import tempfile
 from git import Repo
 
 from csorchestrator.core.report import Report
+from csorchestrator.reporters.report_reporter import repo_to_reporter_sink
 from csorchestrator.utils.git.resolve_url import select_https_or_ssh_url_resolve_token_name_on_env
 
 # keep these values aligned with the ones in tests/csorchestrator/utils/git/repo_config.py
@@ -111,11 +112,11 @@ def main() -> int:
 
         if report.has_errors():
             report.append_error("Repository regeneration failed")
-            report.print()
+            repo_to_reporter_sink(report)
             return 1
 
         report.append_info("Repository successfully regenerated")
-        report.print()
+        repo_to_reporter_sink(report)
 
         # REQUIRED OUTPUT
         print(
