@@ -3,9 +3,10 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Callable, Sequence
+from typing import Callable, Literal, Sequence, cast
 
 import click
 
@@ -15,12 +16,49 @@ from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.execution import validate_and_execute_orchestrator
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
+from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
+from csorchestrator.reporters.reporter_sink_colorama_print import ReporterSinkColoramaPrint
 from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
+from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
 
 CreateOrchestratorFn = Callable[[], OptionalResultWithReport[Orchestrator]]
 
-app = click.Group(help="csOrchestrator command line interface")
+
+SinkType = Literal["print", "colored", "colorama"]
+
+
+def _build_sink(kind: str) -> ReporterSinkBase:
+    if kind == "print":
+        return ReporterSinkPrint()
+    elif kind == "colored":
+        return ReporterSinkColoredPrint()
+    elif kind == "colorama":
+        return ReporterSinkColoramaPrint()
+    else:
+        r = ReporterSinkPrint()
+        r.stderr(f"Unknown sink type: {kind}, fallback to ReporterSinkPrint")
+        return r
+
+
+@dataclass
+class CLIConfig:
+    sink: SinkType = "colorama"
+
+
+@click.group(help="csOrchestrator command line interface")  # type: ignore[untyped-decorator]
+@click.option(  # type: ignore[untyped-decorator]
+    "--sink",
+    type=click.Choice(["print", "colored", "colorama"]),
+    default="print",
+    show_default=True,
+    help="Select reporter sink implementation",
+)
+@click.pass_context  # type: ignore[untyped-decorator]
+def app(ctx: click.Context, sink: str) -> None:
+    config = CLIConfig(sink=cast(SinkType, sink))
+    ctx.ensure_object(dict)
+    ctx.obj["config"] = config
 
 
 def load_project_module(script_path: Path) -> Expected[ModuleType, str]:
@@ -100,9 +138,12 @@ def execute_project_script(
     default=None,
     help="Base folder for orchestrator execution. Defaults to the project script location.",
 )  # type: ignore[untyped-decorator]
-def run(script_path: Path, target_folder: Path | None) -> int:
+@click.pass_context  # type: ignore[untyped-decorator]
+def run(ctx: click.Context, script_path: Path, target_folder: Path | None) -> int:
     """Load a Python project script and execute its create_orchestrator() result."""
-    reporter = OrchestratorExecutorReporterPrint(reporter_sink=ReporterSinkColoredPrint())
+    config: CLIConfig = ctx.obj["config"]
+
+    reporter = OrchestratorExecutorReporterPrint(reporter_sink=_build_sink(config.sink))
     return execute_project_script(script_path, target_folder, reporter)
 
 
