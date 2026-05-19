@@ -135,9 +135,20 @@ def get_supported_context_os_architecture_list(
 
 
 def is_config_selected_multi_config_generator(current_config: BuildConfig, requested_config: BuildConfig) -> bool:
-    if requested_config == current_config:
-        return True
-    return False
+    # verbose but defensive, if used without type checks in place
+    if (
+        requested_config == BuildConfig.DEBUG
+        or requested_config == BuildConfig.RELEASE
+        or requested_config == BuildConfig.RELWITHDEBINFO
+        or requested_config == BuildConfig.PARANOID
+        or requested_config == BuildConfig.DEBUG_RELEASE
+        or requested_config == BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID
+    ):
+        if requested_config == current_config:
+            return True
+        return False
+    else:
+        return False
 
 
 def is_config_selected_single_config_generator(current_config: BuildConfig, requested_config: BuildConfig) -> bool:
@@ -149,10 +160,10 @@ def is_config_selected_single_config_generator(current_config: BuildConfig, requ
     ):
         if current_config == requested_config:
             return True
-    if requested_config == BuildConfig.DEBUG_RELEASE:
+    elif requested_config == BuildConfig.DEBUG_RELEASE:
         if current_config == BuildConfig.DEBUG or current_config == BuildConfig.RELEASE:
             return True
-    if requested_config == BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID:
+    elif requested_config == BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID:
         if (
             current_config == BuildConfig.DEBUG
             or current_config == BuildConfig.RELEASE

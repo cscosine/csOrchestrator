@@ -1962,12 +1962,52 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_get_all_supported_workflow_descriptions",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/presets/test_supported_variants.py::test_get_all_supported_workflow_descriptions"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_get_supported_context_os_architecture_list",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
         "tests/csorchestrator/utils/presets/test_supported_variants.py::test_get_supported_context_os_architecture_list"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_is_config_selected_multi_config_generator",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/presets/test_supported_variants.py::test_is_config_selected_multi_config_generator"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_is_config_selected_single_config_generator",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/presets/test_supported_variants.py::test_is_config_selected_single_config_generator"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/utils/presets/test_supported_variants \u2192 test_workflow_name_from_description",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/utils/presets/test_supported_variants.py::test_workflow_name_from_description"
       ],
       "justMyCode": false
     },
