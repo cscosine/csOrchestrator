@@ -141,8 +141,8 @@ def get_supported_context_os_architecture_list(
                         )
                     )
     ## MACOS
-    for os_version in get_supported_os_version_list(OS.MACOS):
-        _ = os_version  # TODO add macos support
+    # for os_version in get_supported_os_version_list(OS.MACOS):
+    #     _ = os_version  # TODO add macos support
 
     return retList
 
