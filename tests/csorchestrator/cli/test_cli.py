@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.cli import main as csorchestrator_main
+from csorchestrator.cli.cli import main as csorchestrator_main
 
 
 def test_run_command_loads_project_script(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -29,7 +29,7 @@ def test_run_command_loads_project_script(tmp_path: Path, monkeypatch: pytest.Mo
         executed["called"] = True
         return None
 
-    from csorchestrator import cli as mod
+    from csorchestrator.cli import cli as mod
 
     monkeypatch.setattr(mod, "validate_and_execute_orchestrator", fake_validate_and_execute_orchestrator)
 

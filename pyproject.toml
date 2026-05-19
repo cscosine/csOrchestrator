@@ -20,7 +20,7 @@ dependencies = [
 where = ["src"]
 
 [project.scripts]
-csorchestrator = "csorchestrator.cli:main"
+csorchestrator = "csorchestrator.cli.cli:main"
 
 [project.optional-dependencies]
 # development tools (tests, linting, type checking)
