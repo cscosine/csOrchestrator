@@ -1,5 +1,12 @@
 from collections.abc import Sequence
 from dataclasses import dataclass, field
+from enum import Enum
+
+
+class ReportMessageType(Enum):
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
 
 
 @dataclass
@@ -16,6 +23,7 @@ class Report:
     _errors: list[str] = field(default_factory=list, init=False, repr=False)
     _warnings: list[str] = field(default_factory=list, init=False, repr=False)
     _infos: list[str] = field(default_factory=list, init=False, repr=False)
+    _messages: list[tuple[ReportMessageType, str]] = field(default_factory=list, init=False)
 
     @property
     def errors(self) -> Sequence[str]:
@@ -29,6 +37,10 @@ class Report:
     def infos(self) -> Sequence[str]:
         return tuple(self._infos)
 
+    @property
+    def messages(self) -> Sequence[tuple[ReportMessageType, str]]:
+        return tuple(self._messages)
+
     def has_errors(self) -> bool:
         return len(self._errors) > 0
 
@@ -39,14 +51,17 @@ class Report:
         return len(self._infos) > 0
 
     def append_error(self, msg: str) -> "Report":
+        self._messages.append((ReportMessageType.ERROR, msg))
         self._errors.append(msg)
         return self
 
     def append_warning(self, msg: str) -> "Report":
+        self._messages.append((ReportMessageType.WARNING, msg))
         self._warnings.append(msg)
         return self
 
     def append_info(self, msg: str) -> "Report":
+        self._messages.append((ReportMessageType.INFO, msg))
         self._infos.append(msg)
         return self
 
@@ -55,6 +70,7 @@ class Report:
         self._errors.extend(other.errors)
         self._warnings.extend(other.warnings)
         self._infos.extend(other.infos)
+        self._messages.extend(other.messages)
 
     # ANSI styling for terminal output
     _RED = "\033[31m"
