@@ -16,12 +16,17 @@ def normalize_nodeid(nodeid: str) -> tuple[str, str]:
     return file_clean, test_part
 
 
-def collect_tests() -> list[tuple[str, str, str]]:
+def collect_tests() -> list[tuple[str, str, str]] | None:
     result = subprocess.run(
         ["pytest", "--collect-only", "-q"],
         capture_output=True,
         text=True,
     )
+
+    if result.returncode != 0:
+        print(f"pytest collection failed\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}")
+        return None
+
     lines = result.stdout.splitlines()
     tests = {line.strip() for line in lines if "::" in line and not line.startswith("=")}
 
@@ -82,6 +87,9 @@ def build_configs(normalized: list[tuple[str, str, str]]) -> list[dict[str, obje
 
 def main() -> int:
     normalized = collect_tests()
+    if normalized is None:
+        return 1
+
     configs = build_configs(normalized)
 
     new_content = json.dumps({"version": "0.2.0", "configurations": configs}, indent=2)

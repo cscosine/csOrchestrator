@@ -30,6 +30,9 @@ class OrchestratorExecutorReporterDummy(OrchestratorExecutorReporterBase):
     def on_end_visit_step(self, step: StepBase, report: Report) -> None:
         pass
 
+    def report_orchestrator_creation_report(self, report: Report) -> None:
+        pass
+
     def report_execution_description(self, execution_description: OrchestratorExecutorMinimalDescription) -> None:
         pass
 

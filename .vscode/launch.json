@@ -12,6 +12,16 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83d\udcc1 tests/csorchestrator/cli tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/cli"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83d\udcc1 tests/csorchestrator/context tests",
       "type": "debugpy",
       "request": "launch",
@@ -108,6 +118,26 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/visitors"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/cli/test_cli \u2192 test_run_command_loads_project_script",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/cli/test_cli.py::test_run_command_loads_project_script"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/cli/test_cli \u2192 test_run_command_missing_create_orchestrator",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/cli/test_cli.py::test_run_command_missing_create_orchestrator"
       ],
       "justMyCode": false
     },
@@ -798,6 +828,16 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite.py::test_composite_reporter_report_execution_report"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite \u2192 test_composite_reporter_report_orchestrator_creation_report",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite.py::test_composite_reporter_report_orchestrator_creation_report"
       ],
       "justMyCode": false
     },

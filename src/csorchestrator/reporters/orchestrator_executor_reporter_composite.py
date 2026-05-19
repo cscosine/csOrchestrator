@@ -40,6 +40,10 @@ class OrchestratorExecutorReporterComposite(OrchestratorExecutorReporterBase):
         for r in self.reporters:
             r.on_end_visit_step(step, report)
 
+    def report_orchestrator_creation_report(self, report: Report) -> None:
+        for r in self.reporters:
+            r.report_orchestrator_creation_report(report)
+
     def report_execution_description(self, execution_description: OrchestratorExecutorMinimalDescription) -> None:
         for r in self.reporters:
             r.report_execution_description(execution_description)

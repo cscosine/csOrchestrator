@@ -61,6 +61,17 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
         # end step indent
         self.reporter_sink.decrease_indentation()
 
+    def report_orchestrator_creation_report(self, report: Report) -> None:
+        self.reporter_sink.stdout("[Creation Report]")
+        self.reporter_sink.increase_indentation()
+        for m in report.errors:
+            self.reporter_sink.stdout(f"[ERROR] {m}")
+        for m in report.warnings:
+            self.reporter_sink.stdout(f"[WARNING] {m}")
+        for m in report.infos:
+            self.reporter_sink.stdout(f"[INFO] {m}")
+        self.reporter_sink.decrease_indentation()
+
     def report_execution_description(self, execution_description: OrchestratorExecutorMinimalDescription) -> None:
         for phase_desc in execution_description:
             self.reporter_sink.stdout(f"Phase: {phase_desc.phase_name}")

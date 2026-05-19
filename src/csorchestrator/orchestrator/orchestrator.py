@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
+from typing import TypeAlias
 
+from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.orchestrator.phase import Phase
 
 
@@ -48,3 +50,6 @@ class Orchestrator:
                 phase_desc.step_names.append(step.name)
             ret.append(phase_desc)
         return ret
+
+
+OptionalOrchestratorWithReport: TypeAlias = OptionalResultWithReport[Orchestrator]

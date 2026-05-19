@@ -46,7 +46,9 @@ repos:
         name: Generate VS Code launch configs
         entry: python
         args: ["tools/generate_vscode_launch.py"]
-        language: system
+        language: python
+        additional_dependencies:
+        - ".[dev]"
         pass_filenames: false
 
       - id: no-unstaged-changes

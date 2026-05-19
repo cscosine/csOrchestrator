@@ -42,6 +42,11 @@ class OrchestratorExecutorReporterBase(ABC):
         ...
 
     @abstractmethod
+    def report_orchestrator_creation_report(self, report: Report) -> None:
+        """Called after the orchestrator creation, with the report of the orchestrator creation"""
+        ...
+
+    @abstractmethod
     def report_execution_description(self, execution_description: OrchestratorExecutorMinimalDescription) -> None:
         """Called after extracting the execution description from the orchestrator, with the execution description"""
         ...

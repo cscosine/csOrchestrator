@@ -138,6 +138,35 @@ def test_composite_reporter_report_pre_execution_report(capsys: pytest.CaptureFi
         assert captured.count(msg) == 2, f"Expected message '{msg}' to appear twice, found {captured.count(msg)}"
 
 
+def test_composite_reporter_report_orchestrator_creation_report(capsys: pytest.CaptureFixture[str]) -> None:
+    # Setup Composite Reporter with two Printing Reporters and a Dummy reporter
+    rep1 = OrchestratorExecutorReporterPrint()
+    rep2 = OrchestratorExecutorReporterPrint()
+    rep3 = OrchestratorExecutorReporterDummy()
+    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3])
+
+    r = Report()
+    r.append_error("Error")
+    r.append_warning("Warning")
+    r.append_info("Info")
+
+    composite.report_orchestrator_creation_report(r)
+
+    # Verify Output
+    captured = capsys.readouterr().out
+
+    # Every message from the print reporter should appear exactly twice
+    # because the composite delegates to both rep1 and rep2.
+    expected_messages = [
+        "  [cout] [ERROR] Error",
+        "  [cout] [WARNING] Warning",
+        "  [cout] [INFO] Info",
+    ]
+
+    for msg in expected_messages:
+        assert captured.count(msg) == 2, f"Expected message '{msg}' to appear twice, found {captured.count(msg)}"
+
+
 def test_composite_reporter_report_execution_report(capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Orchestrator
     orchestrator = Orchestrator()
