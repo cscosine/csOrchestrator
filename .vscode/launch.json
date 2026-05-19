@@ -772,6 +772,36 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite \u2192 test_composite_reporter_report_execution_description",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite.py::test_composite_reporter_report_execution_description"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite \u2192 test_composite_reporter_report_execution_report",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite.py::test_composite_reporter_report_execution_report"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite \u2192 test_composite_reporter_report_pre_execution_report",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite.py::test_composite_reporter_report_pre_execution_report"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/reporters/test_reporter_sink_print \u2192 test_orchestrator_executor_reporter_print_failure_flow",
       "type": "debugpy",
       "request": "launch",
