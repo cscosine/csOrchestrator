@@ -3,7 +3,7 @@ from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
     GeneratorType,
     get_all_supported_workflow_descriptions,
-    get_supported_context_os_architecture_list,
+    get_supported_context_os_architecture_config_list,
     get_supported_os_version_list,
     is_config_selected_multi_config_generator,
     is_config_selected_single_config_generator,
@@ -11,24 +11,24 @@ from csorchestrator.utils.presets.supported_variants import (
 )
 
 
-def test_get_supported_context_os_architecture_list():
-    supported_list = get_supported_context_os_architecture_list()
+def test_get_supported_context_os_architecture_config_list():
+    supported_list = get_supported_context_os_architecture_config_list()
     n_all = len(supported_list)
     assert n_all > 0
 
-    supported_list = get_supported_context_os_architecture_list(GeneratorType.SINGLE_CONFIG)
+    supported_list = get_supported_context_os_architecture_config_list(GeneratorType.SINGLE_CONFIG)
     n_single = len(supported_list)
 
     assert n_single > 0
     assert n_single < n_all
 
-    supported_list = get_supported_context_os_architecture_list(GeneratorType.MULTI_CONFIG)
+    supported_list = get_supported_context_os_architecture_config_list(GeneratorType.MULTI_CONFIG)
     n_multi = len(supported_list)
 
     assert n_multi > 0
     assert n_multi < n_all
 
-    supported_list = get_supported_context_os_architecture_list("INVALID")  # type: ignore
+    supported_list = get_supported_context_os_architecture_config_list("INVALID")  # type: ignore
     n_invalid = len(supported_list)
     assert n_invalid == 0
 
