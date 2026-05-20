@@ -6,7 +6,7 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Callable, Literal, Sequence, cast
+from typing import Callable, Literal, Optional, Sequence, cast
 
 import click
 
@@ -17,6 +17,8 @@ from csorchestrator.orchestrator.execution import validate_and_execute_orchestra
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.reporters.orchestrator_executor_reporter_composite import OrchestratorExecutorReporterComposite
+from csorchestrator.reporters.orchestrator_executor_reporter_markdown import OrchestratorExecutorReporterMarkdown
 from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
 from csorchestrator.reporters.reporter_sink_colorama_print import ReporterSinkColoramaPrint
 from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
@@ -24,17 +26,19 @@ from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
 
 CreateOrchestratorFn = Callable[[], OptionalResultWithReport[Orchestrator]]
 
+SINK_TYPES = ("print", "colored", "colorama", "none")
+SinkType = Literal["print", "colored", "colorama", "none"]  # keep aligned with SINK_TYPES
 
-SinkType = Literal["print", "colored", "colorama"]
 
-
-def _build_sink(kind: str) -> ReporterSinkBase:
+def _build_sink(kind: str) -> ReporterSinkBase | None:
     if kind == "print":
         return ReporterSinkPrint()
     elif kind == "colored":
         return ReporterSinkColoredPrint()
     elif kind == "colorama":
         return ReporterSinkColoramaPrint()
+    elif kind == "none":
+        return None
     else:
         r = ReporterSinkPrint()
         r.stderr(f"Unknown sink type: {kind}, fallback to ReporterSinkPrint")
@@ -44,19 +48,26 @@ def _build_sink(kind: str) -> ReporterSinkBase:
 @dataclass
 class CLIConfig:
     sink: SinkType = "colorama"
+    markdown_path: Optional[Path] = None
 
 
 @click.group(help="csOrchestrator command line interface")  # type: ignore[untyped-decorator]
 @click.option(  # type: ignore[untyped-decorator]
     "--sink",
-    type=click.Choice(["print", "colored", "colorama"]),
-    default="print",
+    type=click.Choice(SINK_TYPES),
+    default="colorama",
     show_default=True,
     help="Select reporter sink implementation",
 )
+@click.option(  # type: ignore[untyped-decorator]
+    "--markdown",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Write execution report as markdown file",
+)
 @click.pass_context  # type: ignore[untyped-decorator]
-def app(ctx: click.Context, sink: str) -> None:
-    config = CLIConfig(sink=cast(SinkType, sink))
+def app(ctx: click.Context, sink: str, markdown: Path | None = None) -> None:
+    config = CLIConfig(sink=cast(SinkType, sink), markdown_path=markdown)
     ctx.ensure_object(dict)
     ctx.obj["config"] = config
 
@@ -143,7 +154,13 @@ def run(ctx: click.Context, script_path: Path, target_folder: Path | None) -> in
     """Load a Python project script and execute its create_orchestrator() result."""
     config: CLIConfig = ctx.obj["config"]
 
-    reporter = OrchestratorExecutorReporterPrint(reporter_sink=_build_sink(config.sink))
+    reporter = OrchestratorExecutorReporterComposite()
+    console_sink = _build_sink(config.sink)
+    if console_sink is not None:
+        reporter.reporters.append(OrchestratorExecutorReporterPrint(reporter_sink=console_sink))
+    if config.markdown_path is not None:
+        reporter.reporters.append(OrchestratorExecutorReporterMarkdown(path=config.markdown_path))
+
     return execute_project_script(script_path, target_folder, reporter)
 
 
