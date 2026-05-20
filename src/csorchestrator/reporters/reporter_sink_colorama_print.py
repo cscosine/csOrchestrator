@@ -2,13 +2,13 @@ from dataclasses import dataclass
 
 from colorama import Fore, Style, init
 
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrintBase
 
 init()  # enables ANSI on Windows cmd
 
 
 @dataclass
-class ReporterSinkColoramaPrint(ReporterSinkBase):
+class ReporterSinkColoramaPrint(ReporterSinkPrintBase):
     indentation: str = ""
 
     def reset_indentation(self) -> None:

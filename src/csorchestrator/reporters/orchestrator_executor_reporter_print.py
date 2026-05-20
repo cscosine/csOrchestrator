@@ -9,12 +9,12 @@ from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.reporters.report_reporter import repo_to_reporter_sink
-from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
+from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint, ReporterSinkPrintBase
 
 
 @dataclass
 class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
-    reporter_sink: ReporterSinkBase = field(default_factory=ReporterSinkPrint)
+    reporter_sink: ReporterSinkPrintBase = field(default_factory=ReporterSinkPrint)
 
     def on_init_visit(self) -> None:
         self.reporter_sink.reset_indentation()

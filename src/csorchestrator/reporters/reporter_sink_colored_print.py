@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrintBase
 
 
 class Ansi:
@@ -15,7 +15,7 @@ class Ansi:
 
 
 @dataclass
-class ReporterSinkColoredPrint(ReporterSinkBase):
+class ReporterSinkColoredPrint(ReporterSinkPrintBase):
     indentation: str = ""
 
     def reset_indentation(self) -> None:

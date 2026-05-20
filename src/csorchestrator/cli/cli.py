@@ -16,13 +16,12 @@ from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.execution import validate_and_execute_orchestrator
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.reporters.orchestrator_executor_reporter_composite import OrchestratorExecutorReporterComposite
 from csorchestrator.reporters.orchestrator_executor_reporter_markdown import OrchestratorExecutorReporterMarkdown
 from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
 from csorchestrator.reporters.reporter_sink_colorama_print import ReporterSinkColoramaPrint
 from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
-from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
+from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint, ReporterSinkPrintBase
 
 CreateOrchestratorFn = Callable[[], OptionalResultWithReport[Orchestrator]]
 
@@ -30,7 +29,7 @@ SINK_TYPES = ("print", "colored", "colorama", "none")
 SinkType = Literal["print", "colored", "colorama", "none"]  # keep aligned with SINK_TYPES
 
 
-def _build_sink(kind: str) -> ReporterSinkBase | None:
+def _build_sink(kind: str) -> ReporterSinkPrintBase | None:
     if kind == "print":
         return ReporterSinkPrint()
     elif kind == "colored":

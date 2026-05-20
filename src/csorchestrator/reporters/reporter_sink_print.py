@@ -1,10 +1,23 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 
 
 @dataclass
-class ReporterSinkPrint(ReporterSinkBase):
+class ReporterSinkPrintBase(ReporterSinkBase, ABC):
+    @abstractmethod
+    def reset_indentation(self) -> None: ...
+
+    @abstractmethod
+    def increase_indentation(self) -> None: ...
+
+    @abstractmethod
+    def decrease_indentation(self) -> None: ...
+
+
+@dataclass
+class ReporterSinkPrint(ReporterSinkPrintBase):
     indentation: str = ""
 
     def reset_indentation(self) -> None:
