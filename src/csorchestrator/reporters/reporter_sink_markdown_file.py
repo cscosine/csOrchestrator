@@ -18,16 +18,16 @@ class ReporterSinkMarkdown(ReporterSinkBase):
         self.indentation = self.indentation[:-2]
 
     def stdout(self, text: str) -> None:
-        self.lines.append(f"{self.indentation}- {text}")
+        self.lines.append(f"{self.indentation}  - {text}")
 
     def stderr(self, text: str) -> None:
-        self.lines.append(f"{self.indentation}❌ {text}")
+        self.lines.append(f"{self.indentation}  - ❌ {text}")
 
     def info(self, text: str) -> None:
-        self.lines.append(f"{self.indentation}ℹ️ {text}")
+        self.lines.append(f"{self.indentation}  - ℹ️ {text}")
 
     def warning(self, text: str) -> None:
-        self.lines.append(f"{self.indentation}⚠️ {text}")
+        self.lines.append(f"{self.indentation}  - ⚠️ {text}")
 
     def error(self, text: str) -> None:
-        self.lines.append(f"{self.indentation}🔥 {text}")
+        self.lines.append(f"{self.indentation}  - 🔥 {text}")
