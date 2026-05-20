@@ -20,5 +20,8 @@ class Generator(Enum):
 @dataclass(frozen=True)
 class ContextCompilerGenerator:
     compiler_family: Compiler
+    compiler_version: str  # string, use "default" for os/generator default compiler
 
     build_generator: Generator
+
+    COMPILER_VERSION_DEFAULT: str = "default"

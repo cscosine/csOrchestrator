@@ -60,6 +60,10 @@ def create_context_os_architecture_compiler_generator_string(
 
     parts.append(f"{compiler_name}")
 
+    compiler_version = context_compiler_generator.compiler_version.lower()
+
+    parts.append(f"{compiler_version}")
+
     # =====================================================
     # GENERATOR
     # =====================================================

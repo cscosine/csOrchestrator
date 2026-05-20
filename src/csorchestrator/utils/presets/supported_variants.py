@@ -99,7 +99,11 @@ def get_supported_context_os_architecture_list(
 
         for compiler in [Compiler.CLANG, Compiler.GCC]:
             for generator, config_list in zip(generators, configs, strict=True):
-                ccg = ContextCompilerGenerator(compiler_family=compiler, build_generator=generator)
+                ccg = ContextCompilerGenerator(
+                    compiler_family=compiler,
+                    compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+                    build_generator=generator,
+                )
                 for config in config_list:
                     retList.append(
                         ContextOsArchitectureCompilerGeneratorConfig(
@@ -133,7 +137,11 @@ def get_supported_context_os_architecture_list(
 
         for compiler in [Compiler.MSVC, Compiler.MSVC_CLANG]:
             for generator, config_list in zip(generators, configs, strict=True):
-                ccg = ContextCompilerGenerator(compiler_family=compiler, build_generator=generator)
+                ccg = ContextCompilerGenerator(
+                    compiler_family=compiler,
+                    compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+                    build_generator=generator,
+                )
                 for config in config_list:
                     retList.append(
                         ContextOsArchitectureCompilerGeneratorConfig(
