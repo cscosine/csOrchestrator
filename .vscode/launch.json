@@ -802,6 +802,26 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite \u2192 test_composite_reporter_colored_colorama",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite.py::test_composite_reporter_colored_colorama"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite \u2192 test_composite_reporter_markdown",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite.py::test_composite_reporter_markdown"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite \u2192 test_composite_reporter_prints_twice",
       "type": "debugpy",
       "request": "launch",

@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 
 import pytest
 
@@ -11,7 +12,10 @@ from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.reporters.orchestrator_executor_reporter_composite import OrchestratorExecutorReporterComposite
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
+from csorchestrator.reporters.orchestrator_executor_reporter_markdown import OrchestratorExecutorReporterMarkdown
 from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
+from csorchestrator.reporters.reporter_sink_colorama_print import ReporterSinkColoramaPrint
+from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
 
 
 @dataclass
@@ -19,7 +23,10 @@ class MockStep(StepBase):
     pass
 
 
+@dataclass
 class MockVisitor(OrchestratorVisitorBase):
+    multiline: bool = False
+
     def init_visit(self) -> None:
         pass
 
@@ -40,6 +47,8 @@ class MockVisitor(OrchestratorVisitorBase):
         reporter_sink.error(f"Visiting {step.name} [E]")
         reporter_sink.stdout(f"Visiting {step.name} [cout]")
         reporter_sink.stderr(f"Visiting {step.name} [cerr]")
+        if self.multiline:
+            reporter_sink.stdout(f"Visiting {step.name} [cout]\nmultiline")
         return report
 
 
@@ -107,6 +116,54 @@ def test_composite_reporter_prints_twice(capsys: pytest.CaptureFixture[str]) -> 
 
     for msg in expected_messages:
         assert captured.count(msg) == 2, f"Expected message '{msg}' to appear twice, found {captured.count(msg)}"
+
+
+def test_composite_reporter_colored_colorama(capsys: pytest.CaptureFixture[str]) -> None:
+    # 1. Setup Orchestrator
+    orchestrator = Orchestrator()
+    phase = Phase(name="Build")
+    phase.add_step(MockStep(name="Compile", description="Compile source code"))
+    orchestrator.add_phase(phase)
+
+    # 2. Setup Composite Reporter with two Printing Reporters and a Dummy reporter
+    rep1 = OrchestratorExecutorReporterPrint(reporter_sink=ReporterSinkColoredPrint())
+    rep2 = OrchestratorExecutorReporterPrint(reporter_sink=ReporterSinkColoramaPrint())
+    rep3 = OrchestratorExecutorReporterDummy()
+    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3])
+
+    # 3. Execute
+    visitor = MockVisitor(multiline=True)
+    execute_orchestrator(orchestrator, visitor, composite)
+
+    # 4. Verify Output
+    captured = capsys.readouterr().out
+
+    # just veryfy there is some output
+    assert captured.strip() != ""
+
+
+def test_composite_reporter_markdown(tmp_path: Path) -> None:
+    # 1. Setup Orchestrator
+    orchestrator = Orchestrator()
+    phase = Phase(name="Build")
+    phase.add_step(MockStep(name="Compile", description="Compile source code"))
+    orchestrator.add_phase(phase)
+
+    md_path = tmp_path / "output.md"
+
+    # 2. Setup Composite Reporter with two Printing Reporters and a Dummy reporter
+    reporter = OrchestratorExecutorReporterMarkdown(path=md_path)
+
+    # 3. Execute
+    visitor = MockVisitor(multiline=True)
+    execute_orchestrator(orchestrator, visitor, reporter)
+
+    # 4. Assertions
+    assert md_path.exists(), "Markdown file was not created"
+    assert md_path.stat().st_size > 0, "Markdown file is empty"
+
+    content = md_path.read_text(encoding="utf-8")
+    assert content.lstrip().startswith("#"), "Markdown file does not start with '#'"
 
 
 def test_composite_reporter_report_pre_execution_report(capsys: pytest.CaptureFixture[str]) -> None:
