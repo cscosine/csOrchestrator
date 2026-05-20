@@ -60,7 +60,7 @@ class ContextOsArchitectureCompilerGeneratorConfig:
 
 def get_supported_os_version_list(os: OS) -> list[str]:
     if os == OS.LINUX:
-        return ["ubuntu24.04"]
+        return ["ubuntu22.04", "ubuntu24.04"]
     elif os == OS.WINDOWS:
         return ["v10", "v11"]
     elif os == OS.MACOS:
