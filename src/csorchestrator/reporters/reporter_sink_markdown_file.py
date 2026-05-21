@@ -8,9 +8,6 @@ class ReporterSinkMarkdown(ReporterSinkBase):
     lines: list[str] = field(default_factory=list)
     indentation: str = ""
 
-    def reset_indentation(self) -> None:
-        self.indentation = ""
-
     def increase_indentation(self) -> None:
         self.indentation += "  "
 
