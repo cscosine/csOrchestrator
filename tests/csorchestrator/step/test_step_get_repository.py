@@ -156,6 +156,19 @@ def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, dept
     assert report.has_info()
     assert "Clone from" in report.infos[0]
 
+    # Verify actual disk state
+    target_path = tmp_path / cfg.destination_folder
+    status_file = target_path / cfg.file_to_verify
+    assert status_file.exists(), f"File {cfg.file_to_verify} not found in cloned repo"
+
+    expected_content = {
+        cfg.main_branch: cfg.expected_content_main,
+        cfg.dev_branch: cfg.expected_content_dev,
+        cfg.initial_commit_sha: cfg.expected_content_initial,
+        cfg.tag: cfg.expected_content_tag,
+    }.get(repo_ref)
+    assert status_file.read_text(encoding="utf-8").strip() == expected_content
+
     # and get a second time, to test the "update" logic
     report = execute_step_get_repository(
         step=step,
@@ -166,6 +179,8 @@ def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, dept
     assert not report.has_errors()
     assert report.has_info()
     assert "Given target_directory exists, then try to update from" in report.infos[0]
+    assert status_file.exists()
+    assert status_file.read_text(encoding="utf-8").strip() == expected_content
 
 
 @pytest.mark.slow

@@ -932,6 +932,66 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_orchestrator_executor_reporter_markdown \u2192 test_markdown_reporter_produces_valid_file",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/step/test_orchestrator_executor_reporter_markdown.py::test_markdown_reporter_produces_valid_file"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_orchestrator_executor_reporter_print \u2192 test_print_reporter_creation_report",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/step/test_orchestrator_executor_reporter_print.py::test_print_reporter_creation_report"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_orchestrator_executor_reporter_print \u2192 test_print_reporter_formats_reports_correctly",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/step/test_orchestrator_executor_reporter_print.py::test_print_reporter_formats_reports_correctly"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_reporter_sink_colored \u2192 test_colored_sink_error_output",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/step/test_reporter_sink_colored.py::test_colored_sink_error_output"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_reporter_sink_colored \u2192 test_colored_sinks_output_ansi_codes[ReporterSinkColoramaPrint]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/step/test_reporter_sink_colored.py::test_colored_sinks_output_ansi_codes[ReporterSinkColoramaPrint]"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/step/test_reporter_sink_colored \u2192 test_colored_sinks_output_ansi_codes[ReporterSinkColoredPrint]",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/step/test_reporter_sink_colored.py::test_colored_sinks_output_ansi_codes[ReporterSinkColoredPrint]"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_execute_step_get_repository_success[063ee5ddc414553e32b234170542a717cfe9d087-False]",
       "type": "debugpy",
       "request": "launch",
