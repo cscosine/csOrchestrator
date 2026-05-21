@@ -872,6 +872,26 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite \u2192 test_composite_reporter_step_with_errors",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_orchestrator_executor_reporter_composite.py::test_composite_reporter_step_with_errors"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/reporters/test_report_reporter \u2192 test_report_reporter",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/reporters/test_report_reporter.py::test_report_reporter"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/reporters/test_reporter_sink_print \u2192 test_orchestrator_executor_reporter_print_failure_flow",
       "type": "debugpy",
       "request": "launch",

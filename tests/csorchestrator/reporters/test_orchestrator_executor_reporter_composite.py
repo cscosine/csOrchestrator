@@ -166,12 +166,13 @@ def test_composite_reporter_markdown(tmp_path: Path) -> None:
     assert content.lstrip().startswith("#"), "Markdown file does not start with '#'"
 
 
-def test_composite_reporter_report_pre_execution_report(capsys: pytest.CaptureFixture[str]) -> None:
+def test_composite_reporter_report_pre_execution_report(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Composite Reporter with two Printing Reporters and a Dummy reporter
     rep1 = OrchestratorExecutorReporterPrint()
     rep2 = OrchestratorExecutorReporterPrint()
     rep3 = OrchestratorExecutorReporterDummy()
-    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3])
+    rep4 = OrchestratorExecutorReporterMarkdown(tmp_path / "output.md")
+    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3, rep4])
 
     r = Report()
     r.append_error("Error")
@@ -195,12 +196,15 @@ def test_composite_reporter_report_pre_execution_report(capsys: pytest.CaptureFi
         assert captured.count(msg) == 2, f"Expected message '{msg}' to appear twice, found {captured.count(msg)}"
 
 
-def test_composite_reporter_report_orchestrator_creation_report(capsys: pytest.CaptureFixture[str]) -> None:
+def test_composite_reporter_report_orchestrator_creation_report(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
     # Setup Composite Reporter with two Printing Reporters and a Dummy reporter
     rep1 = OrchestratorExecutorReporterPrint()
     rep2 = OrchestratorExecutorReporterPrint()
     rep3 = OrchestratorExecutorReporterDummy()
-    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3])
+    rep4 = OrchestratorExecutorReporterMarkdown(tmp_path / "output.md")
+    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3, rep4])
 
     r = Report()
     r.append_error("Error")
@@ -224,7 +228,7 @@ def test_composite_reporter_report_orchestrator_creation_report(capsys: pytest.C
         assert captured.count(msg) == 2, f"Expected message '{msg}' to appear twice, found {captured.count(msg)}"
 
 
-def test_composite_reporter_report_execution_report(capsys: pytest.CaptureFixture[str]) -> None:
+def test_composite_reporter_step_with_errors(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Orchestrator
     orchestrator = Orchestrator()
     phase = Phase(name="Build")
@@ -235,7 +239,30 @@ def test_composite_reporter_report_execution_report(capsys: pytest.CaptureFixtur
     rep1 = OrchestratorExecutorReporterPrint()
     rep2 = OrchestratorExecutorReporterPrint()
     rep3 = OrchestratorExecutorReporterDummy()
-    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3])
+    rep4 = OrchestratorExecutorReporterMarkdown(tmp_path / "output.md")
+    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3, rep4])
+
+    # Execute
+    visitor = MockVisitorReport()
+    # use a dummy reporter to avoid printing the execution report at the end, which would interfere with our assertions
+    execute_orchestrator(orchestrator, visitor, composite)
+
+    # TODO assert something on print and md
+
+
+def test_composite_reporter_report_execution_report(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
+    # Setup Orchestrator
+    orchestrator = Orchestrator()
+    phase = Phase(name="Build")
+    phase.add_step(MockStep(name="Compile", description="Compile source code"))
+    orchestrator.add_phase(phase)
+
+    # Setup Composite Reporter with two Printing Reporters and a Dummy reporter
+    rep1 = OrchestratorExecutorReporterPrint()
+    rep2 = OrchestratorExecutorReporterPrint()
+    rep3 = OrchestratorExecutorReporterDummy()
+    rep4 = OrchestratorExecutorReporterMarkdown(tmp_path / "output.md")
+    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3, rep4])
 
     # Execute
     visitor = MockVisitorReport()
@@ -259,7 +286,7 @@ def test_composite_reporter_report_execution_report(capsys: pytest.CaptureFixtur
         assert captured.count(msg) == 2, f"Expected message '{msg}' to appear twice, found {captured.count(msg)}"
 
 
-def test_composite_reporter_report_execution_description(capsys: pytest.CaptureFixture[str]) -> None:
+def test_composite_reporter_report_execution_description(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Orchestrator
     orchestrator = Orchestrator()
     phase = Phase(name="Build")
@@ -270,7 +297,8 @@ def test_composite_reporter_report_execution_description(capsys: pytest.CaptureF
     rep1 = OrchestratorExecutorReporterPrint()
     rep2 = OrchestratorExecutorReporterPrint()
     rep3 = OrchestratorExecutorReporterDummy()
-    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3])
+    rep4 = OrchestratorExecutorReporterMarkdown(tmp_path / "output.md")
+    composite = OrchestratorExecutorReporterComposite(reporters=[rep1, rep2, rep3, rep4])
 
     composite.report_execution_description(orchestrator.extract_minimal_description())
 
