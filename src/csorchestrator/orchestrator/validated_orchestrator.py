@@ -1,5 +1,5 @@
 from collections import Counter
-from typing import TypeAlias
+from typing import Optional, TypeAlias
 
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
@@ -14,11 +14,23 @@ from csorchestrator.visitors.orchestrator_visitor_validator import OrchestratorV
 OptionalValidatedOrchestratorWithReport: TypeAlias = OptionalResultWithReport[Orchestrator]
 
 
+# return none if ok, the string error otherwise
+def validPhaseStepName(name: str) -> Optional[str]:
+    if name.count(".") > 0:
+        return "name cannot contains '.'"
+    return None
+
+
 def create_validated_orchestrator(o: Orchestrator) -> OptionalValidatedOrchestratorWithReport:
     report = Report()
 
     # check phases name are unique
     phase_names = [p.name for p in o.phases]
+    for name in phase_names:
+        err_msg = validPhaseStepName(name) is not None
+        if err_msg:
+            report.append_error(f"phase name {name} is invalid, {err_msg}")
+
     counter_phase_names = Counter(phase_names)
     for name, c in counter_phase_names.items():
         if c > 1:
@@ -27,6 +39,11 @@ def create_validated_orchestrator(o: Orchestrator) -> OptionalValidatedOrchestra
     # check step names are unique in each phase
     for p in o.phases:
         step_names = [s.name for s in p.steps]
+        for name in step_names:
+            err_msg = validPhaseStepName(name) is not None
+            if err_msg:
+                report.append_error(f"step name {name} is invalid, {err_msg}")
+
         counter_step_names = Counter(step_names)
         for name, c in counter_step_names.items():
             if c > 1:

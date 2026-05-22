@@ -742,6 +742,16 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator \u2192 test_orchestrator_invalid_phase_name_invalid",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/orchestrator/test_validated_orchestrator.py::test_orchestrator_invalid_phase_name_invalid"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator \u2192 test_orchestrator_invalid_repeated_phase_and_step_names",
       "type": "debugpy",
       "request": "launch",
@@ -788,6 +798,16 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/orchestrator/test_validated_orchestrator.py::test_orchestrator_invalid_step_get_repository"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_validated_orchestrator \u2192 test_orchestrator_invalid_step_name_invalid",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/orchestrator/test_validated_orchestrator.py::test_orchestrator_invalid_step_name_invalid"
       ],
       "justMyCode": false
     },

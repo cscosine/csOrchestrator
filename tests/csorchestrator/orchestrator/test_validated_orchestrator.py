@@ -34,6 +34,32 @@ def test_orchestrator_invalid_repeated_phase_names() -> None:
     assert len(vr.report.infos) == 0
 
 
+def test_orchestrator_invalid_phase_name_invalid() -> None:
+    # invalid, repetition in phases names
+    o = Orchestrator()
+    o.add_phase(Phase("p.1"))
+
+    vr = create_validated_orchestrator(o)
+    assert not vr.has_result()
+    assert "phase name p.1 is invalid" in vr.report.errors[0]
+    assert len(vr.report.errors) == 1
+    assert len(vr.report.warnings) == 0
+    assert len(vr.report.infos) == 0
+
+
+def test_orchestrator_invalid_step_name_invalid() -> None:
+    # invalid, repetition in phases names
+    o = Orchestrator()
+    o.add_phase(Phase("p").add_step(StepEchoMessage("s.1", "", "")))
+
+    vr = create_validated_orchestrator(o)
+    assert not vr.has_result()
+    assert len(vr.report.errors) == 1
+    assert "step name s.1 is invalid" in vr.report.errors[0]
+    assert len(vr.report.warnings) == 0
+    assert len(vr.report.infos) == 0
+
+
 def test_orchestrator_invalid_repeated_step_names() -> None:
     # invalid, repetition in step names
     o = Orchestrator()
