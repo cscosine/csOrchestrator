@@ -5,6 +5,7 @@ from csorchestrator.utils.presets.supported_variants import (
     get_all_supported_workflow_descriptions,
     get_supported_context_os_architecture_config_list,
     get_supported_os_version_list,
+    is_config_selected_for_generator,
     is_config_selected_multi_config_generator,
     is_config_selected_single_config_generator,
     workflow_name_from_description,
@@ -12,21 +13,16 @@ from csorchestrator.utils.presets.supported_variants import (
 
 
 def test_get_supported_context_os_architecture_config_list():
-    supported_list = get_supported_context_os_architecture_config_list()
-    n_all = len(supported_list)
-    assert n_all > 0
 
     supported_list = get_supported_context_os_architecture_config_list(GeneratorType.SINGLE_CONFIG)
     n_single = len(supported_list)
 
     assert n_single > 0
-    assert n_single < n_all
 
     supported_list = get_supported_context_os_architecture_config_list(GeneratorType.MULTI_CONFIG)
     n_multi = len(supported_list)
 
     assert n_multi > 0
-    assert n_multi < n_all
 
     supported_list = get_supported_context_os_architecture_config_list("INVALID")  # type: ignore
     n_invalid = len(supported_list)
@@ -51,6 +47,27 @@ def test_is_config_selected_multi_config_generator() -> None:
     assert not is_config_selected_multi_config_generator(current_config="INVALID", requested_config=BuildConfig.DEBUG)  # type: ignore
     assert not is_config_selected_multi_config_generator(current_config=BuildConfig.DEBUG, requested_config="INVALID")  # type: ignore
     assert not is_config_selected_multi_config_generator(current_config="INVALID", requested_config="INVALID")  # type: ignore
+
+
+def test_is_config_selected_for_generator() -> None:
+    assert not is_config_selected_for_generator(
+        "INVALID",  # type: ignore
+        current_config=BuildConfig.DEBUG,
+        requested_config=BuildConfig.DEBUG,
+    )
+    assert is_config_selected_for_generator(
+        GeneratorType.SINGLE_CONFIG, current_config=BuildConfig.DEBUG, requested_config=BuildConfig.DEBUG
+    )
+    assert not is_config_selected_for_generator(
+        GeneratorType.SINGLE_CONFIG, current_config=BuildConfig.DEBUG, requested_config=BuildConfig.PARANOID
+    )
+
+    assert is_config_selected_for_generator(
+        GeneratorType.MULTI_CONFIG, current_config=BuildConfig.DEBUG, requested_config=BuildConfig.DEBUG
+    )
+    assert not is_config_selected_for_generator(
+        GeneratorType.MULTI_CONFIG, current_config=BuildConfig.DEBUG, requested_config=BuildConfig.PARANOID
+    )
 
 
 def test_is_config_selected_single_config_generator() -> None:
