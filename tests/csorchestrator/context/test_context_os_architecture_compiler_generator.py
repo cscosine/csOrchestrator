@@ -2,6 +2,8 @@ from csorchestrator.context.context_compiler_generator import (
     Compiler,
     ContextCompilerGenerator,
     Generator,
+    GeneratorType,
+    GeneratorWithType,
 )
 from csorchestrator.context.context_os_architecture import OS, Architecture, ContextOsArchitecture
 from csorchestrator.context.context_os_architecture_compiler_generator import (
@@ -20,7 +22,7 @@ def test_basic_linux_ninja_clang():
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.CLANG,
         compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
-        build_generator=Generator.NINJA,
+        build_generator=GeneratorWithType(Generator.NINJA, GeneratorType.SINGLE_CONFIG),
     )
 
     result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
@@ -39,7 +41,7 @@ def test_windows_msvc_vs_generator():
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.MSVC,
         compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
-        build_generator=Generator.MSVC_17_2022,
+        build_generator=GeneratorWithType(Generator.MSVC_17_2022, GeneratorType.MULTI_CONFIG),
     )
 
     result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
@@ -58,7 +60,7 @@ def test_macos_appleclang_ninja_multiconfig():
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.APPLE_CLANG,
         compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
-        build_generator=Generator.NINJA_MULTI,
+        build_generator=GeneratorWithType(Generator.NINJA_MULTI, GeneratorType.MULTI_CONFIG),
     )
 
     result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
@@ -77,7 +79,7 @@ def test_lowercasing_behavior():
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.CLANG,
         compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
-        build_generator=Generator.NINJA,
+        build_generator=GeneratorWithType(Generator.NINJA, GeneratorType.SINGLE_CONFIG),
     )
 
     result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
@@ -94,10 +96,10 @@ def test_all_generators_supported():
     )
 
     for gen, expected in [
-        (Generator.NINJA, "ninja"),
-        (Generator.NINJA_MULTI, "ninjamulticonfig"),
-        (Generator.MSVC_17_2022, "msvc2022"),
-        (Generator.MSVC_18_2026, "msvc2026"),
+        (GeneratorWithType(Generator.NINJA, GeneratorType.SINGLE_CONFIG), "ninja"),
+        (GeneratorWithType(Generator.NINJA_MULTI, GeneratorType.MULTI_CONFIG), "ninjamulticonfig"),
+        (GeneratorWithType(Generator.MSVC_17_2022, GeneratorType.MULTI_CONFIG), "msvc2022"),
+        (GeneratorWithType(Generator.MSVC_18_2026, GeneratorType.MULTI_CONFIG), "msvc2026"),
     ]:
         context_compiler = ContextCompilerGenerator(
             compiler_family=Compiler.GCC,

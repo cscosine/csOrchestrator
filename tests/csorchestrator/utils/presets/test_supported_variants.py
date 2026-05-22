@@ -1,7 +1,7 @@
+from csorchestrator.context.context_compiler_generator import GeneratorType
 from csorchestrator.context.context_os_architecture import OS
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
-    GeneratorType,
     get_all_supported_workflow_descriptions,
     get_supported_context_os_architecture_config_list,
     get_supported_os_version_list,
@@ -14,19 +14,8 @@ from csorchestrator.utils.presets.supported_variants import (
 
 def test_get_supported_context_os_architecture_config_list():
 
-    supported_list = get_supported_context_os_architecture_config_list(GeneratorType.SINGLE_CONFIG)
-    n_single = len(supported_list)
-
-    assert n_single > 0
-
-    supported_list = get_supported_context_os_architecture_config_list(GeneratorType.MULTI_CONFIG)
-    n_multi = len(supported_list)
-
-    assert n_multi > 0
-
-    supported_list = get_supported_context_os_architecture_config_list("INVALID")  # type: ignore
-    n_invalid = len(supported_list)
-    assert n_invalid == 0
+    supported_list = get_supported_context_os_architecture_config_list()
+    assert len(supported_list) > 0
 
 
 def test_is_config_selected_multi_config_generator() -> None:

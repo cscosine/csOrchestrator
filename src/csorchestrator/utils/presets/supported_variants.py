@@ -5,16 +5,35 @@ from csorchestrator.context.context_compiler_generator import (
     Compiler,
     ContextCompilerGenerator,
     Generator,
+    GeneratorType,
+    GeneratorWithType,
 )
-from csorchestrator.context.context_os_architecture import OS, Architecture, ContextOsArchitecture
+from csorchestrator.context.context_os_architecture import (
+    OS,
+    Architecture,
+    ContextOsArchitecture,
+)
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
 )
 
+# TODO this is a glue layer between csorchestrator and cscmake
+# it should not strictly belong to csorchestrator, but having it in cscmake
+# at the moment is complicated: cscmake is normally cloned by project
+# therefore it is not available in imports until it is cloned...
+# so, for the time being, this can stay here
+# once cscmake will be stable and usable via pip install, then we can move this file there
 
-class GeneratorType(Enum):
-    SINGLE_CONFIG = "singleconfig"
-    MULTI_CONFIG = "multiconfig"
+
+def get_supported_os_version_list(os: OS) -> list[str]:
+    if os == OS.LINUX:
+        return ["ubuntu22.04", "ubuntu24.04"]
+    elif os == OS.WINDOWS:
+        return ["v10", "v11"]
+    elif os == OS.MACOS:
+        return []  # TODO add macos support
+    else:
+        return []
 
 
 class BuildConfig(Enum):
@@ -26,9 +45,16 @@ class BuildConfig(Enum):
     DEBUG_RELEASE_RELWITHDEBINFO_PARANOID = "debug-release-relWithDebInfo-paranoid"
 
 
-def get_supported_build_configs_for_generator_type(generator_type: GeneratorType) -> list[BuildConfig]:
+def get_supported_build_configs_for_generator_type(
+    generator_type: GeneratorType,
+) -> list[BuildConfig]:
     if generator_type == GeneratorType.SINGLE_CONFIG:
-        return [BuildConfig.DEBUG, BuildConfig.RELEASE, BuildConfig.RELWITHDEBINFO, BuildConfig.PARANOID]
+        return [
+            BuildConfig.DEBUG,
+            BuildConfig.RELEASE,
+            BuildConfig.RELWITHDEBINFO,
+            BuildConfig.PARANOID,
+        ]
     elif generator_type == GeneratorType.MULTI_CONFIG:
         return [
             BuildConfig.DEBUG,
@@ -49,46 +75,61 @@ class ContextOsArchitectureCompilerGenerator:
     context_compiler_generator: ContextCompilerGenerator
 
 
-@dataclass
-class ContextOsArchitectureCompilerGeneratorConfig:
-    context_os_architecture: ContextOsArchitecture
-    context_compiler_generator: ContextCompilerGenerator
-    config: BuildConfig
-
-
-def get_supported_os_version_list(os: OS) -> list[str]:
+def get_supported_generators_per_os(os: OS) -> list[GeneratorWithType]:
     if os == OS.LINUX:
-        return ["ubuntu22.04", "ubuntu24.04"]
+        return [
+            GeneratorWithType(generator=Generator.NINJA, generator_type=GeneratorType.SINGLE_CONFIG),
+            GeneratorWithType(
+                generator=Generator.NINJA_MULTI,
+                generator_type=GeneratorType.MULTI_CONFIG,
+            ),
+        ]
     elif os == OS.WINDOWS:
-        return ["v10", "v11"]
+        return [
+            GeneratorWithType(
+                generator=Generator.MSVC_17_2022,
+                generator_type=GeneratorType.MULTI_CONFIG,
+            ),
+            GeneratorWithType(
+                generator=Generator.MSVC_18_2026,
+                generator_type=GeneratorType.MULTI_CONFIG,
+            ),
+        ]
     elif os == OS.MACOS:
-        return []  # TODO add macos support
+        # TODO support macos
+        return []
     else:
         return []
 
 
-def get_supported_context_os_architecture_list(
-    generator_type: GeneratorType,
-) -> list[ContextOsArchitectureCompilerGenerator]:
+def get_supported_compilers_per_os(os: OS) -> list[Compiler]:
+    if os == OS.LINUX:
+        return [Compiler.GCC, Compiler.CLANG]
+    elif os == OS.WINDOWS:
+        return [Compiler.MSVC, Compiler.MSVC_CLANG]
+    elif os == OS.MACOS:
+        # TODO support macos
+        return []
+    else:
+        return []
+
+
+def get_supported_context_os_architecture_list() -> list[ContextOsArchitectureCompilerGenerator]:
 
     retList: list[ContextOsArchitectureCompilerGenerator] = []
 
     ## LINUX
     for os_version in get_supported_os_version_list(OS.LINUX):
-        linux_ubuntu2404_x64_generic = ContextOsArchitecture(
+        os_arch = ContextOsArchitecture(
             os=OS.LINUX,
             os_version=os_version,
             architecture=Architecture.X64,
             architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
         )
-        if generator_type == GeneratorType.SINGLE_CONFIG:
-            generators = [Generator.NINJA]
-        elif generator_type == GeneratorType.MULTI_CONFIG:
-            generators = [Generator.NINJA_MULTI]
-        else:
-            generators = []
+        generators = get_supported_generators_per_os(os_arch.os)
+        compilers = get_supported_compilers_per_os(os_arch.os)
 
-        for compiler in [Compiler.CLANG, Compiler.GCC]:
+        for compiler in compilers:
             for generator in generators:
                 ccg = ContextCompilerGenerator(
                     compiler_family=compiler,
@@ -97,29 +138,23 @@ def get_supported_context_os_architecture_list(
                 )
                 retList.append(
                     ContextOsArchitectureCompilerGenerator(
-                        context_os_architecture=linux_ubuntu2404_x64_generic, context_compiler_generator=ccg
+                        context_os_architecture=os_arch, context_compiler_generator=ccg
                     )
                 )
 
     ## WINDOWS
     for os_version in get_supported_os_version_list(OS.WINDOWS):
-        windows_x64_generic = ContextOsArchitecture(
+        os_arch = ContextOsArchitecture(
             os=OS.WINDOWS,
             os_version=os_version,
             architecture=Architecture.X64,
             architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
         )
 
-        if generator_type is None:
-            generators = [Generator.MSVC_17_2022, Generator.MSVC_18_2026]
-        elif generator_type == GeneratorType.SINGLE_CONFIG:
-            generators = []
-        elif generator_type == GeneratorType.MULTI_CONFIG:
-            generators = [Generator.MSVC_17_2022, Generator.MSVC_18_2026]
-        else:
-            generators = []
+        generators = get_supported_generators_per_os(os_arch.os)
+        compilers = get_supported_compilers_per_os(os_arch.os)
 
-        for compiler in [Compiler.MSVC, Compiler.MSVC_CLANG]:
+        for compiler in compilers:
             for generator in generators:
                 ccg = ContextCompilerGenerator(
                     compiler_family=compiler,
@@ -128,7 +163,7 @@ def get_supported_context_os_architecture_list(
                 )
                 retList.append(
                     ContextOsArchitectureCompilerGenerator(
-                        context_os_architecture=windows_x64_generic, context_compiler_generator=ccg
+                        context_os_architecture=os_arch, context_compiler_generator=ccg
                     )
                 )
     ## MACOS
@@ -138,29 +173,44 @@ def get_supported_context_os_architecture_list(
     return retList
 
 
-def get_supported_context_os_architecture_config_list(
-    generator_type: GeneratorType,
+@dataclass
+class ContextOsArchitectureCompilerGeneratorConfig:
+    context_os_architecture: ContextOsArchitecture
+    context_compiler_generator: ContextCompilerGenerator
+    config: BuildConfig
+
+
+def get_supported_context_os_architecture_config_list_per_os_arch_compiler(
+    src: ContextOsArchitectureCompilerGenerator,
 ) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
 
     retList: list[ContextOsArchitectureCompilerGeneratorConfig] = []
 
-    source_list: list[ContextOsArchitectureCompilerGenerator] = get_supported_context_os_architecture_list(
-        generator_type=generator_type
+    configs_per_generator_type = get_supported_build_configs_for_generator_type(
+        src.context_compiler_generator.build_generator.generator_type
     )
-
-    configs_per_generator_type = get_supported_build_configs_for_generator_type(generator_type)
-
-    for src in source_list:
-        for config in configs_per_generator_type:
-            retList.append(
-                ContextOsArchitectureCompilerGeneratorConfig(
-                    context_os_architecture=src.context_os_architecture,
-                    context_compiler_generator=src.context_compiler_generator,
-                    config=config,
-                )
+    for config in configs_per_generator_type:
+        retList.append(
+            ContextOsArchitectureCompilerGeneratorConfig(
+                context_os_architecture=src.context_os_architecture,
+                context_compiler_generator=src.context_compiler_generator,
+                config=config,
             )
+        )
 
     return retList
+
+
+def get_supported_context_os_architecture_config_list() -> list[ContextOsArchitectureCompilerGeneratorConfig]:
+
+    ret_list: list[ContextOsArchitectureCompilerGeneratorConfig] = []
+
+    source_list: list[ContextOsArchitectureCompilerGenerator] = get_supported_context_os_architecture_list()
+
+    for src in source_list:
+        ret_list += get_supported_context_os_architecture_config_list_per_os_arch_compiler(src)
+
+    return ret_list
 
 
 def is_config_selected_multi_config_generator(current_config: BuildConfig, requested_config: BuildConfig) -> bool:
@@ -204,7 +254,9 @@ def is_config_selected_single_config_generator(current_config: BuildConfig, requ
 
 
 def is_config_selected_for_generator(
-    generator_type: GeneratorType, current_config: BuildConfig, requested_config: BuildConfig
+    generator_type: GeneratorType,
+    current_config: BuildConfig,
+    requested_config: BuildConfig,
 ) -> bool:
     if generator_type == GeneratorType.SINGLE_CONFIG:
         return is_config_selected_single_config_generator(
@@ -218,9 +270,22 @@ def is_config_selected_for_generator(
         return False
 
 
-def workflow_name_from_description(description: ContextOsArchitectureCompilerGeneratorConfig) -> str:
-    supported_build_config_string = create_context_os_architecture_compiler_generator_string(
-        description.context_os_architecture, description.context_compiler_generator
+def create_context_os_architecture_compiler_generator_string_unique(
+    context_os_architecture_generator: ContextOsArchitectureCompilerGenerator,
+) -> str:
+    return create_context_os_architecture_compiler_generator_string(
+        context_os_architecture_generator.context_os_architecture,
+        context_os_architecture_generator.context_compiler_generator,
+    )
+
+
+def workflow_name_from_description(
+    description: ContextOsArchitectureCompilerGeneratorConfig,
+) -> str:
+    supported_build_config_string = create_context_os_architecture_compiler_generator_string_unique(
+        ContextOsArchitectureCompilerGenerator(
+            description.context_os_architecture, description.context_compiler_generator
+        )
     )
     config_string = description.config.value
     workflow_name = f"workflow-{supported_build_config_string}-{config_string}"
@@ -232,10 +297,32 @@ def get_all_supported_workflow_descriptions(
 ) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
     workflow_list: list[ContextOsArchitectureCompilerGeneratorConfig] = []
 
-    for generator in GeneratorType:
-        for supported_build_config in get_supported_context_os_architecture_config_list(generator):
-            if not is_config_selected_for_generator(generator, supported_build_config.config, selected_config):
-                continue
-            workflow_list.append(supported_build_config)
+    for supported_build_config in get_supported_context_os_architecture_config_list():
+        if not is_config_selected_for_generator(
+            supported_build_config.context_compiler_generator.build_generator.generator_type,
+            supported_build_config.config,
+            selected_config,
+        ):
+            continue
+        workflow_list.append(supported_build_config)
+
+    return workflow_list
+
+
+def get_all_supported_workflow_descriptions_per_os_arch(
+    os_arch_generator: ContextOsArchitectureCompilerGenerator,
+    selected_config: BuildConfig,
+) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
+    workflow_list: list[ContextOsArchitectureCompilerGeneratorConfig] = []
+
+    src_list = get_supported_context_os_architecture_config_list_per_os_arch_compiler(os_arch_generator)
+    for src in src_list:
+        if not is_config_selected_for_generator(
+            src.context_compiler_generator.build_generator.generator_type,
+            src.config,
+            selected_config,
+        ):
+            continue
+        workflow_list.append(src)
 
     return workflow_list

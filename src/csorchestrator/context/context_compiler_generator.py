@@ -17,11 +17,22 @@ class Generator(Enum):
     MSVC_18_2026 = "msvc2026"
 
 
+class GeneratorType(Enum):
+    SINGLE_CONFIG = "singleconfig"
+    MULTI_CONFIG = "multiconfig"
+
+
+@dataclass(frozen=True)
+class GeneratorWithType:
+    generator: Generator
+    generator_type: GeneratorType
+
+
 @dataclass(frozen=True)
 class ContextCompilerGenerator:
     compiler_family: Compiler
     compiler_version: str  # string, use "default" for os/generator default compiler
 
-    build_generator: Generator
+    build_generator: GeneratorWithType
 
     COMPILER_VERSION_DEFAULT: str = "default"
