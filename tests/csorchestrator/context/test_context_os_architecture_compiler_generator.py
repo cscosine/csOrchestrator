@@ -7,6 +7,7 @@ from csorchestrator.context.context_compiler_generator import (
 )
 from csorchestrator.context.context_os_architecture import OS, Architecture, ContextOsArchitecture
 from csorchestrator.context.context_os_architecture_compiler_generator import (
+    ContextOsArchitectureCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
 )
 
@@ -25,7 +26,9 @@ def test_basic_linux_ninja_clang():
         build_generator=GeneratorWithType(Generator.NINJA, GeneratorType.SINGLE_CONFIG),
     )
 
-    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(
+        ContextOsArchitectureCompilerGenerator(context_os, context_compiler)
+    )
 
     assert result == "csv1-linux-ubuntu24.04-arm64-orin-clang-default-ninja"
 
@@ -44,7 +47,9 @@ def test_windows_msvc_vs_generator():
         build_generator=GeneratorWithType(Generator.MSVC_17_2022, GeneratorType.MULTI_CONFIG),
     )
 
-    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(
+        ContextOsArchitectureCompilerGenerator(context_os, context_compiler)
+    )
 
     assert result == "csv1-windows-v11-x64-generic-msvc-default-msvc2022"
 
@@ -63,7 +68,9 @@ def test_macos_appleclang_ninja_multiconfig():
         build_generator=GeneratorWithType(Generator.NINJA_MULTI, GeneratorType.MULTI_CONFIG),
     )
 
-    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(
+        ContextOsArchitectureCompilerGenerator(context_os, context_compiler)
+    )
 
     assert result == "csv1-macos-v14-arm64-generic-appleclang-default-ninjamulticonfig"
 
@@ -82,7 +89,9 @@ def test_lowercasing_behavior():
         build_generator=GeneratorWithType(Generator.NINJA, GeneratorType.SINGLE_CONFIG),
     )
 
-    result = create_context_os_architecture_compiler_generator_string(context_os, context_compiler)
+    result = create_context_os_architecture_compiler_generator_string(
+        ContextOsArchitectureCompilerGenerator(context_os, context_compiler)
+    )
 
     assert result == "csv1-linux-ubuntu24.04-arm64-orin-clang-default-ninja"
 
@@ -107,6 +116,8 @@ def test_all_generators_supported():
             build_generator=gen,
         )
 
-        result = create_context_os_architecture_compiler_generator_string(base_os, context_compiler)
+        result = create_context_os_architecture_compiler_generator_string(
+            ContextOsArchitectureCompilerGenerator(base_os, context_compiler)
+        )
 
         assert expected in result

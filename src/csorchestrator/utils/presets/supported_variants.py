@@ -14,6 +14,7 @@ from csorchestrator.context.context_os_architecture import (
     ContextOsArchitecture,
 )
 from csorchestrator.context.context_os_architecture_compiler_generator import (
+    ContextOsArchitectureCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
 )
 
@@ -67,12 +68,6 @@ def get_supported_build_configs_for_generator_type(
     else:
         # defensive, for invalid cases
         return []
-
-
-@dataclass
-class ContextOsArchitectureCompilerGenerator:
-    context_os_architecture: ContextOsArchitecture
-    context_compiler_generator: ContextCompilerGenerator
 
 
 def get_supported_generators_per_os(os: OS) -> list[GeneratorWithType]:
@@ -174,43 +169,39 @@ def get_supported_context_os_architecture_list() -> list[ContextOsArchitectureCo
 
 
 @dataclass
-class ContextOsArchitectureCompilerGeneratorConfig:
-    context_os_architecture: ContextOsArchitecture
-    context_compiler_generator: ContextCompilerGenerator
+class ContextOsArchitectureCompilerGeneratorConfig(ContextOsArchitectureCompilerGenerator):
     config: BuildConfig
 
 
-def get_supported_context_os_architecture_config_list_per_os_arch_compiler(
-    src: ContextOsArchitectureCompilerGenerator,
+def get_supported_context_os_architecture_config_list(
+    src: ContextOsArchitectureCompilerGenerator | list[ContextOsArchitectureCompilerGenerator] | None = None,
 ) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
 
     retList: list[ContextOsArchitectureCompilerGeneratorConfig] = []
 
-    configs_per_generator_type = get_supported_build_configs_for_generator_type(
-        src.context_compiler_generator.build_generator.generator_type
-    )
-    for config in configs_per_generator_type:
-        retList.append(
-            ContextOsArchitectureCompilerGeneratorConfig(
-                context_os_architecture=src.context_os_architecture,
-                context_compiler_generator=src.context_compiler_generator,
-                config=config,
-            )
+    if src is None:
+        src_list = get_supported_context_os_architecture_list()
+    elif isinstance(src, list) and all(isinstance(x, ContextOsArchitectureCompilerGenerator) for x in src):
+        src_list = src
+    elif isinstance(src, ContextOsArchitectureCompilerGenerator):
+        src_list = [src]
+    else:
+        raise ValueError("get_supported_context_os_architecture_config_list argument input error")
+
+    for src in src_list:
+        configs_per_generator_type = get_supported_build_configs_for_generator_type(
+            src.context_compiler_generator.build_generator.generator_type
         )
+        for config in configs_per_generator_type:
+            retList.append(
+                ContextOsArchitectureCompilerGeneratorConfig(
+                    context_os_architecture=src.context_os_architecture,
+                    context_compiler_generator=src.context_compiler_generator,
+                    config=config,
+                )
+            )
 
     return retList
-
-
-def get_supported_context_os_architecture_config_list() -> list[ContextOsArchitectureCompilerGeneratorConfig]:
-
-    ret_list: list[ContextOsArchitectureCompilerGeneratorConfig] = []
-
-    source_list: list[ContextOsArchitectureCompilerGenerator] = get_supported_context_os_architecture_list()
-
-    for src in source_list:
-        ret_list += get_supported_context_os_architecture_config_list_per_os_arch_compiler(src)
-
-    return ret_list
 
 
 def is_config_selected_multi_config_generator(current_config: BuildConfig, requested_config: BuildConfig) -> bool:
@@ -270,23 +261,11 @@ def is_config_selected_for_generator(
         return False
 
 
-def create_context_os_architecture_compiler_generator_string_unique(
-    context_os_architecture_generator: ContextOsArchitectureCompilerGenerator,
-) -> str:
-    return create_context_os_architecture_compiler_generator_string(
-        context_os_architecture_generator.context_os_architecture,
-        context_os_architecture_generator.context_compiler_generator,
-    )
-
-
 def workflow_name_from_description(
     description: ContextOsArchitectureCompilerGeneratorConfig,
 ) -> str:
-    supported_build_config_string = create_context_os_architecture_compiler_generator_string_unique(
-        ContextOsArchitectureCompilerGenerator(
-            description.context_os_architecture, description.context_compiler_generator
-        )
-    )
+    supported_build_config_string = create_context_os_architecture_compiler_generator_string(description)
+
     config_string = description.config.value
     workflow_name = f"workflow-{supported_build_config_string}-{config_string}"
     return workflow_name
@@ -294,10 +273,11 @@ def workflow_name_from_description(
 
 def get_all_supported_workflow_descriptions(
     selected_config: BuildConfig,
+    os_arch_generator: ContextOsArchitectureCompilerGenerator | None = None,
 ) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
     workflow_list: list[ContextOsArchitectureCompilerGeneratorConfig] = []
 
-    for supported_build_config in get_supported_context_os_architecture_config_list():
+    for supported_build_config in get_supported_context_os_architecture_config_list(os_arch_generator):
         if not is_config_selected_for_generator(
             supported_build_config.context_compiler_generator.build_generator.generator_type,
             supported_build_config.config,
@@ -305,24 +285,5 @@ def get_all_supported_workflow_descriptions(
         ):
             continue
         workflow_list.append(supported_build_config)
-
-    return workflow_list
-
-
-def get_all_supported_workflow_descriptions_per_os_arch(
-    os_arch_generator: ContextOsArchitectureCompilerGenerator,
-    selected_config: BuildConfig,
-) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
-    workflow_list: list[ContextOsArchitectureCompilerGeneratorConfig] = []
-
-    src_list = get_supported_context_os_architecture_config_list_per_os_arch_compiler(os_arch_generator)
-    for src in src_list:
-        if not is_config_selected_for_generator(
-            src.context_compiler_generator.build_generator.generator_type,
-            src.config,
-            selected_config,
-        ):
-            continue
-        workflow_list.append(src)
 
     return workflow_list

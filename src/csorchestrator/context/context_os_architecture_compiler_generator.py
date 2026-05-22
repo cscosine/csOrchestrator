@@ -1,14 +1,19 @@
-from csorchestrator.context.context_compiler_generator import (
-    ContextCompilerGenerator,
-)
+from dataclasses import dataclass
+
+from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
 
 cs_orchestrator_schema_version = "csv1"
 
 
+@dataclass
+class ContextOsArchitectureCompilerGenerator:
+    context_os_architecture: ContextOsArchitecture
+    context_compiler_generator: ContextCompilerGenerator
+
+
 def create_context_os_architecture_compiler_generator_string(
-    context_os_architecture: ContextOsArchitecture,
-    context_compiler_generator: ContextCompilerGenerator,
+    context_os_architecture_generator: ContextOsArchitectureCompilerGenerator,
 ) -> str:
     """
     Creates canonical CS orchestrator ID.
@@ -21,6 +26,9 @@ def create_context_os_architecture_compiler_generator_string(
     """
 
     parts: list[str] = []
+
+    context_os_architecture = context_os_architecture_generator.context_os_architecture
+    context_compiler_generator = context_os_architecture_generator.context_compiler_generator
 
     # =====================================================
     # SCHEMA
