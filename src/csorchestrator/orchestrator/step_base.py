@@ -31,3 +31,8 @@ class StepBase:
     def get_extra(self, t: type[T]) -> T | None:
         extra = self._extras.get(t)
         return extra if isinstance(extra, t) else None
+
+
+@dataclass
+class StepExecuteOnMatchingContext(StepExtra):
+    pass

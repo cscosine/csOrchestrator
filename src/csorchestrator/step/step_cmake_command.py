@@ -7,7 +7,7 @@ from typing import Callable, TextIO
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepExecuteOnMatchingContext
 from csorchestrator.utils.presets.supported_variants import (
     ContextOsArchitectureCompilerGeneratorConfig,
     workflow_name_from_description,
@@ -27,10 +27,12 @@ def execute_step_cmake_workflow(
 
     workflow_name = workflow_name_from_description(step.workflow_description)
 
-    match = step.workflow_description.context_os_architecture.is_equal_to(context.os_architecture)
-    if not match:
-        report.append_info(f"Skip '{workflow_name}', not compatible with the current context")
-        return report
+    excute_on_matching_context = step.get_extra(StepExecuteOnMatchingContext)
+    if excute_on_matching_context is not None:
+        match = step.workflow_description.context_os_architecture.is_equal_to(context.os_architecture)
+        if not match:
+            report.append_info(f"Skip '{workflow_name}', not compatible with the current context")
+            return report
 
     target_full_path: Path = context.base_folder_path / step.source_dir
     cmd = [
