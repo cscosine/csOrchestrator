@@ -4,11 +4,11 @@ from pathlib import Path
 import pytest
 
 from csorchestrator.context.context_local_execution import create_context_local_execution
+from csorchestrator.orchestrator.step_base import StepExtra
 from csorchestrator.reporters.reporter_sink_dummy import ReporterSinkDummy
 from csorchestrator.step.step_get_repository import (
     RepositoryType,
     StepGetRepository,
-    StepGetRepositoryExtra,
     StepGetRepositoryExtraAccessToken,
     StepGetRepositoryExtraDepthOne,
     execute_step_get_repository,
@@ -18,12 +18,12 @@ from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 
 @dataclass
-class StepGetRepositoryExtraCustom(StepGetRepositoryExtra):
+class StepGetRepositoryExtraCustom(StepExtra):
     value: int
 
 
 @dataclass
-class StepGetRepositoryExtraNotUsed(StepGetRepositoryExtra):
+class StepGetRepositoryExtraNotUsed(StepExtra):
     pass
 
 
@@ -38,7 +38,7 @@ def test_step_get_repository():
     )
     s.add_extra(StepGetRepositoryExtraAccessToken(token_name="THE_TOKEN")).add_extra(StepGetRepositoryExtraCustom(25))
 
-    assert s.get_extra(StepGetRepositoryExtra) is None
+    assert s.get_extra(StepExtra) is None
     assert s.get_extra(StepGetRepositoryExtraNotUsed) is None
 
     token_extra = s.get_extra(StepGetRepositoryExtraAccessToken)

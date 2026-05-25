@@ -1,27 +1,18 @@
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import TypeVar
 
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepExtra
 from csorchestrator.utils.file_system.path import is_clean_relative_path, resolve_path
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
 
 
-# base class for extra information that can be provided
-class StepGetRepositoryExtra:
-    pass
-
-
-T = TypeVar("T", bound="StepGetRepositoryExtra")
-
-
 @dataclass
-class StepGetRepositoryExtraAccessToken(StepGetRepositoryExtra):
+class StepGetRepositoryExtraAccessToken(StepExtra):
     token_name: str
 
 
@@ -41,22 +32,8 @@ class StepGetRepository(StepBase):
     # - Tag, e.g. "v0.0.1"
     # - Commit hash, e.g. "9f8e7d6c5b4a3210abcd1234ef56789012345678"
 
-    _extras: dict[type, StepGetRepositoryExtra] = field(default_factory=dict)
-
     def resolved_target_directory_path(self) -> Path:
         return resolve_path(self.target_directory)
-
-    def add_extra(
-        self,
-        extra: StepGetRepositoryExtra,
-    ) -> "StepGetRepository":
-        key = type(extra)
-        self._extras[key] = extra
-        return self
-
-    def get_extra(self, t: type[T]) -> T | None:
-        extra = self._extras.get(t)
-        return extra if isinstance(extra, t) else None
 
 
 def execute_step_get_repository(
@@ -134,7 +111,7 @@ def _execute_step_get_repository_git(
 
 
 @dataclass
-class StepGetRepositoryExtraDepthOne(StepGetRepositoryExtra):
+class StepGetRepositoryExtraDepthOne(StepExtra):
     on_local_checkout: bool
     on_github_action_checkout: bool
 
