@@ -64,10 +64,14 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
         self.reporter_sink.decrease_indentation()
 
     def report_execution_description(self, execution_description: OrchestratorExecutorMinimalDescription) -> None:
-        for phase_desc in execution_description:
+        for phase_desc in execution_description.phases_and_steps:
             self.reporter_sink.stdout(f"Phase: {phase_desc.phase_name}")
             for step_name in phase_desc.step_names:
                 self.reporter_sink.stdout(f"  Step: {step_name}")
+        if len(execution_description.matrix_description) > 0:
+            self.reporter_sink.stdout("Matrix Description")
+            for line in execution_description.matrix_description:
+                self.reporter_sink.stdout(f"  {line}")
 
     def report_pre_execution_report(self, report: Report) -> None:
         self.reporter_sink.stdout("[Pre-Execution Report]")

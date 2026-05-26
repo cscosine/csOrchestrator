@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from typing import TypeAlias
 
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
+from csorchestrator.orchestrator.execution_matrix_base import OrchestratorExecutionMatrixBase
 from csorchestrator.orchestrator.phase import Phase
 
 
@@ -11,7 +12,12 @@ class PhaseNameWithStepNames:
     step_names: list[str] = field(default_factory=list)
 
 
-OrchestratorExecutorMinimalDescription = list[PhaseNameWithStepNames]  # a list of phases names and list of step names
+@dataclass
+class OrchestratorExecutorMinimalDescription:
+    phases_and_steps: list[PhaseNameWithStepNames] = field(
+        default_factory=list
+    )  # a list of phases names and list of step names
+    matrix_description: list[str] = field(default_factory=list)  # a list of string describing the execution matrix
 
 
 @dataclass
@@ -25,6 +31,7 @@ class Orchestrator:
     #   - run cmake workflow / individual steps (config / build / test / install)
 
     phases: list[Phase] = field(default_factory=list)
+    execution_matrix: OrchestratorExecutionMatrixBase | None = None
 
     def add_phase(self, phase: Phase) -> "Orchestrator":
         self.phases.append(phase)
@@ -35,13 +42,21 @@ class Orchestrator:
         self.phases.append(phase)
         return phase
 
+    def set_execution_matrix(self, matrix: OrchestratorExecutionMatrixBase) -> "Orchestrator":
+        self.execution_matrix = matrix
+        return self
+
     def extract_minimal_description(self) -> OrchestratorExecutorMinimalDescription:
-        ret: OrchestratorExecutorMinimalDescription = []
+        ret = OrchestratorExecutorMinimalDescription()
         for phase in self.phases:
             phase_desc = PhaseNameWithStepNames(phase.name)
             for step in phase.steps:
                 phase_desc.step_names.append(step.name)
-            ret.append(phase_desc)
+            ret.phases_and_steps.append(phase_desc)
+        if self.execution_matrix is None:
+            ret.matrix_description = []
+        else:
+            ret.matrix_description = self.execution_matrix.to_list_string_description()
         return ret
 
 

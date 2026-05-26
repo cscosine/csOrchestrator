@@ -69,10 +69,15 @@ class OrchestratorExecutorReporterMarkdown(OrchestratorExecutorReporterBase):
     ) -> None:
         self.sink.lines.append("## Execution Description\n")
 
-        for phase_desc in execution_description:
+        for phase_desc in execution_description.phases_and_steps:
             self.sink.lines.append(f"### Phase: {phase_desc.phase_name}")
             for step_name in phase_desc.step_names:
                 self.sink.lines.append(f"- Step: {step_name}")
+
+        if len(execution_description.matrix_description) > 0:
+            self.sink.lines.append("### Execution Matrix")
+            for line in execution_description.matrix_description:
+                self.sink.lines.append(f"- {line}")
 
     # ---------------- PRE EXECUTION ----------------
 

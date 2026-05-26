@@ -1,7 +1,8 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
+from csorchestrator.orchestrator.execution_matrix_base import OrchestratorExecutionMatrixBase
 
 cs_orchestrator_schema_version = "csv1"
 
@@ -10,6 +11,17 @@ cs_orchestrator_schema_version = "csv1"
 class ContextOsArchitectureCompilerGenerator:
     context_os_architecture: ContextOsArchitecture
     context_compiler_generator: ContextCompilerGenerator
+
+
+@dataclass
+class ExecutionMatrixOsArchCompilerGenerator(OrchestratorExecutionMatrixBase):
+    configs: list[ContextOsArchitectureCompilerGenerator] = field(default_factory=list)
+
+    def to_list_string_description(self) -> list[str]:
+        ret: list[str] = []
+        for c in self.configs:
+            ret.append(create_context_os_architecture_compiler_generator_string(c))
+        return ret
 
 
 def create_context_os_architecture_compiler_generator_string(

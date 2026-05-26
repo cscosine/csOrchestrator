@@ -38,7 +38,8 @@ def test_orchestrator_executor_minimal_description() -> None:
         StepEchoMessage(name="p2s2", description="p2 step s2", message="")
     )
 
-    od = o.extract_minimal_description()
+    min_desc = o.extract_minimal_description()
+    od = min_desc.phases_and_steps
 
     assert len(od) == 2
 

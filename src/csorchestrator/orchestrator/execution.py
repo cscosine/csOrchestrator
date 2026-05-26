@@ -16,7 +16,9 @@ class ExecutionResult:
     report_pre_execution: Report = field(default_factory=Report)
     # description of the execution, which is extracted from the orchestrator
     # before the execution phase
-    execution_description: OrchestratorExecutorMinimalDescription = field(default_factory=list)
+    execution_description: OrchestratorExecutorMinimalDescription = field(
+        default_factory=OrchestratorExecutorMinimalDescription
+    )
     # report of the execution phase, which is executed after the validation phase
     report_execution: OrchestratorExecutorVisitReports = field(default_factory=list)
 
