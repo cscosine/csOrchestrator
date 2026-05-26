@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import ClassVar
 
 
 class Compiler(Enum):
@@ -26,6 +27,34 @@ class GeneratorType(Enum):
 class GeneratorWithType:
     generator: Generator
     generator_type: GeneratorType
+
+    # class vars (declared for typing only)
+    NINJA: ClassVar["GeneratorWithType"]
+    NINJA_MULTI: ClassVar["GeneratorWithType"]
+    MSVC_17_2022: ClassVar["GeneratorWithType"]
+    MSVC_18_2026: ClassVar["GeneratorWithType"]
+
+
+# define them AFTER the class exists
+GeneratorWithType.NINJA = GeneratorWithType(
+    Generator.NINJA,
+    GeneratorType.SINGLE_CONFIG,
+)
+
+GeneratorWithType.NINJA_MULTI = GeneratorWithType(
+    Generator.NINJA_MULTI,
+    GeneratorType.MULTI_CONFIG,
+)
+
+GeneratorWithType.MSVC_17_2022 = GeneratorWithType(
+    Generator.MSVC_17_2022,
+    GeneratorType.MULTI_CONFIG,
+)
+
+GeneratorWithType.MSVC_18_2026 = GeneratorWithType(
+    Generator.MSVC_18_2026,
+    GeneratorType.MULTI_CONFIG,
+)
 
 
 @dataclass(frozen=True)

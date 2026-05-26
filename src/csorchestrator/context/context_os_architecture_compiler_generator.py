@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
-from csorchestrator.orchestrator.execution_matrix_base import OrchestratorExecutionMatrixBase
+from csorchestrator.context.execution_matrix_base import OrchestratorExecutionMatrixBase
 
 cs_orchestrator_schema_version = "csv1"
 

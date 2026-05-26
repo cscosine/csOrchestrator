@@ -4,7 +4,6 @@ from enum import Enum
 from csorchestrator.context.context_compiler_generator import (
     Compiler,
     ContextCompilerGenerator,
-    Generator,
     GeneratorType,
     GeneratorWithType,
 )
@@ -73,22 +72,13 @@ def get_supported_build_configs_for_generator_type(
 def get_supported_generators_per_os(os: OS) -> list[GeneratorWithType]:
     if os == OS.LINUX:
         return [
-            GeneratorWithType(generator=Generator.NINJA, generator_type=GeneratorType.SINGLE_CONFIG),
-            GeneratorWithType(
-                generator=Generator.NINJA_MULTI,
-                generator_type=GeneratorType.MULTI_CONFIG,
-            ),
+            GeneratorWithType.NINJA,
+            GeneratorWithType.NINJA_MULTI,
         ]
     elif os == OS.WINDOWS:
         return [
-            GeneratorWithType(
-                generator=Generator.MSVC_17_2022,
-                generator_type=GeneratorType.MULTI_CONFIG,
-            ),
-            GeneratorWithType(
-                generator=Generator.MSVC_18_2026,
-                generator_type=GeneratorType.MULTI_CONFIG,
-            ),
+            GeneratorWithType.MSVC_17_2022,
+            GeneratorWithType.MSVC_18_2026,
         ]
     elif os == OS.MACOS:
         # TODO support macos
@@ -287,3 +277,25 @@ def get_all_supported_workflow_descriptions(
         workflow_list.append(supported_build_config)
 
     return workflow_list
+
+
+def default_context_compiler_generator_func_concrete(
+    os_architecture: ContextOsArchitecture,
+) -> ContextCompilerGenerator | None:
+    if os_architecture.os == OS.WINDOWS:
+        return ContextCompilerGenerator(
+            compiler_family=Compiler.MSVC,
+            compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+            build_generator=GeneratorWithType.MSVC_17_2022,
+        )
+    elif os_architecture.os == OS.LINUX:
+        return ContextCompilerGenerator(
+            compiler_family=Compiler.GCC,
+            compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+            build_generator=GeneratorWithType.NINJA,
+        )
+    elif os_architecture.os == OS.MACOS:
+        # TODO add macosx
+        return None
+    else:
+        return None

@@ -1,8 +1,10 @@
 from dataclasses import dataclass, field
-from typing import TypeAlias
+from typing import Callable, Optional, TypeAlias
 
+from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
+from csorchestrator.context.context_os_architecture import ContextOsArchitecture
+from csorchestrator.context.execution_matrix_base import OrchestratorExecutionMatrixBase
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
-from csorchestrator.orchestrator.execution_matrix_base import OrchestratorExecutionMatrixBase
 from csorchestrator.orchestrator.phase import Phase
 
 
@@ -20,6 +22,15 @@ class OrchestratorExecutorMinimalDescription:
     matrix_description: list[str] = field(default_factory=list)  # a list of string describing the execution matrix
 
 
+CompilerGeneratorFunc = Callable[[ContextOsArchitecture], ContextCompilerGenerator | None]
+
+
+def default_context_compiler_generator_func_none(
+    os_architecture: ContextOsArchitecture,
+) -> Optional[ContextCompilerGenerator]:
+    return None
+
+
 @dataclass
 class Orchestrator:
     # - create phase (e.g. setup / config / build)
@@ -32,6 +43,7 @@ class Orchestrator:
 
     phases: list[Phase] = field(default_factory=list)
     execution_matrix: OrchestratorExecutionMatrixBase | None = None
+    _get_context_compiler_generator_func: CompilerGeneratorFunc = default_context_compiler_generator_func_none
 
     def add_phase(self, phase: Phase) -> "Orchestrator":
         self.phases.append(phase)
@@ -45,6 +57,14 @@ class Orchestrator:
     def set_execution_matrix(self, matrix: OrchestratorExecutionMatrixBase) -> "Orchestrator":
         self.execution_matrix = matrix
         return self
+
+    def set_context_compiler_generator_func(self, func: CompilerGeneratorFunc) -> None:
+        self._get_context_compiler_generator_func = func
+
+    def get_default_context_compiler_generator(
+        self, os_architecture: ContextOsArchitecture
+    ) -> ContextCompilerGenerator | None:
+        return self._get_context_compiler_generator_func(os_architecture)
 
     def extract_minimal_description(self) -> OrchestratorExecutorMinimalDescription:
         ret = OrchestratorExecutorMinimalDescription()

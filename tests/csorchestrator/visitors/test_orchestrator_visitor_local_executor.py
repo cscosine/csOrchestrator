@@ -3,7 +3,7 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.context.context_local_execution import create_context_local_execution
+from csorchestrator.orchestrator.execution import create_context_local_execution
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
@@ -41,7 +41,7 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: s
     orchestrator = orchestratorValidatedOpt.result
     assert orchestrator is not None
 
-    context = create_context_local_execution(base_folder_path=str(tmp_path))
+    context = create_context_local_execution(base_folder_path=str(tmp_path), orchestrator=orchestrator)
     assert context.result is not None
     ovb = OrchestratorVisitorLocalExecutor(context=context.result)
 
@@ -75,7 +75,7 @@ def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path, r
     orchestrator = orchestratorValidatedOpt.result
     assert orchestrator is not None
 
-    context = create_context_local_execution(base_folder_path=str(tmp_path))
+    context = create_context_local_execution(base_folder_path=str(tmp_path), orchestrator=orchestrator)
     assert context.result is not None
     ovb = OrchestratorVisitorLocalExecutor(context=context.result)
 
