@@ -2,7 +2,6 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
 
 
@@ -11,4 +10,3 @@ from csorchestrator.context.context_os_architecture import ContextOsArchitecture
 class ContextLocalExecution:
     base_folder_path: Path
     os_architecture: ContextOsArchitecture
-    context_compiler_generator: ContextCompilerGenerator | None = None

@@ -30,9 +30,7 @@ class ExecutionResult:
 OptionalContextLocalExecutionWithReport: TypeAlias = OptionalResultWithReport[ContextLocalExecution]
 
 
-def create_context_local_execution(
-    base_folder_path: str, orchestrator: Orchestrator
-) -> OptionalContextLocalExecutionWithReport:
+def create_context_local_execution(base_folder_path: str) -> OptionalContextLocalExecutionWithReport:
     pr = ensure_directory_exists_or_create_and_is_usable(base_folder_path)
 
     report = Report()
@@ -45,11 +43,7 @@ def create_context_local_execution(
 
     if pr.result is not None and osaExpected.value is not None:
         return OptionalContextLocalExecutionWithReport.createResultAndReport(
-            ContextLocalExecution(
-                base_folder_path=pr.result,
-                os_architecture=osaExpected.value,
-                context_compiler_generator=orchestrator.get_default_context_compiler_generator(osaExpected.value),
-            ),
+            ContextLocalExecution(base_folder_path=pr.result, os_architecture=osaExpected.value),
             report,
         )
     else:
@@ -76,7 +70,7 @@ def validate_and_execute_orchestrator(
 
     # validated orchestrator, create context
 
-    contextWithReport = create_context_local_execution(base_folder_path=target_folder_path, orchestrator=orchestrator)
+    contextWithReport = create_context_local_execution(base_folder_path=target_folder_path)
     er.report_pre_execution.append_report(contextWithReport.report)
 
     if contextWithReport.result is None:

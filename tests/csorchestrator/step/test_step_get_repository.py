@@ -4,7 +4,6 @@ from pathlib import Path
 import pytest
 
 from csorchestrator.orchestrator.execution import create_context_local_execution
-from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.step_base import StepExtra
 from csorchestrator.reporters.reporter_sink_dummy import ReporterSinkDummy
 from csorchestrator.step.step_get_repository import (
@@ -142,7 +141,7 @@ def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, dept
     if depth_one:
         step.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
-    contextOpt = create_context_local_execution(base_folder_path=str(tmp_path), orchestrator=Orchestrator())
+    contextOpt = create_context_local_execution(base_folder_path=str(tmp_path))
     assert contextOpt.result is not None
     context = contextOpt.result
 
@@ -202,7 +201,7 @@ def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: str,
     if depth_one:
         step.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
-    contextOpt = create_context_local_execution(base_folder_path=str(tmp_path), orchestrator=Orchestrator())
+    contextOpt = create_context_local_execution(base_folder_path=str(tmp_path))
     assert contextOpt.result is not None
     context = contextOpt.result
 
@@ -240,7 +239,7 @@ def test_execute_step_get_repository_unknown_repository_type(tmp_path: Path) -> 
         repo_url="url://test.git",
         repo_ref="main",
     )
-    context = create_context_local_execution(base_folder_path=str(tmp_path), orchestrator=Orchestrator())
+    context = create_context_local_execution(base_folder_path=str(tmp_path))
     assert context.result is not None
 
     report = execute_step_get_repository(step, context.result, reporter_sink=ReporterSinkDummy())

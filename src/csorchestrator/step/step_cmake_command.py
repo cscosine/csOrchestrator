@@ -7,14 +7,12 @@ from typing import Callable, TextIO
 from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
-from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase, StepExecuteOnMatchingContext
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
     ContextOsArchitectureCompilerGeneratorConfig,
-    get_all_supported_workflow_descriptions,
     workflow_name_from_description,
 )
 
@@ -52,31 +50,40 @@ def execute_step_cmake_workflow(
     report = Report()
 
     context_os_architecture = step.context_os_architecture
-    if context_os_architecture is None:
-        context_os_architecture = context.os_architecture
-    if context_os_architecture is None:
-        report.append_error(
-            f"context_os_architecture is None for {step.name}, please provide it in the execution matrix or in the step"
-        )
-        return report
-
     context_compiler_generator = step.context_compiler_generator
-    if context_compiler_generator is None:
-        context_compiler_generator = context.context_compiler_generator
-    if context_compiler_generator is None:
+
+    if context_os_architecture is None or context_compiler_generator is None:
+        # workflow_configs = get_all_supported_workflow_descriptions(
+        #     selected_config=step.config,
+        #     os_arch_generator=ContextOsArchitectureCompilerGenerator(
+        #         context_os_architecture=context_os_architecture, context_compiler_generator=context_compiler_generator
+        #     ),
+        # )
+
+        workflow_configs: list[
+            ContextOsArchitectureCompilerGeneratorConfig
+        ] = []  # TODO if both are none, use the matrix execution context,
+        # keep empty to generate error for now
+
+        if len(workflow_configs) == 0:
+            report.append_error("no workflows are supported in the current execution context")
+            return report
+
+    elif context_os_architecture is not None and context_compiler_generator is not None:
+        workflow_configs = [
+            ContextOsArchitectureCompilerGeneratorConfig(
+                context_os_architecture, context_compiler_generator, step.config
+            )
+        ]
+    else:
         report.append_error(
-            f"context_compiler_generator is None for {step.name},"
-            "please provide it in the execution matrix or in the step"
+            "unexpected condition: one of context_os_architecture or context_compiler_generator is None"
+            " and the other no. This should have been catched in validation"
         )
         return report
 
-    workflow_configs = get_all_supported_workflow_descriptions(
-        selected_config=step.config,
-        os_arch_generator=ContextOsArchitectureCompilerGenerator(context_os_architecture, context_compiler_generator),
-    )
-
-    if len(workflow_configs) == 0:
-        report.append_error("no workflows are supported in the current execution context")
+    assert context_os_architecture is not None
+    assert context_compiler_generator is not None
 
     for workflow_config in workflow_configs:
         workflow_name = workflow_name_from_description(workflow_config)
@@ -154,4 +161,12 @@ def execute_step_cmake_workflow(
 
 def validate_step_cmake_workflow(step: StepCMakeWorkflow) -> Report:
     report = Report()
+    if (step.context_compiler_generator is None and step.context_os_architecture is not None) or (
+        step.context_compiler_generator is not None and step.context_os_architecture is None
+    ):
+        report.append_error(
+            f"in StepCMakeWorkflow {step.name} "
+            " both context_os_architecture and context_compiler_generator need to be None or not None"
+        )
+
     return report

@@ -277,25 +277,3 @@ def get_all_supported_workflow_descriptions(
         workflow_list.append(supported_build_config)
 
     return workflow_list
-
-
-def default_context_compiler_generator_func_concrete(
-    os_architecture: ContextOsArchitecture,
-) -> ContextCompilerGenerator | None:
-    if os_architecture.os == OS.WINDOWS:
-        return ContextCompilerGenerator(
-            compiler_family=Compiler.MSVC,
-            compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
-            build_generator=GeneratorWithType.MSVC_17_2022,
-        )
-    elif os_architecture.os == OS.LINUX:
-        return ContextCompilerGenerator(
-            compiler_family=Compiler.GCC,
-            compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
-            build_generator=GeneratorWithType.NINJA,
-        )
-    elif os_architecture.os == OS.MACOS:
-        # TODO add macosx
-        return None
-    else:
-        return None
