@@ -20,9 +20,9 @@ class ContextLocalExecution:
 
 @dataclass(frozen=True)
 class ContextLocalExecutionWithMatrixConfig(ContextLocalExecution):
-    matrix_config: ContextOsArchitectureCompilerGenerator
+    _os_architecture_compiler_generator: ContextOsArchitectureCompilerGenerator
 
     def get_context_os_architecture_compiler_generator(
         self,
     ) -> ContextOsArchitectureCompilerGenerator | None:
-        return self.matrix_config
+        return self._os_architecture_compiler_generator

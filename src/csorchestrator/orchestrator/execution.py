@@ -97,22 +97,22 @@ def validate_and_execute_orchestrator(
 
         er.report_executions.append(report_execution)
     else:
-        for config in matrix.configs:
-            if not config.context_os_architecture.is_equal_to(context.os_architecture):
+        for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
+            if not os_architecture_compiler_generator.context_os_architecture.is_equal_to(context.os_architecture):
                 reporter.report_skip_execution(
                     "skip orchestrator execution on not compatible matrix config: "
-                    f"{create_context_os_architecture_compiler_generator_string(config)}"
+                    f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
                 )
                 er.report_executions.append(None)
 
             else:
                 reporter.report_start_execution(
                     "orchestrator execution on matrix config: "
-                    f"{create_context_os_architecture_compiler_generator_string(config)}"
+                    f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
                 )
 
                 contextWithMatrixConfig = ContextLocalExecutionWithMatrixConfig(
-                    context.base_folder_path, context.os_architecture, config
+                    context.base_folder_path, context.os_architecture, os_architecture_compiler_generator
                 )
 
                 # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...

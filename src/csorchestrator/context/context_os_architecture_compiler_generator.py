@@ -14,11 +14,11 @@ class ContextOsArchitectureCompilerGenerator:
 
 @dataclass
 class ExecutionMatrixOsArchCompilerGenerator:
-    configs: list[ContextOsArchitectureCompilerGenerator] = field(default_factory=list)
+    os_architecture_compiler_generator_list: list[ContextOsArchitectureCompilerGenerator] = field(default_factory=list)
 
     def to_list_string_description(self) -> list[str]:
         ret: list[str] = []
-        for c in self.configs:
+        for c in self.os_architecture_compiler_generator_list:
             ret.append(create_context_os_architecture_compiler_generator_string(c))
         return ret
 
