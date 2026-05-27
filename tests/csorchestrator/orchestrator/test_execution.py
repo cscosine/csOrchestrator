@@ -35,8 +35,8 @@ def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: str
     assert er.execution_description.phases_and_steps == [
         PhaseNameWithStepNames(phase_name="repos checkout", step_names=[cfg.repo_name])
     ]
-    assert len(er.report_execution) == len(er.execution_description.phases_and_steps)
-    for phase_report in er.report_execution:
+    assert len(er.report_executions[0]) == len(er.execution_description.phases_and_steps)
+    for phase_report in er.report_executions[0]:
         for step_report in phase_report:
             assert not step_report.has_errors()
 

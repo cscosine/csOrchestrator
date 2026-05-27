@@ -22,6 +22,11 @@ class OrchestratorExecutorReporterBase(ABC):
         ...
 
     @abstractmethod
+    def finalize_execution(self) -> None:
+        """Called at execution end"""
+        ...
+
+    @abstractmethod
     def on_begin_phase(self, phase: Phase) -> None:
         """Called before processing a phase"""
         ...
@@ -59,4 +64,14 @@ class OrchestratorExecutorReporterBase(ABC):
     @abstractmethod
     def report_execution_report(self, report: OrchestratorExecutorVisitReports) -> None:
         """Called after the execution phase, with the report of the execution phase"""
+        ...
+
+    @abstractmethod
+    def report_start_execution(self, exec_desc: str) -> None:
+        """Called before the execution phase, with a description of the execution"""
+        ...
+
+    @abstractmethod
+    def report_skip_execution(self, exec_desc: str) -> None:
+        """Called before the execution phase, with a description of the skipped execution"""
         ...

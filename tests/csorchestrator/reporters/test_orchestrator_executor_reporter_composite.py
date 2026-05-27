@@ -157,6 +157,7 @@ def test_composite_reporter_markdown(tmp_path: Path) -> None:
     # 3. Execute
     visitor = MockVisitor(multiline=True)
     execute_orchestrator(orchestrator, visitor, reporter)
+    reporter.save()
 
     # 4. Assertions
     assert md_path.exists(), "Markdown file was not created"

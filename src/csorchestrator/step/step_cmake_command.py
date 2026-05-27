@@ -7,12 +7,14 @@ from typing import Callable, TextIO
 from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
+from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase, StepExecuteOnMatchingContext
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
     ContextOsArchitectureCompilerGeneratorConfig,
+    get_all_supported_workflow_descriptions,
     workflow_name_from_description,
 )
 
@@ -53,17 +55,21 @@ def execute_step_cmake_workflow(
     context_compiler_generator = step.context_compiler_generator
 
     if context_os_architecture is None or context_compiler_generator is None:
-        # workflow_configs = get_all_supported_workflow_descriptions(
-        #     selected_config=step.config,
-        #     os_arch_generator=ContextOsArchitectureCompilerGenerator(
-        #         context_os_architecture=context_os_architecture, context_compiler_generator=context_compiler_generator
-        #     ),
-        # )
+        matrix_config = context.get_context_os_architecture_compiler_generator()
+        if matrix_config is None:
+            report.append_error(f"no matrix config specified, cannot execute step {step.name}")
+            return report
 
-        workflow_configs: list[
-            ContextOsArchitectureCompilerGeneratorConfig
-        ] = []  # TODO if both are none, use the matrix execution context,
-        # keep empty to generate error for now
+        workflow_configs = get_all_supported_workflow_descriptions(
+            selected_config=step.config,
+            os_arch_generator=ContextOsArchitectureCompilerGenerator(
+                context_os_architecture=matrix_config.context_os_architecture,
+                context_compiler_generator=matrix_config.context_compiler_generator,
+            ),
+        )
+
+        context_os_architecture = matrix_config.context_os_architecture
+        context_compiler_generator = matrix_config.context_compiler_generator
 
         if len(workflow_configs) == 0:
             report.append_error("no workflows are supported in the current execution context")

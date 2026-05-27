@@ -22,6 +22,10 @@ class OrchestratorExecutorReporterComposite(OrchestratorExecutorReporterBase):
         for r in self.reporters:
             r.on_end_visit(visit_complete)
 
+    def finalize_execution(self) -> None:
+        for r in self.reporters:
+            r.finalize_execution()
+
     def on_begin_phase(self, phase: Phase) -> None:
         for r in self.reporters:
             r.on_begin_phase(phase)
@@ -55,3 +59,11 @@ class OrchestratorExecutorReporterComposite(OrchestratorExecutorReporterBase):
     def report_execution_report(self, report: OrchestratorExecutorVisitReports) -> None:
         for r in self.reporters:
             r.report_execution_report(report)
+
+    def report_start_execution(self, exec_desc: str) -> None:
+        for r in self.reporters:
+            r.report_start_execution(exec_desc)
+
+    def report_skip_execution(self, exec_desc: str) -> None:
+        for r in self.reporters:
+            r.report_skip_execution(exec_desc)

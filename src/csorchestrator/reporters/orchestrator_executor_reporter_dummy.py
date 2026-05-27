@@ -18,6 +18,9 @@ class OrchestratorExecutorReporterDummy(OrchestratorExecutorReporterBase):
     def on_end_visit(self, visit_complete: bool) -> None:
         pass
 
+    def finalize_execution(self) -> None:
+        pass
+
     def on_begin_phase(self, phase: Phase) -> None:
         pass
 
@@ -40,4 +43,10 @@ class OrchestratorExecutorReporterDummy(OrchestratorExecutorReporterBase):
         pass
 
     def report_execution_report(self, report: OrchestratorExecutorVisitReports) -> None:
+        pass
+
+    def report_start_execution(self, exec_desc: str) -> None:
+        pass
+
+    def report_skip_execution(self, exec_desc: str) -> None:
         pass

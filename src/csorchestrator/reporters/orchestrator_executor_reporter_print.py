@@ -20,6 +20,9 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
         self.reporter_sink.reset_indentation()
         self.reporter_sink.stdout("[init visit]")
 
+    def finalize_execution(self) -> None:
+        pass
+
     def on_end_visit(self, visit_complete: bool) -> None:
         if visit_complete:
             self.reporter_sink.stdout("[end visit OK]")
@@ -79,9 +82,17 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
         repo_to_reporter_sink(report, self.reporter_sink)
         self.reporter_sink.decrease_indentation()
 
+    def report_skip_execution(self, exec_desc: str) -> None:
+        self.reporter_sink.stdout(f"[Skip Execution {exec_desc}]")
+
+    def report_start_execution(self, exec_desc: str) -> None:
+        self.reporter_sink.stdout(f"[Start Execution {exec_desc}]")
+        self.reporter_sink.increase_indentation()
+
     def report_execution_report(self, reportVisit: OrchestratorExecutorVisitReports) -> None:
         self.reporter_sink.stdout("[Execution Report]")
         self.reporter_sink.increase_indentation()
         report = flatten_orchestrator_executor_visit_reports(reportVisit)
         repo_to_reporter_sink(report, self.reporter_sink)
         self.reporter_sink.decrease_indentation()
+        self.reporter_sink.decrease_indentation()  # decrease the report_start_execution

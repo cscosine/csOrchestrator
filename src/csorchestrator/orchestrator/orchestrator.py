@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import TypeAlias
 
-from csorchestrator.context.execution_matrix_base import OrchestratorExecutionMatrixBase
+from csorchestrator.context.context_os_architecture_compiler_generator import ExecutionMatrixOsArchCompilerGenerator
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.orchestrator.phase import Phase
 
@@ -31,7 +31,7 @@ class Orchestrator:
     #   - run cmake workflow / individual steps (config / build / test / install)
 
     phases: list[Phase] = field(default_factory=list)
-    _execution_matrix: OrchestratorExecutionMatrixBase | None = None
+    _execution_matrix: ExecutionMatrixOsArchCompilerGenerator | None = None
 
     def add_phase(self, phase: Phase) -> "Orchestrator":
         self.phases.append(phase)
@@ -42,9 +42,12 @@ class Orchestrator:
         self.phases.append(phase)
         return phase
 
-    def set_execution_matrix(self, matrix: OrchestratorExecutionMatrixBase) -> "Orchestrator":
+    def set_execution_matrix(self, matrix: ExecutionMatrixOsArchCompilerGenerator) -> "Orchestrator":
         self._execution_matrix = matrix
         return self
+
+    def get_execution_matrix(self) -> ExecutionMatrixOsArchCompilerGenerator | None:
+        return self._execution_matrix
 
     def extract_minimal_description(self) -> OrchestratorExecutorMinimalDescription:
         ret = OrchestratorExecutorMinimalDescription()

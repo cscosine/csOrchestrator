@@ -1,8 +1,11 @@
 from dataclasses import dataclass, field
 from typing import TypeAlias
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.context.context_local_execution import ContextLocalExecution, ContextLocalExecutionWithMatrixConfig
 from csorchestrator.context.context_os_architecture import detect_context_os_architecture
+from csorchestrator.context.context_os_architecture_compiler_generator import (
+    create_context_os_architecture_compiler_generator_string,
+)
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator, OrchestratorExecutorMinimalDescription
@@ -23,8 +26,8 @@ class ExecutionResult:
     execution_description: OrchestratorExecutorMinimalDescription = field(
         default_factory=OrchestratorExecutorMinimalDescription
     )
-    # report of the execution phase, which is executed after the validation phase
-    report_execution: OrchestratorExecutorVisitReports = field(default_factory=list)
+    # report of each execution phase (can be multiple if matrix is active), which is executed after the validation phase
+    report_executions: list[OrchestratorExecutorVisitReports] = field(default_factory=list)
 
 
 OptionalContextLocalExecutionWithReport: TypeAlias = OptionalResultWithReport[ContextLocalExecution]
@@ -62,6 +65,7 @@ def validate_and_execute_orchestrator(
 
     if orchestratorValidatedOpt.result is None:
         reporter.report_pre_execution_report(er.report_pre_execution)
+        reporter.finalize_execution()
         return er
 
     reporter.report_pre_execution_report(er.report_pre_execution)
@@ -75,15 +79,45 @@ def validate_and_execute_orchestrator(
 
     if contextWithReport.result is None:
         reporter.report_pre_execution_report(er.report_pre_execution)
+        reporter.finalize_execution()
         return er
 
     context = contextWithReport.result
 
-    # execute the orchestrator visitor, which will execute the step to clone the repo
-    er.report_execution = execute_orchestrator(
-        orchestrator, OrchestratorVisitorLocalExecutor(context=context), reporter=reporter
-    )
+    matrix = orchestrator.get_execution_matrix()
+    if matrix is None:
+        reporter.report_start_execution("orchestrator execution without matrix")
+        # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
+        report_execution = execute_orchestrator(
+            orchestrator, OrchestratorVisitorLocalExecutor(context=context), reporter=reporter
+        )
+        reporter.report_execution_report(report_execution)
 
-    reporter.report_execution_report(er.report_execution)
+        er.report_executions.append(report_execution)
+    else:
+        for config in matrix.configs:
+            if not config.context_os_architecture.is_equal_to(context.os_architecture):
+                reporter.report_skip_execution(
+                    "skip orchestrator execution on not compatible matrix config: "
+                    f"{create_context_os_architecture_compiler_generator_string(config)}"
+                )
+            else:
+                reporter.report_start_execution(
+                    "orchestrator execution on matrix config: "
+                    f"{create_context_os_architecture_compiler_generator_string(config)}"
+                )
 
+                contextWithMatrixConfig = ContextLocalExecutionWithMatrixConfig(
+                    context.base_folder_path, context.os_architecture, config
+                )
+
+                # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
+                report_execution = execute_orchestrator(
+                    orchestrator, OrchestratorVisitorLocalExecutor(context=contextWithMatrixConfig), reporter=reporter
+                )
+                reporter.report_execution_report(report_execution)
+
+                er.report_executions.append(report_execution)
+
+    reporter.finalize_execution()
     return er

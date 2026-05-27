@@ -29,6 +29,8 @@ class OrchestratorExecutorReporterMarkdown(OrchestratorExecutorReporterBase):
     def on_end_visit(self, visit_complete: bool) -> None:
         status = "SUCCESS" if visit_complete else "FAILURE"
         self.sink.lines.append(f"\n## End Visit: {status}\n")
+
+    def finalize_execution(self) -> None:
         self.save()
 
     # ---------------- PHASE ----------------
@@ -86,6 +88,12 @@ class OrchestratorExecutorReporterMarkdown(OrchestratorExecutorReporterBase):
         repo_to_reporter_sink(report, self.sink)
 
     # ---------------- EXECUTION REPORT ----------------
+
+    def report_start_execution(self, exec_desc: str) -> None:
+        self.sink.lines.append(f"## Start Execution {exec_desc}\n")
+
+    def report_skip_execution(self, exec_desc: str) -> None:
+        self.sink.lines.append(f"## Skip Execution {exec_desc}\n")
 
     def report_execution_report(self, reportVisit: OrchestratorExecutorVisitReports) -> None:
         self.sink.lines.append("## Execution Report\n")
