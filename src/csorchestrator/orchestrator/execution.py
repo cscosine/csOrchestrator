@@ -26,8 +26,10 @@ class ExecutionResult:
     execution_description: OrchestratorExecutorMinimalDescription = field(
         default_factory=OrchestratorExecutorMinimalDescription
     )
+
     # report of each execution phase (can be multiple if matrix is active), which is executed after the validation phase
-    report_executions: list[OrchestratorExecutorVisitReports] = field(default_factory=list)
+    # if a matrix cycle is skipped (non executable locally, the list contains a None
+    report_executions: list[OrchestratorExecutorVisitReports | None] = field(default_factory=list)
 
 
 OptionalContextLocalExecutionWithReport: TypeAlias = OptionalResultWithReport[ContextLocalExecution]
@@ -101,6 +103,8 @@ def validate_and_execute_orchestrator(
                     "skip orchestrator execution on not compatible matrix config: "
                     f"{create_context_os_architecture_compiler_generator_string(config)}"
                 )
+                er.report_executions.append(None)
+
             else:
                 reporter.report_start_execution(
                     "orchestrator execution on matrix config: "

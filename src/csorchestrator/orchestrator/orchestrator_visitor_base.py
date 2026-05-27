@@ -7,6 +7,7 @@ from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 
+# external list per phase, internal per steps
 OrchestratorExecutorVisitReports = list[list[Report]]  # a list of reports of each step per each phase,
 
 
