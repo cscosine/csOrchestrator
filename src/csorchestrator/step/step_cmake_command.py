@@ -4,9 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, TextIO
 
-from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_local_execution import ContextLocalExecution
-from csorchestrator.context.context_os_architecture import ContextOsArchitecture
 from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
@@ -25,8 +23,7 @@ class StepCMakeWorkflow(StepBase):
 
     config: BuildConfig
 
-    context_os_architecture: ContextOsArchitecture | None = None
-    context_compiler_generator: ContextCompilerGenerator | None = None
+    context_os_architecture_compiler_generator: ContextOsArchitectureCompilerGenerator | None = None
 
     @classmethod
     def create_from_workflow_description(
@@ -40,8 +37,9 @@ class StepCMakeWorkflow(StepBase):
             name=name,
             description=description,
             source_dir=source_dir,
-            context_os_architecture=workflow_description.context_os_architecture,
-            context_compiler_generator=workflow_description.context_compiler_generator,
+            context_os_architecture_compiler_generator=ContextOsArchitectureCompilerGenerator(
+                workflow_description.context_os_architecture, workflow_description.context_compiler_generator
+            ),
             config=workflow_description.config,
         )
 
@@ -51,52 +49,46 @@ def execute_step_cmake_workflow(
 ) -> Report:
     report = Report()
 
-    context_os_architecture = step.context_os_architecture
-    context_compiler_generator = step.context_compiler_generator
+    context_os_architecture_compiler_generator = step.context_os_architecture_compiler_generator
 
-    if context_os_architecture is None or context_compiler_generator is None:
+    if context_os_architecture_compiler_generator is None:
         matrix_config = context.get_context_os_architecture_compiler_generator()
         if matrix_config is None:
             report.append_error(f"no matrix config specified, cannot execute step {step.name}")
             return report
 
+        context_os_architecture_compiler_generator = ContextOsArchitectureCompilerGenerator(
+            context_os_architecture=matrix_config.context_os_architecture,
+            context_compiler_generator=matrix_config.context_compiler_generator,
+        )
         workflow_configs = get_all_supported_workflow_descriptions(
             selected_config=step.config,
-            os_arch_generator=ContextOsArchitectureCompilerGenerator(
-                context_os_architecture=matrix_config.context_os_architecture,
-                context_compiler_generator=matrix_config.context_compiler_generator,
-            ),
+            os_arch_generator=context_os_architecture_compiler_generator,
         )
-
-        context_os_architecture = matrix_config.context_os_architecture
-        context_compiler_generator = matrix_config.context_compiler_generator
 
         if len(workflow_configs) == 0:
             report.append_error("no workflows are supported in the current execution context")
             return report
 
-    elif context_os_architecture is not None and context_compiler_generator is not None:
+    else:
         workflow_configs = [
             ContextOsArchitectureCompilerGeneratorConfig(
-                context_os_architecture, context_compiler_generator, step.config
+                context_os_architecture_compiler_generator.context_os_architecture,
+                context_os_architecture_compiler_generator.context_compiler_generator,
+                step.config,
             )
         ]
-    else:
-        report.append_error(
-            "unexpected condition: one of context_os_architecture or context_compiler_generator is None"
-            " and the other no. This should have been catched in validation"
-        )
-        return report
 
-    assert context_os_architecture is not None
-    assert context_compiler_generator is not None
+    assert context_os_architecture_compiler_generator is not None
 
     for workflow_config in workflow_configs:
         workflow_name = workflow_name_from_description(workflow_config)
 
         excute_on_matching_context = step.get_extra(StepExecuteOnMatchingContext)
         if excute_on_matching_context is not None:
-            match = context_os_architecture.is_equal_to(context.os_architecture)
+            match = context_os_architecture_compiler_generator.context_os_architecture.is_equal_to(
+                context.os_architecture
+            )
             if not match:
                 report.append_info(f"Skip '{workflow_name}', not compatible with the current context")
                 continue
@@ -167,12 +159,4 @@ def execute_step_cmake_workflow(
 
 def validate_step_cmake_workflow(step: StepCMakeWorkflow) -> Report:
     report = Report()
-    if (step.context_compiler_generator is None and step.context_os_architecture is not None) or (
-        step.context_compiler_generator is not None and step.context_os_architecture is None
-    ):
-        report.append_error(
-            f"in StepCMakeWorkflow {step.name} "
-            " both context_os_architecture and context_compiler_generator need to be None or not None"
-        )
-
     return report
