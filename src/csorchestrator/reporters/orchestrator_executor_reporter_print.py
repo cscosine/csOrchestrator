@@ -17,7 +17,6 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
     reporter_sink: ReporterSinkPrintBase = field(default_factory=ReporterSinkPrint)
 
     def on_init_visit(self) -> None:
-        self.reporter_sink.reset_indentation()
         self.reporter_sink.stdout("[init visit]")
 
     def finalize_execution(self) -> None:
@@ -86,6 +85,7 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
         self.reporter_sink.stdout(f"[Skip Execution {exec_desc}]")
 
     def report_start_execution(self, exec_desc: str) -> None:
+        self.reporter_sink.reset_indentation()
         self.reporter_sink.stdout(f"[Start Execution {exec_desc}]")
         self.reporter_sink.increase_indentation()
 

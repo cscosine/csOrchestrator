@@ -52,6 +52,8 @@ def execute_step_cmake_workflow(
     context_os_architecture_compiler_generator = step.context_os_architecture_compiler_generator
 
     if context_os_architecture_compiler_generator is None:
+        # no context, inherit it from the matrix config if any
+
         matrix_config = context.get_context_os_architecture_compiler_generator()
         if matrix_config is None:
             report.append_error(f"no matrix config specified, cannot execute step {step.name}")
@@ -71,6 +73,8 @@ def execute_step_cmake_workflow(
             return report
 
     else:
+        # has context, use it as a single workflow config step
+
         workflow_configs = [
             ContextOsArchitectureCompilerGeneratorConfig(
                 context_os_architecture_compiler_generator.context_os_architecture,

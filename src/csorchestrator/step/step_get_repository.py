@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.context.context_local_execution import ContextLocalExecution, ContextLocalExecutionExtra
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase, StepExtra
@@ -84,6 +84,19 @@ def _execute_step_get_repository_git(
 
     target_full_path = context.base_folder_path / repo_step.target_directory
 
+    # manage matrix execution
+    exec_only_once_on_matrix_option = repo_step.get_extra(StepGetRepositoryExecuteOnlyOncePerMatrix)
+    if exec_only_once_on_matrix_option is not None:
+        matrix_extra = context.get_extra(StepGetRepositoryExecuteOnlyOncePerMatrixContextLocalExecutionExtra)
+        if matrix_extra is None:
+            matrix_extra = StepGetRepositoryExecuteOnlyOncePerMatrixContextLocalExecutionExtra()
+            context.add_extra(matrix_extra)
+        if target_full_path not in matrix_extra.already_executed_on_path:
+            matrix_extra.already_executed_on_path.add(target_full_path)
+        else:
+            report.append_info(f"Skip get repo {repo_step.name} for on {target_full_path} because already executed")
+            return report
+
     if not target_full_path.is_dir():
         depth_one = StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(repo_step)
 
@@ -130,3 +143,13 @@ class StepGetRepositoryExtraDepthOne(StepExtra):
         if depth_one_extra_opt is not None:
             depth_one_only = depth_one_extra_opt.on_github_action_checkout
         return depth_one_only
+
+
+@dataclass
+class StepGetRepositoryExecuteOnlyOncePerMatrix(StepExtra):
+    pass
+
+
+@dataclass
+class StepGetRepositoryExecuteOnlyOncePerMatrixContextLocalExecutionExtra(ContextLocalExecutionExtra):
+    already_executed_on_path: set[Path] = field(default_factory=set)

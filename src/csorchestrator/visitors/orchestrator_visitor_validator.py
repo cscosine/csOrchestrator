@@ -15,10 +15,10 @@ from csorchestrator.step.step_get_repository import (
 
 @dataclass
 class OrchestratorVisitorValidator(OrchestratorVisitorBase):
-    step_validator: StepGetRepositoryValidator = field(default_factory=StepGetRepositoryValidator)
+    step_get_repository_validator: StepGetRepositoryValidator = field(default_factory=StepGetRepositoryValidator)
 
     def init_visit(self) -> None:
-        self.step_validator.clear()
+        self.step_get_repository_validator.clear()
 
     def end_visit(self, visit_complete: bool) -> None:
         pass
@@ -38,7 +38,7 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
 
     @visit_step.register
     def _(self, step: StepGetRepository, reporter_sink: ReporterSinkBase) -> Report:
-        return self.step_validator.validate_step_get_repository(step)
+        return self.step_get_repository_validator.validate_step_get_repository(step)
 
     @visit_step.register
     def _(self, step: StepCMakeWorkflow, reporter_sink: ReporterSinkBase) -> Report:

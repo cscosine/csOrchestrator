@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import TypeAlias
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution, ContextLocalExecutionWithMatrixConfig
+from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.context.context_os_architecture import detect_context_os_architecture
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
@@ -111,9 +111,7 @@ def validate_and_execute_orchestrator(
                     f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
                 )
 
-                contextWithMatrixConfig = ContextLocalExecutionWithMatrixConfig(
-                    context.base_folder_path, context.os_architecture, os_architecture_compiler_generator
-                )
+                contextWithMatrixConfig = context.create_context_with_matrix_config(os_architecture_compiler_generator)
 
                 # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
                 report_execution = execute_orchestrator(
