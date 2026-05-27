@@ -32,6 +32,13 @@ class StepBase:
         extra = self._extras.get(t)
         return extra if isinstance(extra, t) else None
 
+    def remove_extra(
+        self,
+        key: type[T],
+    ) -> "StepBase":
+        self._extras.pop(key, None)  # no exception if not exists
+        return self
+
 
 @dataclass
 class StepSkipExecutionOnNonMatchingContext(StepExtra):

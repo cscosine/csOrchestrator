@@ -7,6 +7,7 @@ from csorchestrator.context.context_local_execution import (
 )
 from csorchestrator.context.context_os_architecture import detect_context_os_architecture
 from csorchestrator.context.context_os_architecture_compiler_generator import (
+    MatrixSkipExecutionOnNonMatchingContext,
     create_context_os_architecture_compiler_generator_string,
 )
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
@@ -101,28 +102,34 @@ def validate_and_execute_orchestrator(
         er.report_executions.append(report_execution)
     else:
         for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
-            if not os_architecture_compiler_generator.context_os_architecture.is_equal_to(context.os_architecture):
-                reporter.report_skip_execution(
-                    "skip orchestrator execution on not compatible matrix config: "
-                    f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
-                )
-                er.report_executions.append(None)
+            excute_on_matching_context = matrix.get_extra(MatrixSkipExecutionOnNonMatchingContext)
+            if excute_on_matching_context is not None:
+                match = os_architecture_compiler_generator.context_os_architecture.is_equal_to(context.os_architecture)
+                if not match:
+                    reporter.report_skip_execution(
+                        "skip orchestrator execution on not compatible matrix config: "
+                        f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
+                    )
+                    er.report_executions.append(None)
+                    continue
 
-            else:
-                reporter.report_start_execution(
-                    "orchestrator execution on matrix config: "
-                    f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
-                )
+            # execute
+            reporter.report_start_execution(
+                "orchestrator execution on matrix config: "
+                f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
+            )
 
-                context.add_extra(ContextLocalExecutionActiveMatrixConfig(os_architecture_compiler_generator))
+            context.add_extra(ContextLocalExecutionActiveMatrixConfig(os_architecture_compiler_generator))
 
-                # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
-                report_execution = execute_orchestrator(
-                    orchestrator, OrchestratorVisitorLocalExecutor(context=context), reporter=reporter
-                )
-                reporter.report_execution_report(report_execution)
+            # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
+            report_execution = execute_orchestrator(
+                orchestrator, OrchestratorVisitorLocalExecutor(context=context), reporter=reporter
+            )
 
-                er.report_executions.append(report_execution)
+            context.remove_extra(ContextLocalExecutionActiveMatrixConfig)
+            reporter.report_execution_report(report_execution)
+
+            er.report_executions.append(report_execution)
 
     reporter.finalize_execution()
     return er

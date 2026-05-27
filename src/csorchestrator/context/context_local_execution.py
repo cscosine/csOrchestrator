@@ -40,9 +40,8 @@ class ContextLocalExecution:
 
     def remove_extra(
         self,
-        extra: ContextLocalExecutionExtra,
+        key: type[T],
     ) -> "ContextLocalExecution":
-        key = type(extra)
         self._extras.pop(key, None)  # no exception if not exists
         return self
 
