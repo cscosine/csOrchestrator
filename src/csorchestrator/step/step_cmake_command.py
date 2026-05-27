@@ -4,11 +4,14 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, TextIO
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.context.context_local_execution import (
+    ContextLocalExecution,
+    ContextLocalExecutionActiveMatrixConfig,
+)
 from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepExecuteOnMatchingContext
+from csorchestrator.orchestrator.step_base import StepBase, StepSkipExecutionOnNonMatchingContext
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
     ContextOsArchitectureCompilerGeneratorConfig,
@@ -54,15 +57,13 @@ def execute_step_cmake_workflow(
     if context_os_architecture_compiler_generator is None:
         # no context, inherit it from the matrix config if any
 
-        matrix_config = context.get_context_os_architecture_compiler_generator()
+        matrix_config = context.get_extra(ContextLocalExecutionActiveMatrixConfig)
         if matrix_config is None:
             report.append_error(f"no matrix config specified, cannot execute step {step.name}")
             return report
 
-        context_os_architecture_compiler_generator = ContextOsArchitectureCompilerGenerator(
-            context_os_architecture=matrix_config.context_os_architecture,
-            context_compiler_generator=matrix_config.context_compiler_generator,
-        )
+        context_os_architecture_compiler_generator = matrix_config.active_os_architecture_compiler_generator
+
         workflow_configs = get_all_supported_workflow_descriptions(
             selected_config=step.config,
             os_arch_generator=context_os_architecture_compiler_generator,
@@ -88,7 +89,7 @@ def execute_step_cmake_workflow(
     for workflow_config in workflow_configs:
         workflow_name = workflow_name_from_description(workflow_config)
 
-        excute_on_matching_context = step.get_extra(StepExecuteOnMatchingContext)
+        excute_on_matching_context = step.get_extra(StepSkipExecutionOnNonMatchingContext)
         if excute_on_matching_context is not None:
             match = context_os_architecture_compiler_generator.context_os_architecture.is_equal_to(
                 context.os_architecture

@@ -34,5 +34,5 @@ class StepBase:
 
 
 @dataclass
-class StepExecuteOnMatchingContext(StepExtra):
+class StepSkipExecutionOnNonMatchingContext(StepExtra):
     pass
