@@ -47,7 +47,7 @@ class Cron:
     month: str = "*"
     day_of_week: DayOfWeek = DayOfWeek.ANY
 
-    def render(self) -> str:
+    def to_string(self) -> str:
         return f"{self.minute} {self.hour} {self.day_of_month} {self.month} {self.day_of_week.value}"
 
     @staticmethod
@@ -82,7 +82,7 @@ class Cron:
 class RawCron(Cron):
     expr: str = ""
 
-    def render(self) -> str:
+    def to_string(self) -> str:
         return self.expr
 
 
@@ -153,7 +153,7 @@ class ScheduleTrigger(Trigger):
     def to_string_lines(self, indent: int = 0) -> list[str]:
         return [
             f"{_indent(indent)}schedule:",
-            f"{_indent(indent + 2)}- cron: '{self.cron.render()}'",
+            f"{_indent(indent + 2)}- cron: '{self.cron.to_string()}'",
         ]
 
 
@@ -163,12 +163,81 @@ TriggerUnion: TypeAlias = PushTrigger | PullRequestTrigger | WorkflowDispatchTri
 # =========================================================
 # Workflow builder
 # =========================================================
+@dataclass(frozen=True, slots=True)
+class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
+    os: str
+    arch: str
+    compiler: str
+    generator: str
+    runner: str
+    # deps: TODO add deps when we will need to install python packages
+
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        return [
+            f"{_indent(indent)}include:",
+            f"{_indent(indent + 2)}- os: {self.os}",
+            f"{_indent(indent + 2)}  arch: {self.arch}",
+            f"{_indent(indent + 2)}  compiler: {self.compiler}",
+            f"{_indent(indent + 2)}  generator: {self.generator}",
+            f"{_indent(indent + 2)}  runner: {self.runner}",
+        ]
+
+
+MatrixEntryUnion: TypeAlias = MatrixOsArchCompilerGeneratorRunnerEntryInclude  # TODO add others
+
+# TODO add matrix like
+# matrix:
+#   include:
+#     - os: ubuntu24.04 # those 4 maps to ContextOsArchitectureCompilerGenerator of matrix
+#       arch: arm64
+#       compiler: gcc
+#       generator: ninja
+#       runner: ubuntu-24.04-arm # this is where to run
+
+
+@dataclass
+class JobStrategy:
+    fail_fast: bool
+    _matrix_includes: list[MatrixEntryUnion] = field(default_factory=list)
+
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        fail_fast_str = "false"
+        if self.fail_fast:
+            fail_fast_str = "true"
+        line_list = [
+            f"{_indent(indent)}strategy:",
+            f"{_indent(indent + 2)}fail-fast: {fail_fast_str}",
+        ]
+        if len(self._matrix_includes) > 0:
+            line_list.append(f"{_indent(indent + 2)}matrix:")
+            for matrix_include in self._matrix_includes:
+                line_list += matrix_include.to_string_lines(indent + 4)
+        return line_list
+
+    def on_matrix_os_arch_compiler_generator_runner_entry_include(
+        self, entry: MatrixOsArchCompilerGeneratorRunnerEntryInclude
+    ) -> "JobStrategy":
+        self._matrix_includes.append(entry)
+        return self
+
+
+@dataclass
+class JobDescription:
+    name: str
+    strategy: JobStrategy
+
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        line_list = [f"{_indent(indent)}{self.name}:", f"{_indent(indent + 2)}runs-on: ${{{{ matrix.runner }}}}", ""]
+        line_list += self.strategy.to_string_lines(indent + 2)
+        line_list += [""]
+        return line_list
 
 
 @dataclass
 class GitHubWorkflow:
     name: str
     _on: dict[str, TriggerUnion] = field(default_factory=dict)
+    _jobs: list[JobDescription] = field(default_factory=list)
 
     # ---------------- PUSH ----------------
 
@@ -203,6 +272,11 @@ class GitHubWorkflow:
         self._on[TriggerType.SCHEDULE] = ScheduleTrigger(cron)
         return self
 
+    # ---------------- SCHEDULE ----------------
+    def on_job(self, job: JobDescription) -> Self:
+        self._jobs.append(job)
+        return self
+
     # ---------------- OUTPUT ----------------
 
     def to_string_lines(self) -> list[str]:
@@ -212,8 +286,11 @@ class GitHubWorkflow:
 
         for trigger in self._on.values():
             lines.extend(trigger.to_string_lines(indent=2))
+        lines += [""]
+
+        if len(self._jobs) > 0:
+            lines += ["jobs:"]
+            for job in self._jobs:
+                lines += job.to_string_lines(indent=2)
 
         return lines
-
-    def render(self) -> str:
-        return "\n".join(self.to_string_lines())

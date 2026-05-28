@@ -132,12 +132,22 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/ci/github/test_github_workflow_config \u2192 test_full_workflow",
+      "name": "\ud83e\uddea tests/csorchestrator/ci/github/test_github_workflow_config \u2192 test_workflow_with_triggers",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/ci/github/test_github_workflow_config.py::test_full_workflow"
+        "tests/csorchestrator/ci/github/test_github_workflow_config.py::test_workflow_with_triggers"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/ci/github/test_github_workflow_config \u2192 test_workflow_with_triggers_and_one_job",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/ci/github/test_github_workflow_config.py::test_workflow_with_triggers_and_one_job"
       ],
       "justMyCode": false
     },
