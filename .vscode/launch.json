@@ -12,6 +12,16 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83d\udcc1 tests/csorchestrator/ci/github tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/ci/github"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83d\udcc1 tests/csorchestrator/cli tests",
       "type": "debugpy",
       "request": "launch",
@@ -118,6 +128,16 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/visitors"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/ci/github/test_github_workflow_config \u2192 test_full_workflow",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/ci/github/test_github_workflow_config.py::test_full_workflow"
       ],
       "justMyCode": false
     },
