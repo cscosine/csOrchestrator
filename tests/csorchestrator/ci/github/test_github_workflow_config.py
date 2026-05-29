@@ -1,4 +1,5 @@
 from csorchestrator.ci.github.github_workflow_config import (
+    CreateGitHubWorkflowConfig,
     Cron,
     DayOfWeek,
     GitHubWorkflow,
@@ -89,11 +90,13 @@ def test_workflow_with_creation_helper():
 
     wf = create_github_wf(
         name="test-wf-name",
-        on_push_branches=["main", "dev"],
-        on_push_tags=["'v*.*.*'"],
-        on_pull_request_branches=["main"],
-        on_dispatch=True,
-        on_schedule=Cron.weekly(DayOfWeek.MON, hour=3),
+        config=CreateGitHubWorkflowConfig(
+            on_push_branches=["main", "dev"],
+            on_push_tags=["'v*.*.*'"],
+            on_pull_request_branches=["main"],
+            on_dispatch=True,
+            on_schedule=Cron.weekly(DayOfWeek.MON, hour=3),
+        ),
     ).on_job(
         job=create_job_from_matrix(
             name="the_job",

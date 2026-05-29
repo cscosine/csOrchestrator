@@ -305,23 +305,24 @@ class GitHubWorkflow:
         return lines
 
 
-def create_github_wf(
-    name: str,
-    *,
-    on_push_branches: list[str] | None,
-    on_push_tags: list[str] | None,
-    on_pull_request_branches: list[str] | None,
-    on_dispatch: bool | None,
-    on_schedule: Cron | None,
-) -> GitHubWorkflow:
+@dataclass
+class CreateGitHubWorkflowConfig:
+    on_push_branches: list[str] | None = None
+    on_push_tags: list[str] | None = None
+    on_pull_request_branches: list[str] | None = None
+    on_dispatch: bool | None = None
+    on_schedule: Cron | None = None
+
+
+def create_github_wf(name: str, *, config: CreateGitHubWorkflowConfig) -> GitHubWorkflow:
 
     gwf = GitHubWorkflow(name)
-    if on_push_branches is not None or on_push_tags is not None:
-        gwf.on_push(branches=on_push_branches, tags=on_push_tags)
-    if on_pull_request_branches is not None:
-        gwf.on_pull_request(branches=on_pull_request_branches)
-    if on_dispatch:  # not None and true
+    if config.on_push_branches is not None or config.on_push_tags is not None:
+        gwf.on_push(branches=config.on_push_branches, tags=config.on_push_tags)
+    if config.on_pull_request_branches is not None:
+        gwf.on_pull_request(branches=config.on_pull_request_branches)
+    if config.on_dispatch:  # not None and true
         gwf.on_dispatch()
-    if on_schedule is not None:
-        gwf.on_schedule(on_schedule)
+    if config.on_schedule is not None:
+        gwf.on_schedule(config.on_schedule)
     return gwf
