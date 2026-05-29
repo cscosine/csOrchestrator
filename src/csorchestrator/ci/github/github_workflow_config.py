@@ -163,13 +163,15 @@ TriggerUnion: TypeAlias = PushTrigger | PullRequestTrigger | WorkflowDispatchTri
 # =========================================================
 # Workflow builder
 # =========================================================
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
     os: str
     arch: str
     compiler: str
     generator: str
     runner: str
+
+    RUNS_ON_RUNNER_NAME: str = "${{ matrix.runner }}"
     # deps: TODO add deps when we will need to install python packages
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
@@ -214,9 +216,7 @@ class JobStrategy:
                 line_list += matrix_include.to_string_lines(indent + 4)
         return line_list
 
-    def on_matrix_os_arch_compiler_generator_runner_entry_include(
-        self, entry: MatrixOsArchCompilerGeneratorRunnerEntryInclude
-    ) -> "JobStrategy":
+    def on_matrix(self, entry: MatrixOsArchCompilerGeneratorRunnerEntryInclude) -> "JobStrategy":
         self._matrix_includes.append(entry)
         return self
 
@@ -224,13 +224,22 @@ class JobStrategy:
 @dataclass
 class JobDescription:
     name: str
+    runs_on: str
     strategy: JobStrategy
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
-        line_list = [f"{_indent(indent)}{self.name}:", f"{_indent(indent + 2)}runs-on: ${{{{ matrix.runner }}}}", ""]
+        line_list = [f"{_indent(indent)}{self.name}:", f"{_indent(indent + 2)}runs-on: {self.runs_on}", ""]
         line_list += self.strategy.to_string_lines(indent + 2)
         line_list += [""]
         return line_list
+
+
+def create_job_from_matrix(name: str, matrix: MatrixOsArchCompilerGeneratorRunnerEntryInclude) -> JobDescription:
+    return JobDescription(
+        name=name,
+        runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.RUNS_ON_RUNNER_NAME,
+        strategy=JobStrategy(fail_fast=False).on_matrix(matrix),
+    )
 
 
 @dataclass

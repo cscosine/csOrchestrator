@@ -5,6 +5,7 @@ from csorchestrator.ci.github.github_workflow_config import (
     JobDescription,
     JobStrategy,
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    create_job_from_matrix,
 )
 
 
@@ -44,7 +45,8 @@ def test_workflow_with_triggers_and_one_job():
         .on_job(
             job=JobDescription(
                 name="the_job",
-                strategy=JobStrategy(fail_fast=False).on_matrix_os_arch_compiler_generator_runner_entry_include(
+                runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.RUNS_ON_RUNNER_NAME,
+                strategy=JobStrategy(fail_fast=False).on_matrix(
                     MatrixOsArchCompilerGeneratorRunnerEntryInclude(
                         os="ubuntu22.04",
                         arch="x64",
@@ -57,7 +59,7 @@ def test_workflow_with_triggers_and_one_job():
         )
     )
 
-    assert wf.to_string_lines() == [
+    expected_lines = [
         "name: test-wf-name",
         "",
         "on:",
@@ -86,3 +88,27 @@ def test_workflow_with_triggers_and_one_job():
         "            runner: ubuntu-22.04",
         "",
     ]
+
+    assert wf.to_string_lines() == expected_lines
+
+    wf_helper = (
+        GitHubWorkflow("test-wf-name")
+        .on_push(branches=["main"])
+        .on_pull_request(branches=["main"])
+        .on_dispatch()
+        .on_schedule(Cron.weekly(DayOfWeek.MON, hour=3))
+        .on_job(
+            create_job_from_matrix(
+                name="the_job",
+                matrix=MatrixOsArchCompilerGeneratorRunnerEntryInclude(
+                    os="ubuntu22.04",
+                    arch="x64",
+                    compiler="gcc",
+                    generator="ninja",
+                    runner="ubuntu-22.04",
+                ),
+            )
+        )
+    )
+
+    assert wf_helper.to_string_lines() == expected_lines
