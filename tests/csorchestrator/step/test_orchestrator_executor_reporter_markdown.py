@@ -18,7 +18,7 @@ def test_markdown_reporter_produces_valid_file(tmp_path: Path) -> None:
     reporter.report_orchestrator_creation_report(creation_report)
 
     # 2. Test Execution Description
-    orchestrator = Orchestrator()
+    orchestrator = Orchestrator("myName")
     phase = orchestrator.create_phase("Build")
     phase.add_step(StepEchoMessage(name="Compile", description="Compiling...", message="Compiling..."))
 

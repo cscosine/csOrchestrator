@@ -91,7 +91,7 @@ def test_reporter_sink_print_indentation(capsys: pytest.CaptureFixture[str]) -> 
 
 def test_orchestrator_executor_reporter_print_success_flow(capsys: pytest.CaptureFixture[str]) -> None:
     """End-to-end test of the printing reporter via execute_orchestrator on success."""
-    orchestrator = Orchestrator()
+    orchestrator = Orchestrator("myName")
     phase = Phase(name="Setup")
     phase.add_step(MockStep(name="StepA", description=""))
     orchestrator.add_phase(phase)
@@ -117,7 +117,7 @@ def test_orchestrator_executor_reporter_print_success_flow(capsys: pytest.Captur
 
 def test_orchestrator_executor_reporter_print_failure_flow(capsys: pytest.CaptureFixture[str]) -> None:
     """End-to-end test of the printing reporter via execute_orchestrator on failure."""
-    orchestrator = Orchestrator()
+    orchestrator = Orchestrator("myName")
     phase = Phase(name="Execution")
     phase.add_step(MockStep(name="FailingStep", description="", should_fail=True))
     orchestrator.add_phase(phase)

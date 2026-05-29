@@ -30,6 +30,7 @@ class Orchestrator:
     #   - add local folder as src
     #   - run cmake workflow / individual steps (config / build / test / install)
 
+    name: str
     phases: list[Phase] = field(default_factory=list)
     _execution_matrix: ExecutionMatrixOsArchCompilerGenerator | None = None
 

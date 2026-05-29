@@ -9,7 +9,7 @@ from csorchestrator.step.step_get_repository import RepositoryType, StepGetRepos
 
 def test_orchestrator_valid() -> None:
     # valid, no repetition in phases or step
-    o = Orchestrator()
+    o = Orchestrator("myName")
     o.add_phase(Phase("p1").add_step(StepEchoMessage("s1", "", "")).add_step(StepEchoMessage("s2", "", ""))).add_phase(
         Phase("p2").add_step(StepEchoMessage("s1", "", "")).add_step(StepEchoMessage("s2", "", ""))
     )
@@ -23,7 +23,7 @@ def test_orchestrator_valid() -> None:
 
 def test_orchestrator_invalid_repeated_phase_names() -> None:
     # invalid, repetition in phases names
-    o = Orchestrator()
+    o = Orchestrator("myName")
     o.add_phase(Phase("p").add_step(StepEchoMessage("s1", "", ""))).add_phase(
         Phase("p").add_step(StepEchoMessage("s1", "", ""))
     )
@@ -36,7 +36,7 @@ def test_orchestrator_invalid_repeated_phase_names() -> None:
 
 def test_orchestrator_invalid_repeated_step_names() -> None:
     # invalid, repetition in step names
-    o = Orchestrator()
+    o = Orchestrator("myName")
     o.add_phase(Phase("p").add_step(StepEchoMessage("s", "", "")).add_step(StepEchoMessage("s", "", "")))
     vr = create_validated_orchestrator(o)
     assert not vr.has_result()
@@ -47,7 +47,7 @@ def test_orchestrator_invalid_repeated_step_names() -> None:
 
 def test_orchestrator_invalid_repeated_phase_and_step_names() -> None:
     # invalid, repetition in both phases and step names
-    o = Orchestrator()
+    o = Orchestrator("myName")
     o.add_phase(Phase("p").add_step(StepEchoMessage("s", "", "")).add_step(StepEchoMessage("s", "", ""))).add_phase(
         Phase("p").add_step(StepEchoMessage("s", "", "")).add_step(StepEchoMessage("s", "", ""))
     )
@@ -60,7 +60,7 @@ def test_orchestrator_invalid_repeated_phase_and_step_names() -> None:
 
 def test_orchestrator_invalid_step_get_repository() -> None:
     # invalid, step get repository with empty repository name
-    o = Orchestrator()
+    o = Orchestrator("myName")
     s = StepGetRepository(
         repo_type=RepositoryType.GIT,
         name="get repo",
@@ -80,7 +80,7 @@ def test_orchestrator_invalid_step_get_repository() -> None:
 
 def test_orchestrator_invalid_step_duplicate_target_directory() -> None:
     # invalid, step get repository with duplicate target directory
-    o = Orchestrator()
+    o = Orchestrator("myName")
     s1 = StepGetRepository(
         repo_type=RepositoryType.GIT,
         name="get repo 1",

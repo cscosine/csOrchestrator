@@ -15,7 +15,7 @@ from tests.csorchestrator.repo_test_data_config import RepoTestData
 def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: str) -> None:
     cfg = RepoTestData()
 
-    orchestrator = Orchestrator()
+    orchestrator = Orchestrator("myName")
 
     step = StepGetRepository(
         repo_type=RepositoryType.GIT,
@@ -49,7 +49,7 @@ def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path, re
     file_path = tmp_path / "file.txt"
     file_path.write_text("data")
 
-    orchestrator = Orchestrator()
+    orchestrator = Orchestrator("myName")
 
     er: ExecutionResult = validate_and_execute_orchestrator(
         orchestrator, target_folder_path=str(file_path), reporter=OrchestratorExecutorReporterDummy()
@@ -61,7 +61,7 @@ def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path, re
 def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_url: str) -> None:
     cfg = RepoTestData()
 
-    orchestrator = Orchestrator()
+    orchestrator = Orchestrator("myName")
 
     step = StepGetRepository(
         repo_type=RepositoryType.GIT,

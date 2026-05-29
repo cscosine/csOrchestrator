@@ -32,7 +32,7 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: s
         repo_ref=cfg.main_branch,
     ).add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
-    orchestrator = Orchestrator()
+    orchestrator = Orchestrator("myName")
     orchestrator.add_phase(Phase(name="repos checkout").add_step(step))
 
     orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
@@ -64,7 +64,7 @@ class StepCustom1(StepBase):
 
 def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path, repo_url: str) -> None:
 
-    orchestrator = Orchestrator()
+    orchestrator = Orchestrator("myName")
     orchestrator.add_phase(
         Phase(name="repos checkout").add_step(StepBase(name="unknown step", description="unknown step description"))
     )
