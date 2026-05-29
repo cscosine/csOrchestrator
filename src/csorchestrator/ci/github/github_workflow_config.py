@@ -282,7 +282,7 @@ class GitHubWorkflow:
         return self
 
     # ---------------- SCHEDULE ----------------
-    def on_job(self, job: JobDescription) -> Self:
+    def on_job(self, *, job: JobDescription) -> Self:
         self._jobs.append(job)
         return self
 
@@ -303,3 +303,25 @@ class GitHubWorkflow:
                 lines += job.to_string_lines(indent=2)
 
         return lines
+
+
+def create_github_wf(
+    name: str,
+    *,
+    on_push_branches: list[str] | None,
+    on_push_tags: list[str] | None,
+    on_pull_request_branches: list[str] | None,
+    on_dispatch: bool | None,
+    on_schedule: Cron | None,
+) -> GitHubWorkflow:
+
+    gwf = GitHubWorkflow(name)
+    if on_push_branches is not None or on_push_tags is not None:
+        gwf.on_push(branches=on_push_branches, tags=on_push_tags)
+    if on_pull_request_branches is not None:
+        gwf.on_pull_request(branches=on_pull_request_branches)
+    if on_dispatch:  # not None and true
+        gwf.on_dispatch()
+    if on_schedule is not None:
+        gwf.on_schedule(on_schedule)
+    return gwf

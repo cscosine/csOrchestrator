@@ -132,6 +132,16 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83e\uddea tests/csorchestrator/ci/github/test_github_workflow_config \u2192 test_workflow_with_creation_helper",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/ci/github/test_github_workflow_config.py::test_workflow_with_creation_helper"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83e\uddea tests/csorchestrator/ci/github/test_github_workflow_config \u2192 test_workflow_with_triggers",
       "type": "debugpy",
       "request": "launch",
