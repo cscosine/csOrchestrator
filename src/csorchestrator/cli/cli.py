@@ -13,7 +13,10 @@ import click
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.execution import validate_and_execute_orchestrator
+from csorchestrator.orchestrator.execution import (
+    validate_and_execute_orchestrator,
+    validate_and_generate_github_workflow,
+)
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.reporters.orchestrator_executor_reporter_composite import OrchestratorExecutorReporterComposite
@@ -99,17 +102,13 @@ def assert_create_orchestrator(module: ModuleType) -> Expected[CreateOrchestrato
     return Expected[CreateOrchestratorFn, str].make_value(module.create_orchestrator)
 
 
-def execute_project_script(
-    script_path: Path, target_folder: Path | None, reporter: OrchestratorExecutorReporterBase
-) -> int:
-    """Load and execute a project script's create_orchestrator() function."""
-
+def project_script_preparation(script_path: Path, reporter: OrchestratorExecutorReporterBase) -> Orchestrator | None:
     module_or_error = load_project_module(script_path)
     if module_or_error.error is not None:
         report = Report()
         report.append_error(module_or_error.error)
         reporter.report_orchestrator_creation_report(report)
-        return 1
+        return None
 
     assert module_or_error.value is not None
     module = module_or_error.value
@@ -119,7 +118,7 @@ def execute_project_script(
         report = Report()
         report.append_error(create_orchestrator_expected.error)
         reporter.report_orchestrator_creation_report(report)
-        return 1
+        return None
 
     assert create_orchestrator_expected.value is not None
     create_orchestrator = create_orchestrator_expected.value
@@ -128,11 +127,31 @@ def execute_project_script(
 
     reporter.report_orchestrator_creation_report(orchestrator_result.report)
 
-    if orchestrator_result.result is None:
+    return orchestrator_result.result
+
+
+def execute_project_script(
+    script_path: Path, target_folder: Path | None, reporter: OrchestratorExecutorReporterBase
+) -> int:
+    """Load and execute a project script's create_orchestrator() function."""
+
+    orchestrator_or_none = project_script_preparation(script_path, reporter)
+    if orchestrator_or_none is None:
         return 1
 
     target_folder = resolve_target_folder(script_path, target_folder)
-    validate_and_execute_orchestrator(orchestrator_result.result, str(target_folder), reporter)
+    validate_and_execute_orchestrator(orchestrator_or_none, str(target_folder), reporter)
+    return 0
+
+
+def generate_github_workflow_project_script(script_path: Path, reporter: OrchestratorExecutorReporterBase) -> int:
+    """Load a project script's create_orchestrator() function and use it to generate a github wf."""
+
+    orchestrator_or_none = project_script_preparation(script_path, reporter)
+    if orchestrator_or_none is None:
+        return 1
+
+    validate_and_generate_github_workflow(orchestrator_or_none, reporter)
     return 0
 
 
@@ -163,27 +182,95 @@ def run(ctx: click.Context, script_path: Path, target_folder: Path | None) -> in
     return execute_project_script(script_path, target_folder, reporter)
 
 
-def orchestrator_main_with_default_run(script_path: str, argv: Sequence[str] | None) -> int:
-    """Invoke orchestrator CLI with default 'run' command if not specified."""
+@app.command("generate-github-workflow")  # type: ignore[untyped-decorator]
+@click.argument(
+    "script_path",
+    type=click.Path(exists=True, dir_okay=False, path_type=Path),
+)  # type: ignore[untyped-decorator]
+@click.pass_context  # type: ignore[untyped-decorator]
+def gen_wf(ctx: click.Context, script_path: Path) -> int:
+    """Load a Python project script and create the gitHub workflow for create_orchestrator() result."""
+    config: CLIConfig = ctx.obj["config"]
+
+    reporter = OrchestratorExecutorReporterComposite()
+    console_sink = _build_sink(config.sink)
+    if console_sink is not None:
+        reporter.reporters.append(OrchestratorExecutorReporterPrint(reporter_sink=console_sink))
+    if config.markdown_path is not None:
+        reporter.reporters.append(OrchestratorExecutorReporterMarkdown(path=config.markdown_path))
+
+    return generate_github_workflow_project_script(script_path, reporter)
+
+
+COMMANDS_WITH_OPTIONAL_SCRIPT = {
+    "run",
+    "generate-github-workflow",
+}
+
+
+def _same_script(a: str, b: str) -> bool:
+    return Path(a).resolve() == Path(b).resolve()
+
+
+def orchestrator_main_with_default_run(
+    script_path: str,
+    argv: Sequence[str] | None,
+) -> int:
     if argv is None:
         argv = sys.argv[1:]
 
+    argv = list(argv)
+
+    # No args:
+    # ./project.py
+    # -> run project.py
     if not argv:
         argv = ["run", script_path]
-    elif argv[0] != "run":
-        argv = ["run", script_path, *argv]
-    return main(list(argv))
+
+    else:
+        command = argv[0]
+
+        # No explicit command:
+        # ./project.py foo bar
+        # -> run project.py foo bar
+        if command not in COMMANDS_WITH_OPTIONAL_SCRIPT:
+            argv = ["run", script_path, *argv]
+
+        else:
+            # Handle commands with optional script parameter
+            if len(argv) == 1:
+                # ./project.py run
+                # ./project.py generate-github-workflow
+                argv.append(script_path)
+
+            else:
+                supplied_script = argv[1]
+
+                if not _same_script(supplied_script, script_path):
+                    raise SystemExit(f"This wrapper only operates on {script_path}, not {supplied_script}")
+
+    return main(argv)
 
 
 def main(argv: list[str] | None = None) -> int:
     """CLI entry point."""
     try:
         result = app.main(args=argv, standalone_mode=False)
+
+    except click.ClickException as exc:
+        exc.show()
+        return cast(int, exc.exit_code)
+
+    except click.Abort:
+        click.echo("Aborted!", err=True)
+        return 1
+
     except SystemExit as exc:
         return int(exc.code or 0)
 
     if result is None:
         return 0
+
     return int(result)
 
 

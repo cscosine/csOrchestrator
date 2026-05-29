@@ -133,3 +133,10 @@ def validate_and_execute_orchestrator(
 
     reporter.finalize_execution()
     return er
+
+
+def validate_and_generate_github_workflow(
+    orchestrator: Orchestrator, reporter: OrchestratorExecutorReporterBase
+) -> ExecutionResult:
+    # TODO continue from here to impl
+    return ExecutionResult()
