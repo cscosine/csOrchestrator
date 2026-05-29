@@ -7,8 +7,9 @@ from csorchestrator.ci.github.github_workflow_config import (
     JobStrategy,
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     create_github_wf,
-    create_job_from_matrix,
+    create_job_from_matrix_list,
 )
+from csorchestrator.context.context_os_architecture import OS
 
 EXPECTED_LINES_HEADER = [
     "name: test-wf-name",
@@ -38,9 +39,12 @@ EXPECTED_LINES = EXPECTED_LINES_HEADER + [
     "      fail-fast: false",
     "      matrix:",
     "        include:",
-    "          - os: ubuntu22.04",
-    "            arch: x64",
+    "          - os: linux",
+    "            os_version: ubuntu22.04",
+    "            architecture: x64",
+    "            architecture_variant: generic",
     "            compiler: gcc",
+    "            compiler_version: default",
     "            generator: ninja",
     "            runner: ubuntu-22.04",
     "",
@@ -72,10 +76,13 @@ def test_workflow_with_triggers_and_one_job():
                 runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.RUNS_ON_RUNNER_NAME,
                 strategy=JobStrategy(fail_fast=False).on_matrix(
                     MatrixOsArchCompilerGeneratorRunnerEntryInclude(
-                        os="ubuntu22.04",
-                        arch="x64",
+                        os=OS.LINUX.value,
+                        os_version="ubuntu22.04",
+                        architecture="x64",
+                        architecture_variant="generic",
                         compiler="gcc",
-                        generator="ninja",
+                        compiler_version="default",
+                        build_generator="ninja",
                         runner="ubuntu-22.04",
                     )
                 ),
@@ -98,15 +105,20 @@ def test_workflow_with_creation_helper():
             on_schedule=Cron.weekly(DayOfWeek.MON, hour=3),
         ),
     ).on_job(
-        job=create_job_from_matrix(
+        job=create_job_from_matrix_list(
             name="the_job",
-            matrix=MatrixOsArchCompilerGeneratorRunnerEntryInclude(
-                os="ubuntu22.04",
-                arch="x64",
-                compiler="gcc",
-                generator="ninja",
-                runner="ubuntu-22.04",
-            ),
+            matrix_list=[
+                MatrixOsArchCompilerGeneratorRunnerEntryInclude(
+                    os=OS.LINUX.value,
+                    os_version="ubuntu22.04",
+                    architecture="x64",
+                    architecture_variant="generic",
+                    compiler="gcc",
+                    compiler_version="default",
+                    build_generator="ninja",
+                    runner="ubuntu-22.04",
+                )
+            ],
         )
     )
 

@@ -140,19 +140,28 @@ def execute_project_script(
         return 1
 
     target_folder = resolve_target_folder(script_path, target_folder)
-    validate_and_execute_orchestrator(orchestrator_or_none, str(target_folder), reporter)
-    return 0
+
+    res = validate_and_execute_orchestrator(orchestrator_or_none, str(target_folder), reporter)
+
+    if res.is_execution_successful():
+        return 0
+    return 1
 
 
-def generate_github_workflow_project_script(script_path: Path, reporter: OrchestratorExecutorReporterBase) -> int:
+def generate_github_workflow_project_script(
+    script_path: Path, output_path: Path | None, reporter: OrchestratorExecutorReporterBase
+) -> int:
     """Load a project script's create_orchestrator() function and use it to generate a github wf."""
 
     orchestrator_or_none = project_script_preparation(script_path, reporter)
     if orchestrator_or_none is None:
         return 1
 
-    validate_and_generate_github_workflow(orchestrator_or_none, reporter)
-    return 0
+    res = validate_and_generate_github_workflow(orchestrator_or_none, output_path, reporter)
+    if res.is_execution_successful():
+        return 0
+
+    return 1
 
 
 @app.command("run")  # type: ignore[untyped-decorator]
@@ -187,8 +196,15 @@ def run(ctx: click.Context, script_path: Path, target_folder: Path | None) -> in
     "script_path",
     type=click.Path(exists=True, dir_okay=False, path_type=Path),
 )  # type: ignore[untyped-decorator]
+@click.option(
+    "--output",
+    "-o",
+    type=click.Path(dir_okay=False, path_type=Path),
+    default=None,
+    help="Write workflow to this file. Defaults to stdout.",
+)  # type: ignore[untyped-decorator]
 @click.pass_context  # type: ignore[untyped-decorator]
-def gen_wf(ctx: click.Context, script_path: Path) -> int:
+def gen_wf(ctx: click.Context, script_path: Path, output: Path | None) -> int:
     """Load a Python project script and create the gitHub workflow for create_orchestrator() result."""
     config: CLIConfig = ctx.obj["config"]
 
@@ -199,7 +215,7 @@ def gen_wf(ctx: click.Context, script_path: Path) -> int:
     if config.markdown_path is not None:
         reporter.reporters.append(OrchestratorExecutorReporterMarkdown(path=config.markdown_path))
 
-    return generate_github_workflow_project_script(script_path, reporter)
+    return generate_github_workflow_project_script(script_path, output, reporter)
 
 
 COMMANDS_WITH_OPTIONAL_SCRIPT = {
@@ -220,6 +236,10 @@ def orchestrator_main_with_default_run(
         argv = sys.argv[1:]
 
     argv = list(argv)
+
+    # early exit for help
+    if argv in (["--help"], ["-h"]):
+        return main(argv)
 
     # No args:
     # ./project.py

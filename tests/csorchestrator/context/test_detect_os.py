@@ -76,12 +76,12 @@ def test_detect_os_real_linux():
 def test_detect_os_mock_windows_from_linux():
     with (
         patch("platform.system", return_value="Windows"),
-        patch("platform.release", return_value="11"),
+        patch("platform.release", return_value="10"),
     ):
         result = detect_os()
 
     assert result.error is None
-    assert result.value == (OS.WINDOWS, "v11")
+    assert result.value == (OS.WINDOWS, "v10")
 
 
 @pytest.mark.skipif(platform.system() != "Linux", reason="Linux-only test")
@@ -118,12 +118,12 @@ def test_detect_os_real_macos():
 def test_detect_os_mock_windows_from_macos():
     with (
         patch("platform.system", return_value="Windows"),
-        patch("platform.release", return_value="11"),
+        patch("platform.release", return_value="10"),
     ):
         result = detect_os()
 
     assert result.error is None
-    assert result.value == (OS.WINDOWS, "v11")
+    assert result.value == (OS.WINDOWS, "v10")
 
 
 @pytest.mark.skipif(platform.system() != "Darwin", reason="macOS-only test")

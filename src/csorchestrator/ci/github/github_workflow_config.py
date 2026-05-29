@@ -166,9 +166,12 @@ TriggerUnion: TypeAlias = PushTrigger | PullRequestTrigger | WorkflowDispatchTri
 @dataclass(frozen=True)
 class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
     os: str
-    arch: str
+    os_version: str
+    architecture: str
+    architecture_variant: str
     compiler: str
-    generator: str
+    compiler_version: str
+    build_generator: str
     runner: str
 
     RUNS_ON_RUNNER_NAME: str = "${{ matrix.runner }}"
@@ -178,23 +181,17 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
         return [
             f"{_indent(indent)}include:",
             f"{_indent(indent + 2)}- os: {self.os}",
-            f"{_indent(indent + 2)}  arch: {self.arch}",
+            f"{_indent(indent + 2)}  os_version: {self.os_version}",
+            f"{_indent(indent + 2)}  architecture: {self.architecture}",
+            f"{_indent(indent + 2)}  architecture_variant: {self.architecture_variant}",
             f"{_indent(indent + 2)}  compiler: {self.compiler}",
-            f"{_indent(indent + 2)}  generator: {self.generator}",
+            f"{_indent(indent + 2)}  compiler_version: {self.compiler_version}",
+            f"{_indent(indent + 2)}  generator: {self.build_generator}",
             f"{_indent(indent + 2)}  runner: {self.runner}",
         ]
 
 
-MatrixEntryUnion: TypeAlias = MatrixOsArchCompilerGeneratorRunnerEntryInclude  # TODO add others
-
-# TODO add matrix like
-# matrix:
-#   include:
-#     - os: ubuntu24.04 # those 4 maps to ContextOsArchitectureCompilerGenerator of matrix
-#       arch: arm64
-#       compiler: gcc
-#       generator: ninja
-#       runner: ubuntu-24.04-arm # this is where to run
+MatrixEntryUnion: TypeAlias = MatrixOsArchCompilerGeneratorRunnerEntryInclude
 
 
 @dataclass
@@ -234,12 +231,20 @@ class JobDescription:
         return line_list
 
 
-def create_job_from_matrix(name: str, matrix: MatrixOsArchCompilerGeneratorRunnerEntryInclude) -> JobDescription:
-    return JobDescription(
+def create_job_from_matrix_list(
+    name: str, matrix_list: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude]
+) -> JobDescription:
+
+    jd = JobDescription(
         name=name,
         runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.RUNS_ON_RUNNER_NAME,
-        strategy=JobStrategy(fail_fast=False).on_matrix(matrix),
+        strategy=JobStrategy(fail_fast=False),
     )
+
+    for matrix in matrix_list:
+        jd.strategy.on_matrix(matrix)
+
+    return jd
 
 
 @dataclass

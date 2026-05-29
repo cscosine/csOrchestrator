@@ -34,10 +34,10 @@ class Orchestrator:
     name: str
     phases: list[Phase] = field(default_factory=list)
     _execution_matrix: ExecutionMatrixOsArchCompilerGenerator | None = None
-    _default_github_wf: GitHubWorkflow | None = None
+    default_github_wf: GitHubWorkflow | None = None
 
     def create_default_github_workflow(self, config: CreateGitHubWorkflowConfig) -> "Orchestrator":
-        self._default_github_wf = create_github_wf(self.name, config=config)
+        self.default_github_wf = create_github_wf(self.name, config=config)
         return self
 
     def add_phase(self, phase: Phase) -> "Orchestrator":

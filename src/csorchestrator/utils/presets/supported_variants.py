@@ -29,7 +29,7 @@ def get_supported_os_version_list(os: OS) -> list[str]:
     if os == OS.LINUX:
         return ["ubuntu22.04", "ubuntu24.04"]
     elif os == OS.WINDOWS:
-        return ["v10", "v11"]
+        return ["v10"]
     elif os == OS.MACOS:
         return []  # TODO add macos support
     else:

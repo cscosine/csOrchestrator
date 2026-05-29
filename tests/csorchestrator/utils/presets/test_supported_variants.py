@@ -147,7 +147,6 @@ def test_get_supported_os_version_list() -> None:
     windows_versions = get_supported_os_version_list(OS.WINDOWS)
     assert len(windows_versions) > 0
     assert "v10" in windows_versions
-    assert "v11" in windows_versions
 
     macos_versions = get_supported_os_version_list(OS.MACOS)
     assert len(macos_versions) == 0  # TODO add macos support

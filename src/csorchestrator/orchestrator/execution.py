@@ -1,19 +1,30 @@
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import TypeAlias
 
+from csorchestrator.ci.github.github_workflow_config import (
+    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    create_job_from_matrix_list,
+)
+from csorchestrator.context.context_compiler_generator import Generator
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
     ContextLocalExecutionActiveMatrixConfig,
 )
-from csorchestrator.context.context_os_architecture import detect_context_os_architecture
+from csorchestrator.context.context_os_architecture import OS, Architecture, detect_context_os_architecture
 from csorchestrator.context.context_os_architecture_compiler_generator import (
+    ExecutionMatrixOsArchCompilerGenerator,
     MatrixSkipExecutionOnNonMatchingContext,
     create_context_os_architecture_compiler_generator_string,
 )
+from csorchestrator.core.expected import Expected
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator, OrchestratorExecutorMinimalDescription
-from csorchestrator.orchestrator.orchestrator_executor import execute_orchestrator
+from csorchestrator.orchestrator.orchestrator_executor import (
+    execute_orchestrator,
+    flatten_orchestrator_executor_visit_reports,
+)
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
 from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
@@ -34,6 +45,20 @@ class ExecutionResult:
     # report of each execution phase (can be multiple if matrix is active), which is executed after the validation phase
     # if a matrix cycle is skipped (non executable locally, the list contains a None
     report_executions: list[OrchestratorExecutorVisitReports | None] = field(default_factory=list)
+
+    def is_execution_successful(
+        self,
+    ) -> bool:
+        if self.report_pre_execution.has_errors():
+            return False
+        if self.report_executions is None:
+            return False
+
+        for exec in self.report_executions:
+            if exec is not None:
+                if flatten_orchestrator_executor_visit_reports(exec).has_errors():
+                    return False
+        return True
 
 
 OptionalContextLocalExecutionWithReport: TypeAlias = OptionalResultWithReport[ContextLocalExecution]
@@ -135,8 +160,114 @@ def validate_and_execute_orchestrator(
     return er
 
 
+OrchestratorMatrixToGitHubWFExpected: TypeAlias = Expected[
+    list[MatrixOsArchCompilerGeneratorRunnerEntryInclude], list[str]
+]  # str is the error messages
+
+
+def get_runner(os: OS, os_version: str, arch: Architecture, generator: Generator) -> Expected[str, str]:
+    if os == OS.LINUX:
+        if os_version == "ubuntu22.04":
+            if arch == Architecture.X64:
+                return Expected[str, str].make_value("ubuntu-22.04")
+        elif os_version == "ubuntu24.04":
+            if arch == Architecture.X64:
+                return Expected[str, str].make_value("ubuntu-24.04")
+    elif os == OS.WINDOWS:
+        if os_version == "v10":
+            if arch == Architecture.X64:
+                if generator == Generator.MSVC_17_2022:
+                    return Expected[str, str].make_value("windows-2022")
+                elif generator == Generator.MSVC_18_2026:
+                    return Expected[str, str].make_value("windows-2025-vs2026")
+
+    return Expected[str, str].make_error(
+        f"unsupported config os: {os.value}, os_version: {os_version}, arch: {arch.value}, generator: {generator.value}"
+    )
+
+
+def orchestrator_matrix_to_github_wf_matrix(
+    orchestrator_matrix: ExecutionMatrixOsArchCompilerGenerator,
+) -> OrchestratorMatrixToGitHubWFExpected:
+    res: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude] = []
+    errors: list[str] = []
+
+    for entry in orchestrator_matrix.os_architecture_compiler_generator_list:
+        runner_or_err = get_runner(
+            entry.context_os_architecture.os,
+            entry.context_os_architecture.os_version,
+            entry.context_os_architecture.architecture,
+            entry.context_compiler_generator.build_generator.generator,
+        )
+        if runner_or_err.error is not None:
+            errors.append(runner_or_err.error)
+            continue
+
+        assert runner_or_err.value is not None
+        runner = runner_or_err.value
+
+        res.append(
+            MatrixOsArchCompilerGeneratorRunnerEntryInclude(
+                os=entry.context_os_architecture.os.value.lower(),
+                os_version=entry.context_os_architecture.os_version.lower(),
+                architecture=entry.context_os_architecture.architecture.value.lower(),
+                architecture_variant=entry.context_os_architecture.architecture_variant.lower(),
+                compiler=entry.context_compiler_generator.compiler_family.value.lower(),
+                compiler_version=entry.context_compiler_generator.compiler_version.lower(),
+                build_generator=entry.context_compiler_generator.build_generator.generator.value.lower(),
+                runner=runner,
+            )
+        )
+    if len(errors) > 0:
+        return OrchestratorMatrixToGitHubWFExpected.make_error(errors)
+
+    return OrchestratorMatrixToGitHubWFExpected.make_value(res)
+
+
 def validate_and_generate_github_workflow(
-    orchestrator: Orchestrator, reporter: OrchestratorExecutorReporterBase
+    orchestrator: Orchestrator, output_path: Path | None, reporter: OrchestratorExecutorReporterBase
 ) -> ExecutionResult:
-    # TODO continue from here to impl
-    return ExecutionResult()
+
+    res = ExecutionResult()
+
+    if output_path is None:
+        output_path = Path("orchestrator.default_github_wf.name.wf")
+
+    matrix = orchestrator.get_execution_matrix()
+    if matrix is None:
+        res.report_pre_execution.append_error("github_workflow requires a execution matrix in the orchestrator")
+        reporter.report_pre_execution_report(res.report_pre_execution)
+        reporter.finalize_execution()
+        return res
+
+    wf_matrix_or_errors = orchestrator_matrix_to_github_wf_matrix(matrix)
+    if wf_matrix_or_errors.error is not None:
+        for e in wf_matrix_or_errors.error:
+            res.report_pre_execution.append_error(e)
+        reporter.report_pre_execution_report(res.report_pre_execution)
+        reporter.finalize_execution()
+        return res
+
+    assert wf_matrix_or_errors.value is not None
+    wf_matrix = wf_matrix_or_errors.value
+
+    wf = orchestrator.default_github_wf  # TODO(wf) need a deep copy!
+    if wf is None:
+        res.report_pre_execution.append_error(
+            "github_workflow requires setting up the default_github_wf in orchestrator"
+        )
+        reporter.report_pre_execution_report(res.report_pre_execution)
+        reporter.finalize_execution()
+        return res
+
+    wf.on_job(
+        job=create_job_from_matrix_list(
+            name="the_job",
+            matrix_list=wf_matrix,
+        )
+    )
+
+    # TODO(wf) continue from here with executor and step additions
+
+    output_path.write_text("\n".join(wf.to_string_lines()), encoding="utf-8")
+    return res

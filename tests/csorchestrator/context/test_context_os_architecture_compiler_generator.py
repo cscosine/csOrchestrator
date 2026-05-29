@@ -36,7 +36,7 @@ def test_basic_linux_ninja_clang():
 def test_windows_msvc_vs_generator():
     context_os = ContextOsArchitecture(
         os=OS.WINDOWS,
-        os_version="v11",
+        os_version="v10",
         architecture=Architecture.X64,
         architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
     )
@@ -51,7 +51,7 @@ def test_windows_msvc_vs_generator():
         ContextOsArchitectureCompilerGenerator(context_os, context_compiler)
     )
 
-    assert result == "csv1-windows-v11-x64-generic-msvc-default-msvc2022"
+    assert result == "csv1-windows-v10-x64-generic-msvc-default-msvc2022"
 
 
 def test_macos_appleclang_ninja_multiconfig():
