@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import TypeAlias
 
+from csorchestrator.ci.github.github_workflow_config import CreateGitHubWorkflowConfig, GitHubWorkflow, create_github_wf
 from csorchestrator.context.context_os_architecture_compiler_generator import ExecutionMatrixOsArchCompilerGenerator
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.orchestrator.phase import Phase
@@ -33,6 +34,11 @@ class Orchestrator:
     name: str
     phases: list[Phase] = field(default_factory=list)
     _execution_matrix: ExecutionMatrixOsArchCompilerGenerator | None = None
+    _default_github_wf: GitHubWorkflow | None = None
+
+    def create_default_github_workflow(self, config: CreateGitHubWorkflowConfig) -> "Orchestrator":
+        self._default_github_wf = create_github_wf(self.name, config=config)
+        return self
 
     def add_phase(self, phase: Phase) -> "Orchestrator":
         self.phases.append(phase)
