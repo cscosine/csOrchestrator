@@ -14,10 +14,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+# TODO this function has been added in multiple places, factorize
 def repo_url_tuple_to_str(repo_url: tuple[str, str, str]) -> str:
     return repo_url[0] + repo_url[1] + "/" + repo_url[2]
 
 
+# TODO this function has been added in multiple places, factorize
 def _clone_test_repo(target_path: Path, repo_url: tuple[str, str, str], repo_ref: str, depth_one: bool) -> None:
     assert not target_path.is_dir()
 
@@ -223,9 +225,9 @@ def test_validate_and_sync_repo_bare_fails(
     target_path = tmp_path / cfg.destination_folder
 
     if not depth_one:
-        repo = Repo.clone_from(repo_url, target_path, bare=True)
+        repo = Repo.clone_from(repo_url_tuple_to_str(repo_url), target_path, bare=True)
     else:
-        repo = Repo.clone_from(repo_url, target_path, no_checkout=True, bare=True)
+        repo = Repo.clone_from(repo_url_tuple_to_str(repo_url), target_path, no_checkout=True, bare=True)
 
         remote = repo.remotes[0].name
         repo.git.fetch("--depth", "1", remote, cfg.main_branch)

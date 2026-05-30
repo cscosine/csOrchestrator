@@ -13,10 +13,12 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
+# TODO this function has been added in multiple places, factorize
 def repo_url_tuple_to_str(repo_url: tuple[str, str, str]) -> str:
     return repo_url[0] + repo_url[1] + "/" + repo_url[2]
 
 
+# TODO this function has been added in multiple places, factorize
 def _clone_test_repo(target_path: Path, repo_url: tuple[str, str, str], repo_ref: str, depth_one: bool) -> None:
     assert not target_path.is_dir()
 
