@@ -199,9 +199,7 @@ class JobStrategy:
     _matrix_includes: list[MatrixEntryUnion] = field(default_factory=list)
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
-        fail_fast_str = "false"
-        if self.fail_fast:
-            fail_fast_str = "true"
+        fail_fast_str = str(self.fail_fast).lower()
         line_list = [
             f"{_indent(indent)}strategy:",
             f"{_indent(indent + 2)}fail-fast: {fail_fast_str}",
@@ -228,6 +226,7 @@ class Step:
         raise NotImplementedError
 
 
+@dataclass
 class StepCheckoutRepositoryWith:
     repository: str | None
     path: str | None
@@ -236,18 +235,21 @@ class StepCheckoutRepositoryWith:
     token: str | None
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
-        lines = [f"{_indent(indent)}with:"]
+        lines = []
 
         if self.repository:
-            lines = [f"{_indent(indent + 2)}repository: {self.repository}"]
+            lines += [f"{_indent(indent + 2)}repository: {self.repository}"]
         if self.path:
-            lines = [f"{_indent(indent + 2)}path: {self.path}"]
+            lines += [f"{_indent(indent + 2)}path: {self.path}"]
         if self.ref:
-            lines = [f"{_indent(indent + 2)}ref: {self.ref}"]
+            lines += [f"{_indent(indent + 2)}ref: {self.ref}"]
         if self.fetch_depth:
-            lines = [f"{_indent(indent + 2)}fetch-depth: {self.fetch_depth}"]
+            lines += [f"{_indent(indent + 2)}fetch-depth: {self.fetch_depth}"]
         if self.token:
-            lines = [f"{_indent(indent + 2)}token: {self.token}"]
+            lines += [f"{_indent(indent + 2)}token: {self.token}"]
+
+        if len(lines) > 0:
+            lines = [f"{_indent(indent)}with:"] + lines
 
         return lines
 
@@ -262,7 +264,7 @@ class StepCheckoutRepository(Step):
         lines = [f"{_indent(indent)}- name: {self.name}"]
         lines += [f"{_indent(indent)}  uses: {self.uses}"]
         if self.with_step is not None:
-            lines += self.with_step.to_string_lines()
+            lines += self.with_step.to_string_lines(indent + 2)
 
         return lines
 

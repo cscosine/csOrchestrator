@@ -1,7 +1,11 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from csorchestrator.ci.github.github_workflow_config import JobDescription, StepCheckoutRepository
+from csorchestrator.ci.github.github_workflow_config import (
+    JobDescription,
+    StepCheckoutRepository,
+    StepCheckoutRepositoryWith,
+)
 from csorchestrator.context.context_local_execution import ContextLocalExecution, ContextLocalExecutionExtra
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
@@ -9,11 +13,6 @@ from csorchestrator.orchestrator.step_base import StepBase, StepExtra
 from csorchestrator.utils.file_system.path import is_clean_relative_path, resolve_path
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
-
-
-@dataclass
-class StepGetRepositoryExtraAccessToken(StepExtra):
-    token_name: str
 
 
 @dataclass
@@ -37,6 +36,19 @@ class StepGetRepositoryGitHub(StepBase):
 
     def resolved_target_directory_path(self) -> Path:
         return resolve_path(self.target_directory)
+
+
+@dataclass
+class StepGetRepositoryExtraAccessToken(StepExtra):
+    token_name: str
+
+    @classmethod
+    def get_token_name_or_none(cls, repo_step: StepGetRepositoryGitHub) -> str | None:
+        access_token_extra = repo_step.get_extra(StepGetRepositoryExtraAccessToken)
+        if access_token_extra is None:
+            return None
+
+        return access_token_extra.token_name
 
 
 def execute_step_get_repository(
@@ -93,8 +105,16 @@ def step_get_repository_to_githubwf(
 ) -> Report:
     wf_job.steps.append(
         StepCheckoutRepository(
-            name=step.name
-            # TODO(wf) continue
+            name=step.name,
+            with_step=StepCheckoutRepositoryWith(
+                repository=step.repo_org + "/" + step.name,
+                path=step.target_directory,
+                ref=step.repo_ref,
+                fetch_depth="1"
+                if StepGetRepositoryExtraDepthOne.has_depth_one_on_github_action_checkout(step)
+                else None,
+                token=StepGetRepositoryExtraAccessToken.get_token_name_or_none(step),
+            ),
         )
     )
     return Report()
