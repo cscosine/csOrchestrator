@@ -8,7 +8,7 @@ from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_cmake_command import StepCMakeWorkflow
 from csorchestrator.step.step_echo_message import StepEchoMessage
-from csorchestrator.step.step_get_repository import StepGetRepository, step_get_repository_to_githubwf
+from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub, step_get_repository_to_githubwf
 
 
 @dataclass
@@ -35,7 +35,7 @@ class OrchestratorVisitorGithubWorkflowPreparation(OrchestratorVisitorBase):
     visit_step = OrchestratorVisitorBase.create_visit_dispatch()
 
     @visit_step.register
-    def _(self, step: StepGetRepository, reporter_sink: ReporterSinkBase) -> Report:
+    def _(self, step: StepGetRepositoryGitHub, reporter_sink: ReporterSinkBase) -> Report:
         return step_get_repository_to_githubwf(step, self.wf_job, reporter_sink)
 
     @visit_step.register

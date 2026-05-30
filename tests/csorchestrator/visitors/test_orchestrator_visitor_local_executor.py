@@ -13,7 +13,10 @@ from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
-from csorchestrator.step.step_get_repository import RepositoryType, StepGetRepository, StepGetRepositoryExtraDepthOne
+from csorchestrator.step.step_get_repository import (
+    StepGetRepositoryExtraDepthOne,
+    StepGetRepositoryGitHub,
+)
 from csorchestrator.visitors.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
@@ -23,8 +26,7 @@ from tests.csorchestrator.repo_test_data_config import RepoTestData
 def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: str) -> None:
     cfg = RepoTestData()
 
-    step = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    step = StepGetRepositoryGitHub(
         name=cfg.repo_name,
         description=cfg.repo_name + " description",
         target_directory=cfg.destination_folder,

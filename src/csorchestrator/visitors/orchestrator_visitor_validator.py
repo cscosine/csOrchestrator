@@ -8,7 +8,7 @@ from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, validate_step_cmake_workflow
 from csorchestrator.step.step_echo_message import StepEchoMessage
 from csorchestrator.step.step_get_repository import (
-    StepGetRepository,
+    StepGetRepositoryGitHub,
     StepGetRepositoryValidator,
 )
 
@@ -37,7 +37,7 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
     visit_step = OrchestratorVisitorBase.create_visit_dispatch()
 
     @visit_step.register
-    def _(self, step: StepGetRepository, reporter_sink: ReporterSinkBase) -> Report:
+    def _(self, step: StepGetRepositoryGitHub, reporter_sink: ReporterSinkBase) -> Report:
         return self.step_get_repository_validator.validate_step_get_repository(step)
 
     @visit_step.register

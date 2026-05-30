@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from enum import Enum
 from pathlib import Path
 
 from csorchestrator.ci.github.github_workflow_config import JobDescription, StepCheckoutRepository
@@ -17,13 +16,8 @@ class StepGetRepositoryExtraAccessToken(StepExtra):
     token_name: str
 
 
-class RepositoryType(Enum):
-    GIT = 1
-
-
 @dataclass
-class StepGetRepository(StepBase):
-    repo_type: RepositoryType
+class StepGetRepositoryGitHub(StepBase):
     repo_url: str
     repo_ref: str
     target_directory: str
@@ -38,70 +32,8 @@ class StepGetRepository(StepBase):
 
 
 def execute_step_get_repository(
-    step: StepGetRepository, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
+    repo_step: StepGetRepositoryGitHub, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
-    if step.repo_type == RepositoryType.GIT:
-        return _execute_step_get_repository_git(step, context, reporter_sink)
-    else:
-        return Report().append_error(f"Unknown repository type {step.repo_type}")
-
-
-def step_get_repository_to_githubwf(
-    step: StepGetRepository, wf_job: JobDescription, reporter_sink: ReporterSinkBase
-) -> Report:
-    if step.repo_type == RepositoryType.GIT:
-        return _step_get_repository_to_githubwf_git(step, wf_job, reporter_sink)
-    else:
-        return Report().append_error(f"Unknown repository type {step.repo_type}")
-
-
-def validate_step_get_repository(step: StepGetRepository) -> Report:
-    report = Report()
-
-    if not is_clean_relative_path(step.target_directory, avoid_leaving_base=True):
-        report.append_error(
-            f"Invalid target_directory {step.target_directory}, it must be a clean relative path that "
-            "does not leave the base folder"
-        )
-
-    return report
-
-
-@dataclass
-class StepGetRepositoryValidator:
-    _collected_step_get_repository_target_directories: set[Path] = field(default_factory=set)
-
-    def clear(self) -> None:
-        self._collected_step_get_repository_target_directories.clear()
-
-    def validate_step_get_repository(self, step: StepGetRepository) -> Report:
-        r = validate_step_get_repository(step)
-        if not r.has_errors():
-            target_directory_path = step.resolved_target_directory_path()
-            if target_directory_path in self._collected_step_get_repository_target_directories:
-                r.append_error(f"target_directory {str(target_directory_path)} is already used by another step")
-            else:
-                self._collected_step_get_repository_target_directories.add(target_directory_path)
-        return r
-
-
-def _step_get_repository_to_githubwf_git(
-    step: StepGetRepository, wf_job: JobDescription, reporter_sink: ReporterSinkBase
-) -> Report:
-    wf_job.steps.append(
-        StepCheckoutRepository(
-            name=step.name
-            # TODO(wf) continue
-        )
-    )
-    return Report()
-
-
-def _execute_step_get_repository_git(
-    repo_step: StepGetRepository, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
-) -> Report:
-    assert repo_step.repo_type == RepositoryType.GIT  # defensive
-
     report = Report()
 
     target_full_path = context.base_folder_path / repo_step.target_directory
@@ -145,13 +77,55 @@ def _execute_step_get_repository_git(
     return report
 
 
+def step_get_repository_to_githubwf(
+    step: StepGetRepositoryGitHub, wf_job: JobDescription, reporter_sink: ReporterSinkBase
+) -> Report:
+    wf_job.steps.append(
+        StepCheckoutRepository(
+            name=step.name
+            # TODO(wf) continue
+        )
+    )
+    return Report()
+
+
+def validate_step_get_repository(step: StepGetRepositoryGitHub) -> Report:
+    report = Report()
+
+    if not is_clean_relative_path(step.target_directory, avoid_leaving_base=True):
+        report.append_error(
+            f"Invalid target_directory {step.target_directory}, it must be a clean relative path that "
+            "does not leave the base folder"
+        )
+
+    return report
+
+
+@dataclass
+class StepGetRepositoryValidator:
+    _collected_step_get_repository_target_directories: set[Path] = field(default_factory=set)
+
+    def clear(self) -> None:
+        self._collected_step_get_repository_target_directories.clear()
+
+    def validate_step_get_repository(self, step: StepGetRepositoryGitHub) -> Report:
+        r = validate_step_get_repository(step)
+        if not r.has_errors():
+            target_directory_path = step.resolved_target_directory_path()
+            if target_directory_path in self._collected_step_get_repository_target_directories:
+                r.append_error(f"target_directory {str(target_directory_path)} is already used by another step")
+            else:
+                self._collected_step_get_repository_target_directories.add(target_directory_path)
+        return r
+
+
 @dataclass
 class StepGetRepositoryExtraDepthOne(StepExtra):
     on_local_checkout: bool
     on_github_action_checkout: bool
 
     @classmethod
-    def has_depth_one_on_local_checkout(cls, repo_step: StepGetRepository) -> bool:
+    def has_depth_one_on_local_checkout(cls, repo_step: StepGetRepositoryGitHub) -> bool:
         depth_one_only = False
         depth_one_extra_opt = repo_step.get_extra(StepGetRepositoryExtraDepthOne)
         if depth_one_extra_opt is not None:
@@ -159,7 +133,7 @@ class StepGetRepositoryExtraDepthOne(StepExtra):
         return depth_one_only
 
     @classmethod
-    def has_depth_one_on_github_action_checkout(cls, repo_step: StepGetRepository) -> bool:
+    def has_depth_one_on_github_action_checkout(cls, repo_step: StepGetRepositoryGitHub) -> bool:
         depth_one_only = False
         depth_one_extra_opt = repo_step.get_extra(StepGetRepositoryExtraDepthOne)
         if depth_one_extra_opt is not None:

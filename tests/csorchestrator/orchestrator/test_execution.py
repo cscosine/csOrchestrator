@@ -6,7 +6,10 @@ from csorchestrator.orchestrator.execution import ExecutionResult, validate_and_
 from csorchestrator.orchestrator.orchestrator import Orchestrator, PhaseNameWithStepNames
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
-from csorchestrator.step.step_get_repository import RepositoryType, StepGetRepository, StepGetRepositoryExtraDepthOne
+from csorchestrator.step.step_get_repository import (
+    StepGetRepositoryExtraDepthOne,
+    StepGetRepositoryGitHub,
+)
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 
@@ -17,8 +20,7 @@ def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: str
 
     orchestrator = Orchestrator("myName")
 
-    step = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    step = StepGetRepositoryGitHub(
         name=cfg.repo_name,
         description=cfg.repo_name + " description",
         target_directory=cfg.destination_folder,
@@ -63,8 +65,7 @@ def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_
 
     orchestrator = Orchestrator("myName")
 
-    step = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    step = StepGetRepositoryGitHub(
         name=cfg.repo_name,
         description=cfg.repo_name + " description",
         target_directory=cfg.destination_folder,

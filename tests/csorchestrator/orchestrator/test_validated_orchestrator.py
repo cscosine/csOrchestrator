@@ -4,7 +4,7 @@ from csorchestrator.orchestrator.validated_orchestrator import (
     create_validated_orchestrator,
 )
 from csorchestrator.step.step_echo_message import StepEchoMessage
-from csorchestrator.step.step_get_repository import RepositoryType, StepGetRepository
+from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub
 
 
 def test_orchestrator_valid() -> None:
@@ -61,8 +61,7 @@ def test_orchestrator_invalid_repeated_phase_and_step_names() -> None:
 def test_orchestrator_invalid_step_get_repository() -> None:
     # invalid, step get repository with empty repository name
     o = Orchestrator("myName")
-    s = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    s = StepGetRepositoryGitHub(
         name="get repo",
         description="get repo desc",
         target_directory="../dir",
@@ -81,16 +80,14 @@ def test_orchestrator_invalid_step_get_repository() -> None:
 def test_orchestrator_invalid_step_duplicate_target_directory() -> None:
     # invalid, step get repository with duplicate target directory
     o = Orchestrator("myName")
-    s1 = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    s1 = StepGetRepositoryGitHub(
         name="get repo 1",
         description="get repo desc 1",
         target_directory="./dir",
         repo_url="url://test.git",
         repo_ref="main",
     )
-    s2 = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    s2 = StepGetRepositoryGitHub(
         name="get repo 2",
         description="get repo desc 2",
         target_directory="dir",

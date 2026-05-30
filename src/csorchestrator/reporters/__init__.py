@@ -5,7 +5,7 @@ from csorchestrator.step.step_cmake_command import StepCMakeWorkflow
 from csorchestrator.step.step_custom_command import StepCustomCommand
 from csorchestrator.step.step_echo_message import StepEchoMessage
 from csorchestrator.step.step_get_precompiled_lib import StepGetPrecompiledLib
-from csorchestrator.step.step_get_repository import StepGetRepository
+from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub
 
 __all__ = [
     "StepAddLocalFolder",
@@ -13,5 +13,5 @@ __all__ = [
     "StepCustomCommand",
     "StepEchoMessage",
     "StepGetPrecompiledLib",
-    "StepGetRepository",
+    "StepGetRepositoryGitHub",
 ]

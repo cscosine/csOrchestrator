@@ -1112,16 +1112,6 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_execute_step_get_repository_unknown_repository_type",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/step/test_step_get_repository.py::test_execute_step_get_repository_unknown_repository_type"
-      ],
-      "justMyCode": false
-    },
-    {
       "name": "\ud83e\uddea tests/csorchestrator/step/test_step_get_repository \u2192 test_execute_step_get_repository_update_fails[False]",
       "type": "debugpy",
       "request": "launch",

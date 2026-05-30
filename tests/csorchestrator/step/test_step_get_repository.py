@@ -7,10 +7,9 @@ from csorchestrator.orchestrator.execution import create_context_local_execution
 from csorchestrator.orchestrator.step_base import StepExtra
 from csorchestrator.reporters.reporter_sink_dummy import ReporterSinkDummy
 from csorchestrator.step.step_get_repository import (
-    RepositoryType,
-    StepGetRepository,
     StepGetRepositoryExtraAccessToken,
     StepGetRepositoryExtraDepthOne,
+    StepGetRepositoryGitHub,
     execute_step_get_repository,
     validate_step_get_repository,
 )
@@ -28,8 +27,7 @@ class StepGetRepositoryExtraNotUsed(StepExtra):
 
 
 def test_step_get_repository():
-    s = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    s = StepGetRepositoryGitHub(
         name="get repo",
         description="get repo desc",
         target_directory="dir",
@@ -57,8 +55,7 @@ def test_step_get_repository():
 
 
 def test_validate_step_get_repository() -> None:
-    s = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    s = StepGetRepositoryGitHub(
         name="get repo",
         description="get repo desc",
         target_directory="../dir",
@@ -76,8 +73,7 @@ def test_validate_step_get_repository() -> None:
 
 
 def test_resolved_target_directory_path() -> None:
-    s = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    s = StepGetRepositoryGitHub(
         name="get repo",
         description="get repo desc",
         target_directory="dir/subdir/..",
@@ -90,8 +86,7 @@ def test_resolved_target_directory_path() -> None:
 
 
 def test_step_get_repository_extra_depth_one() -> None:
-    s = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    s = StepGetRepositoryGitHub(
         name="get repo",
         description="get repo desc",
         target_directory="dir/subdir/..",
@@ -129,8 +124,7 @@ def test_step_get_repository_extra_depth_one() -> None:
 def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, depth_one: bool, repo_ref: str) -> None:
     cfg = RepoTestData()
 
-    step = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    step = StepGetRepositoryGitHub(
         name="get test repo",
         description="get test repo desc",
         target_directory=cfg.destination_folder,
@@ -147,7 +141,7 @@ def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, dept
 
     # execute the step for the first time, to clone the repo
     report = execute_step_get_repository(
-        step=step,
+        repo_step=step,
         context=context,
         reporter_sink=ReporterSinkDummy(),
     )
@@ -171,7 +165,7 @@ def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, dept
 
     # and get a second time, to test the "update" logic
     report = execute_step_get_repository(
-        step=step,
+        repo_step=step,
         context=context,
         reporter_sink=ReporterSinkDummy(),
     )
@@ -189,8 +183,7 @@ def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, dept
 def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
     cfg = RepoTestData()
 
-    step = StepGetRepository(
-        repo_type=RepositoryType.GIT,
+    step = StepGetRepositoryGitHub(
         name="get test repo",
         description="get test repo desc",
         target_directory=cfg.destination_folder,
@@ -207,7 +200,7 @@ def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: str,
 
     # execute the step for the first time, to clone the repo
     report = execute_step_get_repository(
-        step=step,
+        repo_step=step,
         context=context,
         reporter_sink=ReporterSinkDummy(),
     )
@@ -219,7 +212,7 @@ def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: str,
     # and get a second time, to test the "update" logic and that it correctly detect errors
     step.repo_ref = cfg.dev_branch
     report = execute_step_get_repository(
-        step=step,
+        repo_step=step,
         context=context,
         reporter_sink=ReporterSinkDummy(),
     )
@@ -228,21 +221,3 @@ def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: str,
     assert report.has_info()
     assert "Given target_directory exists, then try to update from" in report.infos[0]
     assert "Branch mismatch: local=main, expected=dev" in report.errors[0]
-
-
-def test_execute_step_get_repository_unknown_repository_type(tmp_path: Path) -> None:
-    step = StepGetRepository(
-        repo_type="NOT_AN_EXISTING_TYPE",  # type: ignore
-        name="get repo",
-        description="get repo desc",
-        target_directory="dir",
-        repo_url="url://test.git",
-        repo_ref="main",
-    )
-    context = create_context_local_execution(base_folder_path=str(tmp_path))
-    assert context.result is not None
-
-    report = execute_step_get_repository(step, context.result, reporter_sink=ReporterSinkDummy())
-
-    assert report.has_errors()
-    assert "Unknown repository type" in report.errors[0]
