@@ -225,13 +225,25 @@ def orchestrator_matrix_to_github_wf_matrix(
 
 
 def validate_and_generate_github_workflow(
-    orchestrator: Orchestrator, output_path: Path | None, reporter: OrchestratorExecutorReporterBase
+    orchestrator: Orchestrator,
+    script_folder_path: Path,
+    output_path: Path | None,
+    reporter: OrchestratorExecutorReporterBase,
 ) -> ExecutionResult:
 
     res = ExecutionResult()
 
-    if output_path is None:
-        output_path = Path("orchestrator.default_github_wf.name.wf")
+    orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
+    res.report_pre_execution.append_report(orchestratorValidatedOpt.report)
+
+    if orchestratorValidatedOpt.result is None:
+        reporter.report_pre_execution_report(res.report_pre_execution)
+        reporter.finalize_execution()
+        return res
+
+    orchestrator = orchestratorValidatedOpt.result
+
+    # validated orchestrator
 
     matrix = orchestrator.get_execution_matrix()
     if matrix is None:
@@ -268,6 +280,17 @@ def validate_and_generate_github_workflow(
     )
 
     # TODO(wf) continue from here with executor and step additions
+
+    if output_path is None:
+        output_path = script_folder_path / Path(f".github/workflows/{wf.name}.yml")
+
+    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(output_path.parent.resolve()))
+    res.report_pre_execution.append_report(dir_creation_res.report)
+
+    if dir_creation_res.result is None:
+        reporter.report_pre_execution_report(res.report_pre_execution)
+        reporter.finalize_execution()
+        return res
 
     output_path.write_text("\n".join(wf.to_string_lines()), encoding="utf-8")
     return res

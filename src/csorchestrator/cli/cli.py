@@ -157,7 +157,9 @@ def generate_github_workflow_project_script(
     if orchestrator_or_none is None:
         return 1
 
-    res = validate_and_generate_github_workflow(orchestrator_or_none, output_path, reporter)
+    res = validate_and_generate_github_workflow(
+        orchestrator_or_none, script_path.parent.resolve(), output_path, reporter
+    )
     if res.is_execution_successful():
         return 0
 

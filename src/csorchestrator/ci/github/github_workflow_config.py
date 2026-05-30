@@ -179,15 +179,14 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         return [
-            f"{_indent(indent)}include:",
-            f"{_indent(indent + 2)}- os: {self.os}",
-            f"{_indent(indent + 2)}  os_version: {self.os_version}",
-            f"{_indent(indent + 2)}  architecture: {self.architecture}",
-            f"{_indent(indent + 2)}  architecture_variant: {self.architecture_variant}",
-            f"{_indent(indent + 2)}  compiler: {self.compiler}",
-            f"{_indent(indent + 2)}  compiler_version: {self.compiler_version}",
-            f"{_indent(indent + 2)}  generator: {self.build_generator}",
-            f"{_indent(indent + 2)}  runner: {self.runner}",
+            f"{_indent(indent)}- os: {self.os}",
+            f"{_indent(indent)}  os_version: {self.os_version}",
+            f"{_indent(indent)}  architecture: {self.architecture}",
+            f"{_indent(indent)}  architecture_variant: {self.architecture_variant}",
+            f"{_indent(indent)}  compiler: {self.compiler}",
+            f"{_indent(indent)}  compiler_version: {self.compiler_version}",
+            f"{_indent(indent)}  generator: {self.build_generator}",
+            f"{_indent(indent)}  runner: {self.runner}",
         ]
 
 
@@ -209,8 +208,9 @@ class JobStrategy:
         ]
         if len(self._matrix_includes) > 0:
             line_list.append(f"{_indent(indent + 2)}matrix:")
+            line_list.append(f"{_indent(indent + 4)}include:")
             for matrix_include in self._matrix_includes:
-                line_list += matrix_include.to_string_lines(indent + 4)
+                line_list += matrix_include.to_string_lines(indent + 6)
         return line_list
 
     def on_matrix(self, entry: MatrixOsArchCompilerGeneratorRunnerEntryInclude) -> "JobStrategy":
