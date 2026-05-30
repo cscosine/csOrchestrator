@@ -274,7 +274,7 @@ def validate_and_generate_github_workflow(
 
     wf.on_job(
         job=create_job_from_matrix_list(
-            name="the_job",
+            name="csOrchestratorJob",
             matrix_list=wf_matrix,
         )
     )
