@@ -31,7 +31,9 @@ def test_step_get_repository():
         name="get repo",
         description="get repo desc",
         target_directory="dir",
-        repo_url="url://test.git",
+        repo_base_url=StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
+        repo_org="cscosine",
+        repo_name="myrepo",
         repo_ref="main",
     )
     s.add_extra(StepGetRepositoryExtraAccessToken(token_name="THE_TOKEN")).add_extra(StepGetRepositoryExtraCustom(25))
@@ -59,7 +61,9 @@ def test_validate_step_get_repository() -> None:
         name="get repo",
         description="get repo desc",
         target_directory="../dir",
-        repo_url="url://test.git",
+        repo_base_url=StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
+        repo_org="cscosine",
+        repo_name="myrepo",
         repo_ref="main",
     )
 
@@ -77,7 +81,9 @@ def test_resolved_target_directory_path() -> None:
         name="get repo",
         description="get repo desc",
         target_directory="dir/subdir/..",
-        repo_url="url://test.git",
+        repo_base_url=StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
+        repo_org="cscosine",
+        repo_name="myrepo",
         repo_ref="main",
     )
 
@@ -90,7 +96,9 @@ def test_step_get_repository_extra_depth_one() -> None:
         name="get repo",
         description="get repo desc",
         target_directory="dir/subdir/..",
-        repo_url="url://test.git",
+        repo_base_url=StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
+        repo_org="cscosine",
+        repo_name="myrepo",
         repo_ref="main",
     )
 
@@ -121,14 +129,18 @@ def test_step_get_repository_extra_depth_one() -> None:
     "repo_ref",
     [RepoTestData().main_branch, RepoTestData().dev_branch, RepoTestData().initial_commit_sha, RepoTestData().tag],
 )
-def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, depth_one: bool, repo_ref: str) -> None:
+def test_execute_step_get_repository_success(
+    tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool, repo_ref: str
+) -> None:
     cfg = RepoTestData()
 
     step = StepGetRepositoryGitHub(
         name="get test repo",
         description="get test repo desc",
         target_directory=cfg.destination_folder,
-        repo_url=repo_url,
+        repo_base_url=repo_url[0],
+        repo_org=repo_url[1],
+        repo_name=repo_url[2],
         repo_ref=repo_ref,
     )
 
@@ -180,14 +192,18 @@ def test_execute_step_get_repository_success(tmp_path: Path, repo_url: str, dept
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: str, depth_one: bool) -> None:
+def test_execute_step_get_repository_update_fails(
+    tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool
+) -> None:
     cfg = RepoTestData()
 
     step = StepGetRepositoryGitHub(
         name="get test repo",
         description="get test repo desc",
         target_directory=cfg.destination_folder,
-        repo_url=repo_url,
+        repo_base_url=repo_url[0],
+        repo_org=repo_url[1],
+        repo_name=repo_url[2],
         repo_ref=cfg.main_branch,
     )
 

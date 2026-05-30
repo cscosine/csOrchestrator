@@ -23,14 +23,16 @@ from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: str) -> None:
+def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: tuple[str, str, str]) -> None:
     cfg = RepoTestData()
 
     step = StepGetRepositoryGitHub(
         name=cfg.repo_name,
         description=cfg.repo_name + " description",
         target_directory=cfg.destination_folder,
-        repo_url=repo_url,
+        repo_base_url=repo_url[0],
+        repo_org=repo_url[1],
+        repo_name=repo_url[2],
         repo_ref=cfg.main_branch,
     ).add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
@@ -64,7 +66,7 @@ class StepCustom1(StepBase):
     pass
 
 
-def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path, repo_url: str) -> None:
+def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path, repo_url: tuple[str, str, str]) -> None:
 
     orchestrator = Orchestrator("myName")
     orchestrator.add_phase(

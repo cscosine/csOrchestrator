@@ -15,7 +15,7 @@ from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: str) -> None:
+def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: tuple[str, str, str]) -> None:
     cfg = RepoTestData()
 
     orchestrator = Orchestrator("myName")
@@ -24,7 +24,9 @@ def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: str
         name=cfg.repo_name,
         description=cfg.repo_name + " description",
         target_directory=cfg.destination_folder,
-        repo_url=repo_url,
+        repo_base_url=repo_url[0],
+        repo_org=repo_url[1],
+        repo_name=repo_url[2],
         repo_ref=cfg.main_branch,
     ).add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
@@ -44,7 +46,7 @@ def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: str
             assert not step_report.has_errors()
 
 
-def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path, repo_url: str) -> None:
+def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path) -> None:
 
     # create a file in the target folder path,
     # which cause the pre-execution validation to fail, since it expects a folder
@@ -60,7 +62,7 @@ def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path, re
     assert er.report_pre_execution.has_errors()
 
 
-def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_url: str) -> None:
+def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_url: tuple[str, str, str]) -> None:
     cfg = RepoTestData()
 
     orchestrator = Orchestrator("myName")
@@ -69,7 +71,9 @@ def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_
         name=cfg.repo_name,
         description=cfg.repo_name + " description",
         target_directory=cfg.destination_folder,
-        repo_url=repo_url,
+        repo_base_url=repo_url[0],
+        repo_org=repo_url[1],
+        repo_name=repo_url[2],
         repo_ref=cfg.main_branch,
     ).add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 

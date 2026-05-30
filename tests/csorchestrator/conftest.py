@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session")
-def repo_url() -> str:
+def repo_url() -> tuple[str, str, str]:
     # return url
     repo_test_data = RepoTestData()
     repo_url, selected_url = select_https_or_ssh_url_resolve_token_name_on_env(

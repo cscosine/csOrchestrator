@@ -18,9 +18,17 @@ class StepGetRepositoryExtraAccessToken(StepExtra):
 
 @dataclass
 class StepGetRepositoryGitHub(StepBase):
-    repo_url: str
+    repo_base_url: str
+    repo_org: str
+    repo_name: str
     repo_ref: str
     target_directory: str
+
+    def repo_url(self) -> str:
+        return self.repo_base_url + self.repo_org + "/" + self.repo_name
+
+    GITHUB_BASE_URL_SSH: str = "git@github.com:"
+    GITHUB_BASE_URL_HTTPS: str = "https://github.com/"
 
     # note, repo_ref can be
     # - Branch, e.g. "main", "dev"
@@ -55,22 +63,25 @@ def execute_step_get_repository(
         depth_one = StepGetRepositoryExtraDepthOne.has_depth_one_on_local_checkout(repo_step)
 
         report.append_info(
-            f"Clone from {repo_step.repo_url} to {target_full_path} {f'depth one? {depth_one}' if depth_one else ''}"
+            f"Clone from {repo_step.repo_url()} to {target_full_path} {f'depth one? {depth_one}' if depth_one else ''}"
         )
 
         r_sub = try_git_clone_checkout(
-            repo_url=repo_step.repo_url, repo_ref=repo_step.repo_ref, target_path=target_full_path, depth_one=depth_one
+            repo_url=repo_step.repo_url(),
+            repo_ref=repo_step.repo_ref,
+            target_path=target_full_path,
+            depth_one=depth_one,
         )
 
         report.append_report(r_sub)
 
     else:
         report.append_info(
-            f"Given target_directory exists, then try to update from {repo_step.repo_url} ref {repo_step.repo_ref}"
+            f"Given target_directory exists, then try to update from {repo_step.repo_url()} ref {repo_step.repo_ref}"
         )
 
         validate_and_sync_report = validate_and_sync_repo(
-            repo_url=repo_step.repo_url, repo_ref=repo_step.repo_ref, target_path=target_full_path
+            repo_url=repo_step.repo_url(), repo_ref=repo_step.repo_ref, target_path=target_full_path
         )
         report.append_report(validate_and_sync_report)
 

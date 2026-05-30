@@ -34,5 +34,5 @@ class RepoTestData:
     #        run: |
     #          pytest [...]
     token_name: str = "ACTIONS_ORG_ACCESS"
-    https_url_template: str = "https://{token}@github.com/cscosine/csOrchestratorTestRepo.git"
-    ssh_url: str = "git@github.com:cscosine/csOrchestratorTestRepo.git"
+    https_url_template: tuple[str, str, str] = ("https://{token}@github.com/", "cscosine", "csOrchestratorTestRepo.git")
+    ssh_url: tuple[str, str, str] = ("git@github.com:", "cscosine", "csOrchestratorTestRepo.git")

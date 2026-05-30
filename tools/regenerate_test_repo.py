@@ -11,8 +11,8 @@ from csorchestrator.utils.git.resolve_url import select_https_or_ssh_url_resolve
 
 # keep these values aligned with the ones in tests/csorchestrator/utils/git/repo_config.py
 TOKEN_NAME: str = "ACTIONS_ORG_ACCESS"
-HTTPS_URL_TEMPLATE: str = "https://{token}@github.com/cscosine/csOrchestratorTestRepo.git"
-SSH_URL: str = "git@github.com:cscosine/csOrchestratorTestRepo.git"
+HTTPS_URL_TEMPLATE: tuple[str, str, str] = ("https://{token}@github.com/", "cscosine", "csOrchestratorTestRepo.git")
+SSH_URL: tuple[str, str, str] = ("git@github.com:", "cscosine", "csOrchestratorTestRepo.git")
 STATUS_FILE: str = "STATUS.txt"
 
 
@@ -99,7 +99,7 @@ def main() -> int:
         TOKEN_NAME,
     )
 
-    report.append_info(f"Selected remote: {selected}, url: {url}")
+    report.append_info(f"Selected remote: {selected}, url: {url[0] + url[1] + '/' + url[2]}")
 
     tmp_dir = tempfile.mkdtemp(prefix="cs_orchestrator_repo_")
 
