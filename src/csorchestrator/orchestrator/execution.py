@@ -29,6 +29,9 @@ from csorchestrator.orchestrator.orchestrator_executor_reporter_base import Orch
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
 from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.utils.file_system.directory import ensure_directory_exists_or_create_and_is_usable
+from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import (
+    OrchestratorVisitorGithubWorkflowPreparation,
+)
 from csorchestrator.visitors.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
 
 
@@ -272,14 +275,20 @@ def validate_and_generate_github_workflow(
         reporter.finalize_execution()
         return res
 
-    wf.on_job(
-        job=create_job_from_matrix_list(
-            name="csOrchestratorJob",
-            matrix_list=wf_matrix,
-        )
+    wf_job = create_job_from_matrix_list(
+        name="csOrchestratorJob",
+        matrix_list=wf_matrix,
     )
+    wf.on_job(job=wf_job)
 
-    # TODO(wf) continue from here with executor and step additions
+    reporter.report_start_execution("orchestrator execution without matrix")
+    # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
+    report_execution = execute_orchestrator(
+        orchestrator, OrchestratorVisitorGithubWorkflowPreparation(wf_job), reporter=reporter
+    )
+    reporter.report_execution_report(report_execution)
+
+    res.report_executions.append(report_execution)
 
     if output_path is None:
         output_path = script_folder_path / Path(f".github/workflows/{wf.name}.yml")

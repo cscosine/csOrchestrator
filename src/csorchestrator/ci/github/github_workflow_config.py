@@ -218,16 +218,75 @@ class JobStrategy:
         return self
 
 
+# =========================================================
+# Steps models
+# =========================================================
+
+
+class Step:
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        raise NotImplementedError
+
+
+class StepCheckoutRepositoryWith:
+    repository: str | None
+    path: str | None
+    ref: str | None
+    fetch_depth: str | None
+    token: str | None
+
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        lines = [f"{_indent(indent)}with:"]
+
+        if self.repository:
+            lines = [f"{_indent(indent + 2)}repository: {self.repository}"]
+        if self.path:
+            lines = [f"{_indent(indent + 2)}path: {self.path}"]
+        if self.ref:
+            lines = [f"{_indent(indent + 2)}ref: {self.ref}"]
+        if self.fetch_depth:
+            lines = [f"{_indent(indent + 2)}fetch-depth: {self.fetch_depth}"]
+        if self.token:
+            lines = [f"{_indent(indent + 2)}token: {self.token}"]
+
+        return lines
+
+
+@dataclass(frozen=True, slots=True)
+class StepCheckoutRepository(Step):
+    name: str
+    uses: str = "actions/checkout@v6"
+    with_step: StepCheckoutRepositoryWith | None = None
+
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        lines = [f"{_indent(indent)}- name: {self.name}"]
+        lines += [f"{_indent(indent)}  uses: {self.uses}"]
+        if self.with_step is not None:
+            lines += self.with_step.to_string_lines()
+
+        return lines
+
+
+StepUnionType: TypeAlias = StepCheckoutRepository  # TODO continue | StepCMakeWorkflow | StepEchoMessage
+
+
 @dataclass
 class JobDescription:
     name: str
     runs_on: str
     strategy: JobStrategy
+    steps: list[StepUnionType] = field(default_factory=list)
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         line_list = [f"{_indent(indent)}{self.name}:", f"{_indent(indent + 2)}runs-on: {self.runs_on}", ""]
         line_list += self.strategy.to_string_lines(indent + 2)
         line_list += [""]
+        if len(self.steps) > 0:
+            line_list += [f"{_indent(indent + 2)}steps:"]
+            for step in self.steps:
+                line_list += step.to_string_lines(indent + 4)
+                line_list += [""]
+
         return line_list
 
 

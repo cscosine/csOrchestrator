@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 
+from csorchestrator.ci.github.github_workflow_config import JobDescription, StepCheckoutRepository
 from csorchestrator.context.context_local_execution import ContextLocalExecution, ContextLocalExecutionExtra
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
@@ -45,6 +46,15 @@ def execute_step_get_repository(
         return Report().append_error(f"Unknown repository type {step.repo_type}")
 
 
+def step_get_repository_to_githubwf(
+    step: StepGetRepository, wf_job: JobDescription, reporter_sink: ReporterSinkBase
+) -> Report:
+    if step.repo_type == RepositoryType.GIT:
+        return _step_get_repository_to_githubwf_git(step, wf_job, reporter_sink)
+    else:
+        return Report().append_error(f"Unknown repository type {step.repo_type}")
+
+
 def validate_step_get_repository(step: StepGetRepository) -> Report:
     report = Report()
 
@@ -73,6 +83,18 @@ class StepGetRepositoryValidator:
             else:
                 self._collected_step_get_repository_target_directories.add(target_directory_path)
         return r
+
+
+def _step_get_repository_to_githubwf_git(
+    step: StepGetRepository, wf_job: JobDescription, reporter_sink: ReporterSinkBase
+) -> Report:
+    wf_job.steps.append(
+        StepCheckoutRepository(
+            name=step.name
+            # TODO(wf) continue
+        )
+    )
+    return Report()
 
 
 def _execute_step_get_repository_git(
