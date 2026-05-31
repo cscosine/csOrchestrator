@@ -7,12 +7,13 @@ from git import Repo
 
 from csorchestrator.core.report import Report
 from csorchestrator.reporters.report_reporter import repo_to_reporter_sink
+from csorchestrator.step.step_get_repository import RepoUrlParts
 from csorchestrator.utils.git.resolve_url import select_https_or_ssh_url_resolve_token_name_on_env
 
 # keep these values aligned with the ones in tests/csorchestrator/utils/git/repo_config.py
 TOKEN_NAME: str = "ACTIONS_ORG_ACCESS"
-HTTPS_URL_TEMPLATE: tuple[str, str, str] = ("https://{token}@github.com/", "cscosine", "csOrchestratorTestRepo.git")
-SSH_URL: tuple[str, str, str] = ("git@github.com:", "cscosine", "csOrchestratorTestRepo.git")
+HTTPS_URL_TEMPLATE: RepoUrlParts = RepoUrlParts("https://{token}@github.com/", "cscosine", "csOrchestratorTestRepo.git")
+SSH_URL: RepoUrlParts = RepoUrlParts("git@github.com:", "cscosine", "csOrchestratorTestRepo.git")
 STATUS_FILE: str = "STATUS.txt"
 
 
@@ -99,7 +100,7 @@ def main() -> int:
         TOKEN_NAME,
     )
 
-    report.append_info(f"Selected remote: {selected}, url: {url[0] + url[1] + '/' + url[2]}")
+    report.append_info(f"Selected remote: {selected}, url: {url.repo_url()}")
 
     tmp_dir = tempfile.mkdtemp(prefix="cs_orchestrator_repo_")
 

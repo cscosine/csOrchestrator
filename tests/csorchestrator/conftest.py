@@ -2,6 +2,7 @@ import logging
 
 import pytest
 
+from csorchestrator.step.step_get_repository import RepoUrlParts
 from csorchestrator.utils.git.resolve_url import RepoUrlSelected, select_https_or_ssh_url_resolve_token_name_on_env
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
@@ -9,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 
 @pytest.fixture(scope="session")
-def repo_url() -> tuple[str, str, str]:
+def repo_url() -> RepoUrlParts:
     # return url
     repo_test_data = RepoTestData()
     repo_url, selected_url = select_https_or_ssh_url_resolve_token_name_on_env(

@@ -15,16 +15,27 @@ from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
 
 
-@dataclass
-class StepGetRepositoryGitHub(StepBase):
+@dataclass(frozen=True)
+class RepoUrlParts:
     repo_base_url: str
     repo_org: str
     repo_name: str
+
+    def repo_org_name_sub_url(self) -> str:
+        return self.repo_org + "/" + self.repo_name
+
+    def repo_url(self) -> str:
+        return self.repo_base_url + self.repo_org_name_sub_url()
+
+
+@dataclass
+class StepGetRepositoryGitHub(StepBase):
+    repo_url_parts: RepoUrlParts
     repo_ref: str
     target_directory: str
 
     def repo_url(self) -> str:
-        return self.repo_base_url + self.repo_org + "/" + self.repo_name
+        return self.repo_url_parts.repo_url()
 
     GITHUB_BASE_URL_SSH: str = "git@github.com:"
     GITHUB_BASE_URL_HTTPS: str = "https://github.com/"
@@ -107,7 +118,7 @@ def step_get_repository_to_githubwf(
         StepCheckoutRepository(
             name=step.name,
             with_step=StepCheckoutRepositoryWith(
-                repository=step.repo_org + "/" + step.name,
+                repository=step.repo_url_parts.repo_org_name_sub_url(),
                 path=step.target_directory,
                 ref=step.repo_ref,
                 fetch_depth="1"

@@ -4,7 +4,7 @@ from csorchestrator.orchestrator.validated_orchestrator import (
     create_validated_orchestrator,
 )
 from csorchestrator.step.step_echo_message import StepEchoMessage
-from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub
+from csorchestrator.step.step_get_repository import RepoUrlParts, StepGetRepositoryGitHub
 
 
 def test_orchestrator_valid() -> None:
@@ -65,9 +65,11 @@ def test_orchestrator_invalid_step_get_repository() -> None:
         name="get repo",
         description="get repo desc",
         target_directory="../dir",
-        repo_base_url=StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
-        repo_org="cscosine",
-        repo_name="myrepo",
+        repo_url_parts=RepoUrlParts(
+            StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
+            repo_org="cscosine",
+            repo_name="myrepo",
+        ),
         repo_ref="main",
     )
     o.add_phase(Phase("p").add_step(s))
@@ -86,18 +88,22 @@ def test_orchestrator_invalid_step_duplicate_target_directory() -> None:
         name="get repo 1",
         description="get repo desc 1",
         target_directory="./dir",
-        repo_base_url=StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
-        repo_org="cscosine",
-        repo_name="myrepo",
+        repo_url_parts=RepoUrlParts(
+            StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
+            repo_org="cscosine",
+            repo_name="myrepo",
+        ),
         repo_ref="main",
     )
     s2 = StepGetRepositoryGitHub(
         name="get repo 2",
         description="get repo desc 2",
         target_directory="dir",
-        repo_base_url=StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
-        repo_org="cscosine",
-        repo_name="myrepo",
+        repo_url_parts=RepoUrlParts(
+            StepGetRepositoryGitHub.GITHUB_BASE_URL_SSH,
+            repo_org="cscosine",
+            repo_name="myrepo",
+        ),
         repo_ref="main",
     )
     o.add_phase(Phase("p").add_step(s1).add_step(s2))

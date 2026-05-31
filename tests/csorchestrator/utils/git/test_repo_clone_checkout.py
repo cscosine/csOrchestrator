@@ -3,15 +3,12 @@ from pathlib import Path
 
 import pytest
 
+from csorchestrator.step.step_get_repository import RepoUrlParts
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-
-def repo_url_tuple_to_str(repo_url: tuple[str, str, str]) -> str:
-    return repo_url[0] + repo_url[1] + "/" + repo_url[2]
 
 
 def _check_status(target_path: Path, expected_content: str) -> None:
@@ -25,7 +22,7 @@ def _check_status(target_path: Path, expected_content: str) -> None:
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_try_git_clone_checkout_branch_main(tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool) -> None:
+def test_try_git_clone_checkout_branch_main(tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -33,7 +30,7 @@ def test_try_git_clone_checkout_branch_main(tmp_path: Path, repo_url: tuple[str,
     assert not target_path.is_dir()
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url), repo_ref=cfg.main_branch, target_path=target_path, depth_one=depth_one
+        repo_url=repo_url.repo_url(), repo_ref=cfg.main_branch, target_path=target_path, depth_one=depth_one
     )
 
     assert not r.has_errors()
@@ -43,7 +40,7 @@ def test_try_git_clone_checkout_branch_main(tmp_path: Path, repo_url: tuple[str,
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_try_git_clone_checkout_branch_dev(tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool) -> None:
+def test_try_git_clone_checkout_branch_dev(tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -51,7 +48,7 @@ def test_try_git_clone_checkout_branch_dev(tmp_path: Path, repo_url: tuple[str, 
     assert not target_path.is_dir()
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url),
+        repo_url=repo_url.repo_url(),
         repo_ref=cfg.dev_branch,
         target_path=target_path,
         depth_one=depth_one,
@@ -64,7 +61,7 @@ def test_try_git_clone_checkout_branch_dev(tmp_path: Path, repo_url: tuple[str, 
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_try_git_clone_checkout_tag(tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool) -> None:
+def test_try_git_clone_checkout_tag(tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -72,7 +69,7 @@ def test_try_git_clone_checkout_tag(tmp_path: Path, repo_url: tuple[str, str, st
     assert not target_path.is_dir()
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url), repo_ref=cfg.tag, target_path=target_path, depth_one=depth_one
+        repo_url=repo_url.repo_url(), repo_ref=cfg.tag, target_path=target_path, depth_one=depth_one
     )
 
     assert not r.has_errors()
@@ -82,7 +79,7 @@ def test_try_git_clone_checkout_tag(tmp_path: Path, repo_url: tuple[str, str, st
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_try_git_clone_checkout_sha(tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool) -> None:
+def test_try_git_clone_checkout_sha(tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -90,7 +87,7 @@ def test_try_git_clone_checkout_sha(tmp_path: Path, repo_url: tuple[str, str, st
     assert not target_path.is_dir()
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url),
+        repo_url=repo_url.repo_url(),
         repo_ref=cfg.initial_commit_sha,
         target_path=target_path,
         depth_one=depth_one,
@@ -104,9 +101,7 @@ def test_try_git_clone_checkout_sha(tmp_path: Path, repo_url: tuple[str, str, st
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_try_git_clone_checkout_non_existing_ref(
-    tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool
-) -> None:
+def test_try_git_clone_checkout_non_existing_ref(tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -114,7 +109,7 @@ def test_try_git_clone_checkout_non_existing_ref(
     assert not target_path.is_dir()
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url),
+        repo_url=repo_url.repo_url(),
         repo_ref=cfg.non_existing_ref,
         target_path=target_path,
         depth_one=depth_one,
@@ -126,9 +121,7 @@ def test_try_git_clone_checkout_non_existing_ref(
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_try_git_clone_checkout_branch_origin_main(
-    tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool
-) -> None:
+def test_try_git_clone_checkout_branch_origin_main(tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -136,7 +129,7 @@ def test_try_git_clone_checkout_branch_origin_main(
     assert not target_path.is_dir()
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url),
+        repo_url=repo_url.repo_url(),
         repo_ref=cfg.origin_main_branch,
         target_path=target_path,
         depth_one=depth_one,
@@ -148,7 +141,7 @@ def test_try_git_clone_checkout_branch_origin_main(
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_try_git_clone_checkout_HEAD(tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool) -> None:
+def test_try_git_clone_checkout_HEAD(tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -156,7 +149,7 @@ def test_try_git_clone_checkout_HEAD(tmp_path: Path, repo_url: tuple[str, str, s
     assert not target_path.is_dir()
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url), repo_ref=cfg.head, target_path=target_path, depth_one=depth_one
+        repo_url=repo_url.repo_url(), repo_ref=cfg.head, target_path=target_path, depth_one=depth_one
     )
 
     assert r.has_errors()
@@ -165,9 +158,7 @@ def test_try_git_clone_checkout_HEAD(tmp_path: Path, repo_url: tuple[str, str, s
 @pytest.mark.slow
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
-def test_try_git_clone_checkout_refs_heads_main(
-    tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool
-) -> None:
+def test_try_git_clone_checkout_refs_heads_main(tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool) -> None:
     cfg = RepoTestData()
 
     target_path = tmp_path / cfg.destination_folder
@@ -175,7 +166,7 @@ def test_try_git_clone_checkout_refs_heads_main(
     assert not target_path.is_dir()
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url),
+        repo_url=repo_url.repo_url(),
         repo_ref=cfg.refs_heads_main,
         target_path=target_path,
         depth_one=depth_one,
@@ -188,7 +179,7 @@ def test_try_git_clone_checkout_refs_heads_main(
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
 def test_try_git_clone_checkout_repo_refs_remote_origin_main(
-    tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool
+    tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool
 ) -> None:
     cfg = RepoTestData()
 
@@ -197,7 +188,7 @@ def test_try_git_clone_checkout_repo_refs_remote_origin_main(
     assert not target_path.is_dir()
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url),
+        repo_url=repo_url.repo_url(),
         repo_ref=cfg.refs_remote_origin_main,
         target_path=target_path,
         depth_one=depth_one,
@@ -211,7 +202,7 @@ def test_try_git_clone_checkout_repo_refs_remote_origin_main(
 @pytest.mark.git
 @pytest.mark.parametrize("depth_one", [True, False])
 def test_try_git_clone_checkout_unknown_ref_type(
-    tmp_path: Path, repo_url: tuple[str, str, str], depth_one: bool, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, repo_url: RepoUrlParts, depth_one: bool, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     cfg = RepoTestData()
 
@@ -228,7 +219,7 @@ def test_try_git_clone_checkout_unknown_ref_type(
     monkeypatch.setattr(mod, "resolve_ref_type", mock_resolve_ref_type)
 
     r = try_git_clone_checkout(
-        repo_url=repo_url_tuple_to_str(repo_url),
+        repo_url=repo_url.repo_url(),
         repo_ref=cfg.main_branch,
         target_path=target_path,
         depth_one=depth_one,

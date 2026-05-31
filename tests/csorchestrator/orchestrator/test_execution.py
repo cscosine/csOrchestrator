@@ -7,6 +7,7 @@ from csorchestrator.orchestrator.orchestrator import Orchestrator, PhaseNameWith
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import (
+    RepoUrlParts,
     StepGetRepositoryExtraDepthOne,
     StepGetRepositoryGitHub,
 )
@@ -15,7 +16,7 @@ from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 @pytest.mark.slow
 @pytest.mark.git
-def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: tuple[str, str, str]) -> None:
+def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: RepoUrlParts) -> None:
     cfg = RepoTestData()
 
     orchestrator = Orchestrator("myName")
@@ -24,9 +25,7 @@ def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: tup
         name=cfg.repo_name,
         description=cfg.repo_name + " description",
         target_directory=cfg.destination_folder,
-        repo_base_url=repo_url[0],
-        repo_org=repo_url[1],
-        repo_name=repo_url[2],
+        repo_url_parts=repo_url,
         repo_ref=cfg.main_branch,
     ).add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
@@ -62,7 +61,7 @@ def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path) ->
     assert er.report_pre_execution.has_errors()
 
 
-def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_url: tuple[str, str, str]) -> None:
+def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_url: RepoUrlParts) -> None:
     cfg = RepoTestData()
 
     orchestrator = Orchestrator("myName")
@@ -71,9 +70,7 @@ def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_
         name=cfg.repo_name,
         description=cfg.repo_name + " description",
         target_directory=cfg.destination_folder,
-        repo_base_url=repo_url[0],
-        repo_org=repo_url[1],
-        repo_name=repo_url[2],
+        repo_url_parts=repo_url,
         repo_ref=cfg.main_branch,
     ).add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
