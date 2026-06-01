@@ -46,6 +46,7 @@ EXPECTED_LINES = EXPECTED_LINES_HEADER + [
     "            compiler: gcc",
     "            compiler_version: default",
     "            generator: ninja",
+    "            generator_type: single",
     "            runner: ubuntu-22.04",
     "",
 ]
@@ -73,7 +74,7 @@ def test_workflow_with_triggers_and_one_job():
         .on_job(
             job=JobDescription(
                 name="the_job",
-                runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.RUNS_ON_RUNNER_NAME,
+                runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED,
                 strategy=JobStrategy(fail_fast=False).on_matrix(
                     MatrixOsArchCompilerGeneratorRunnerEntryInclude(
                         os=OS.LINUX.value,
@@ -83,6 +84,7 @@ def test_workflow_with_triggers_and_one_job():
                         compiler="gcc",
                         compiler_version="default",
                         build_generator="ninja",
+                        build_generator_type="single",
                         runner="ubuntu-22.04",
                     )
                 ),
@@ -116,6 +118,7 @@ def test_workflow_with_creation_helper():
                     compiler="gcc",
                     compiler_version="default",
                     build_generator="ninja",
+                    build_generator_type="single",
                     runner="ubuntu-22.04",
                 )
             ],

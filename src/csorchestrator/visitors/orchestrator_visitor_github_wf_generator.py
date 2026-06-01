@@ -6,7 +6,7 @@ from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVi
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
-from csorchestrator.step.step_cmake_command import StepCMakeWorkflow
+from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, step_cmake_workflow_to_githubwf
 from csorchestrator.step.step_echo_message import StepEchoMessage
 from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub, step_get_repository_to_githubwf
 
@@ -40,8 +40,7 @@ class OrchestratorVisitorGithubWorkflowPreparation(OrchestratorVisitorBase):
 
     @visit_step.register
     def _(self, step: StepCMakeWorkflow, reporter_sink: ReporterSinkBase) -> Report:
-        # return step_cmake_workflow_to_githubwf(step, self.wf_job, reporter_sink)
-        return Report()  # TODO
+        return step_cmake_workflow_to_githubwf(step, self.wf_job, reporter_sink)
 
     @visit_step.register
     def _(self, step: StepEchoMessage, reporter_sink: ReporterSinkBase) -> Report:

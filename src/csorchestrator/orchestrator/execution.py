@@ -218,6 +218,7 @@ def orchestrator_matrix_to_github_wf_matrix(
                 compiler=entry.context_compiler_generator.compiler_family.value.lower(),
                 compiler_version=entry.context_compiler_generator.compiler_version.lower(),
                 build_generator=entry.context_compiler_generator.build_generator.generator.value.lower(),
+                build_generator_type=entry.context_compiler_generator.build_generator.generator_type.value.lower(),
                 runner=runner,
             )
         )

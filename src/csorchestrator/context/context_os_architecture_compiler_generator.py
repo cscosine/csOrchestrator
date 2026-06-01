@@ -59,6 +59,27 @@ class ExecutionMatrixOsArchCompilerGenerator:
         return ret
 
 
+def create_context_os_architecture_compiler_generator_string_from_components(
+    os: str,
+    os_version: str,
+    architecture: str,
+    architecture_variant: str,
+    compiler: str,
+    compiler_version: str,
+    build_generator: str,
+) -> str:
+    parts: list[str] = []
+    parts.append(cs_orchestrator_schema_version.lower())
+    parts.append(os.lower())
+    parts.append(os_version.lower())
+    parts.append(architecture.lower())
+    parts.append(architecture_variant.lower())
+    parts.append(compiler.lower())
+    parts.append(compiler_version.lower())
+    parts.append(build_generator.lower())
+    return "-".join(parts)
+
+
 def create_context_os_architecture_compiler_generator_string(
     context_os_architecture_generator: ContextOsArchitectureCompilerGenerator,
 ) -> str:
@@ -72,63 +93,15 @@ def create_context_os_architecture_compiler_generator_string(
         csv1-macos-14-arm64-generic-appleclang-ninjamulticonfig
     """
 
-    parts: list[str] = []
-
     context_os_architecture = context_os_architecture_generator.context_os_architecture
     context_compiler_generator = context_os_architecture_generator.context_compiler_generator
 
-    # =====================================================
-    # SCHEMA
-    # =====================================================
-
-    parts.append(cs_orchestrator_schema_version.lower())
-
-    # =====================================================
-    # OS
-    # =====================================================
-
-    os_name = context_os_architecture.os.value.lower()
-
-    # windows-11
-    # macos-14
-    # linux-ubuntu22.04
-    os_version = context_os_architecture.os_version.lower()
-    parts.append(f"{os_name}-{os_version}")
-
-    # =====================================================
-    # ARCHITECTURE
-    # =====================================================
-
-    parts.append(context_os_architecture.architecture.value.lower())
-
-    # =====================================================
-    # ARCH VARIANT
-    # =====================================================
-
-    parts.append(context_os_architecture.architecture_variant.lower())
-
-    # =====================================================
-    # COMPILER
-    # =====================================================
-
-    compiler_name = context_compiler_generator.compiler_family.value.lower()
-
-    parts.append(f"{compiler_name}")
-
-    compiler_version = context_compiler_generator.compiler_version.lower()
-
-    parts.append(f"{compiler_version}")
-
-    # =====================================================
-    # GENERATOR
-    # =====================================================
-
-    generator = context_compiler_generator.build_generator.generator.value.lower()
-
-    parts.append(f"{generator}")
-
-    # =====================================================
-    # FINAL
-    # =====================================================
-
-    return "-".join(parts)
+    return create_context_os_architecture_compiler_generator_string_from_components(
+        context_os_architecture.os.value.lower(),
+        context_os_architecture.os_version.lower(),
+        context_os_architecture.architecture.value.lower(),
+        context_os_architecture.architecture_variant.lower(),
+        context_compiler_generator.compiler_family.value.lower(),
+        context_compiler_generator.compiler_version.lower(),
+        context_compiler_generator.build_generator.generator.value.lower(),
+    )

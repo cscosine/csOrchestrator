@@ -4,6 +4,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Callable, TextIO
 
+from csorchestrator.ci.github.github_workflow_config import (
+    JobDescription,
+    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    StepRunCommand,
+)
+from csorchestrator.context.context_compiler_generator import GeneratorType
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
     ContextLocalExecutionActiveMatrixConfig,
@@ -16,6 +22,9 @@ from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
     ContextOsArchitectureCompilerGeneratorConfig,
     get_all_supported_workflow_descriptions,
+    get_supported_build_configs_for_generator_type,
+    is_config_selected_for_generator,
+    workflow_name_from_components,
     workflow_name_from_description,
 )
 
@@ -160,6 +169,52 @@ def execute_step_cmake_workflow(
 
         # success => empty report
     return report
+
+
+def step_cmake_workflow_to_githubwf(
+    step: StepCMakeWorkflow, wf_job: JobDescription, reporter_sink: ReporterSinkBase
+) -> Report:
+
+    for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:
+        generator_supported_configs = get_supported_build_configs_for_generator_type(generator_type)
+        selected_configs = []
+        for supported_config in generator_supported_configs:
+            if is_config_selected_for_generator(
+                generator_type, current_config=supported_config, requested_config=step.config
+            ):
+                selected_configs += [supported_config]
+
+        if len(selected_configs) == 0:
+            return Report().append_error(
+                f"Requested config {step.config.value} is not supported for generator type {generator_type.value}"
+            )
+
+        run_str_list = ["|", "set -e"]
+        for config in selected_configs:
+            wf_name = workflow_name_from_components(
+                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME_EMBRACED,
+                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION_EMBRACED,
+                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_EMBRACED,
+                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
+                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_EMBRACED,
+                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_VERSION_EMBRACED,
+                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_EMBRACED,
+                config.value,
+            )
+            run_str_list += ["cmake --workflow " + wf_name]
+
+        generator_type_matrix = MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_TYPE
+
+        wf_job.steps.append(
+            StepRunCommand(
+                name=f"cmake workflow on {step.name} - ({generator_type.value})",
+                if_str=f"if: {generator_type_matrix} == '{generator_type.value}'",
+                run=run_str_list,
+                working_directory=step.source_dir,
+            )
+        )
+
+    return Report()
 
 
 def validate_step_cmake_workflow(step: StepCMakeWorkflow) -> Report:

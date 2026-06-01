@@ -172,10 +172,22 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
     compiler: str
     compiler_version: str
     build_generator: str
+    build_generator_type: str
     runner: str
-
-    RUNS_ON_RUNNER_NAME: str = "${{ matrix.runner }}"
     # deps: TODO add deps when we will need to install python packages
+
+    # embraced
+    MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED: str = "${{ matrix.runner }}"
+    MATRIX_OS_NAME_EMBRACED: str = "${{ matrix.os }}"
+    MATRIX_OS_VERSION_EMBRACED: str = "${{ matrix.os_version }}"
+    MATRIX_ARCHITECTURE_EMBRACED: str = "${{ matrix.architecture }}"
+    MATRIX_ARCHITECTURE_VARIANT_EMBRACED: str = "${{ matrix.architecture_variant }}"
+    MATRIX_COMPILER_EMBRACED: str = "${{ matrix.compiler }}"
+    MATRIX_COMPILER_VERSION_EMBRACED: str = "${{ matrix.compiler_version }}"
+    MATRIX_GENERATOR_EMBRACED: str = "${{ matrix.generator }}"
+
+    # not embraced
+    MATRIX_GENERATOR_TYPE: str = "matrix.generator_type"
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         return [
@@ -186,17 +198,15 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
             f"{_indent(indent)}  compiler: {self.compiler}",
             f"{_indent(indent)}  compiler_version: {self.compiler_version}",
             f"{_indent(indent)}  generator: {self.build_generator}",
+            f"{_indent(indent)}  generator_type: {self.build_generator_type}",
             f"{_indent(indent)}  runner: {self.runner}",
         ]
-
-
-MatrixEntryUnion: TypeAlias = MatrixOsArchCompilerGeneratorRunnerEntryInclude
 
 
 @dataclass
 class JobStrategy:
     fail_fast: bool
-    _matrix_includes: list[MatrixEntryUnion] = field(default_factory=list)
+    _matrix_includes: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude] = field(default_factory=list)
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         fail_fast_str = str(self.fail_fast).lower()
@@ -269,7 +279,27 @@ class StepCheckoutRepository(Step):
         return lines
 
 
-StepUnionType: TypeAlias = StepCheckoutRepository  # TODO continue | StepCMakeWorkflow | StepEchoMessage
+@dataclass(frozen=True, slots=True)
+class StepRunCommand(Step):
+    name: str
+    if_str: str | None
+    run: list[str]
+    working_directory: str
+
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        lines = [f"{_indent(indent)}- name: {self.name}"]
+        if self.if_str:
+            lines += [f"{_indent(indent)}  {self.if_str}"]
+        if len(self.run) > 0:
+            lines += [f"{_indent(indent)}  run: {self.run[0]}"]
+            for i in range(1, len(self.run)):
+                lines += [f"{_indent(indent)}    {self.run[i]}"]
+        lines += [f"{_indent(indent)}  working-directory: {self.working_directory}"]
+
+        return lines
+
+
+StepUnionType: TypeAlias = StepCheckoutRepository | StepRunCommand
 
 
 @dataclass
@@ -298,7 +328,7 @@ def create_job_from_matrix_list(
 
     jd = JobDescription(
         name=name,
-        runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.RUNS_ON_RUNNER_NAME,
+        runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED,
         strategy=JobStrategy(fail_fast=False),
     )
 

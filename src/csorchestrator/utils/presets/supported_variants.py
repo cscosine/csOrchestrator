@@ -15,6 +15,7 @@ from csorchestrator.context.context_os_architecture import (
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
+    create_context_os_architecture_compiler_generator_string_from_components,
 )
 
 # TODO this is a glue layer between csorchestrator and cscmake
@@ -257,6 +258,24 @@ def workflow_name_from_description(
     supported_build_config_string = create_context_os_architecture_compiler_generator_string(description)
 
     config_string = description.config.value
+    workflow_name = f"workflow-{supported_build_config_string}-{config_string}"
+    return workflow_name
+
+
+def workflow_name_from_components(
+    os: str,
+    os_version: str,
+    architecture: str,
+    architecture_variant: str,
+    compiler: str,
+    compiler_version: str,
+    build_generator: str,
+    config_string: str,
+) -> str:
+    supported_build_config_string = create_context_os_architecture_compiler_generator_string_from_components(
+        os, os_version, architecture, architecture_variant, compiler, compiler_version, build_generator
+    )
+
     workflow_name = f"workflow-{supported_build_config_string}-{config_string}"
     return workflow_name
 
