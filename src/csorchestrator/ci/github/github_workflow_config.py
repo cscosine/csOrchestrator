@@ -283,13 +283,19 @@ class StepCheckoutRepository(Step):
 class StepRunCommand(Step):
     name: str
     if_str: str | None
+    shell_bash: bool
     run: list[str]
     working_directory: str
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         lines = [f"{_indent(indent)}- name: {self.name}"]
+
         if self.if_str:
             lines += [f"{_indent(indent)}  {self.if_str}"]
+
+        if self.shell_bash:
+            lines += [f"{_indent(indent)}  shell: bash"]
+
         if len(self.run) > 0:
             lines += [f"{_indent(indent)}  run: {self.run[0]}"]
             for i in range(1, len(self.run)):
@@ -299,7 +305,9 @@ class StepRunCommand(Step):
         return lines
 
 
-StepUnionType: TypeAlias = StepCheckoutRepository | StepRunCommand
+StepUnionType: TypeAlias = (
+    StepCheckoutRepository | StepRunCommand
+)  # | StepConfigureMSVC | StepConfigureCMake # TODO continue
 
 
 @dataclass
