@@ -44,8 +44,8 @@ def execute_step_create_archives(
     install_subdir = create_context_os_architecture_compiler_generator_string(
         context_os_architecture_compiler_generator
     )
-    input_full_dir = context.base_folder_path / step.base_install_dir / install_subdir
-    input_full_path = input_full_dir / Path(step.input_id + ".ver")
+    input_full_dir = Path(context.base_folder_path / step.base_install_dir / install_subdir).resolve()
+    input_full_path = Path(input_full_dir / Path(step.input_id + ".ver")).resolve()
 
     packages = None
     with open(input_full_path) as f:
@@ -61,13 +61,15 @@ def execute_step_create_archives(
     for item in packages:
         name = item["name"]
         version = item["version"]
-        input_path = input_full_dir / Path(name)
-        output_path = input_full_dir / Path(name + "-" + version + ".tar.gz")
+        input_path = Path(input_full_dir / Path(name)).resolve()
+        output_path = Path(input_full_dir / Path(name + "-" + version + ".tar.gz")).resolve()
 
         report.append_info(f"tar.gz {str(input_path)} to {str(output_path)} ")
         with tarfile.open(output_path, "w:gz") as tar:
-            tar.add(input_path, arcname=name)
-
+            for path in input_path.rglob("*"):
+                resolved_path = path.resolve()
+                arcname = path.resolve().relative_to(input_full_dir)
+                tar.add(resolved_path, arcname=arcname)
     return report
 
 
@@ -96,11 +98,15 @@ def step_create_archives_to_githubwf(
         "for entry in versions:",
         "    name = entry['name']",
         "    version = entry['version']",
-        f"    input_path = Path('{install_subdir}') / Path(name)",
-        f"    output_path = Path('{install_subdir}') / Path(name + '-' + version + '.tar.gz')",
+        f"    install_subdir = Path('{install_subdir}').resolve()",
+        "    input_path = Path(install_subdir / Path(name)).resolve()",
+        "    output_path = Path(install_subdir / Path(name + '-' + version + '.tar.gz')).resolve()",
         "    ",
         "    with tarfile.open(output_path, 'w:gz') as tar:",
-        "      tar.add(input_path, arcname=name)",
+        "        for path in input_path.rglob('*'):",
+        "            resolved_path = path.resolve()",
+        "            arcname = path.resolve().relative_to(install_subdir)",
+        "            tar.add(resolved_path, arcname=arcname)",
     ]
 
     # produce output
