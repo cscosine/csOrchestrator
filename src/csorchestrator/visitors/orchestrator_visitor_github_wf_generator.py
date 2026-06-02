@@ -7,8 +7,14 @@ from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, step_cmake_workflow_to_githubwf
+from csorchestrator.step.step_create_archives import StepCreateArchives, step_create_archives_to_githubwf
 from csorchestrator.step.step_echo_message import StepEchoMessage
 from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub, step_get_repository_to_githubwf
+from csorchestrator.step.step_get_versions_from_cmake_config_package_version import (
+    StepGetVersionsFromCMakeConfigPackageVersion,
+    step_get_versions_from_cmake_config_package_version_to_githubwf,
+)
+from csorchestrator.step.step_upload_artifacts import StepUploadArtifacts, step_upload_artifacts_to_githubwf
 
 
 @dataclass
@@ -46,3 +52,15 @@ class OrchestratorVisitorGithubWorkflowPreparation(OrchestratorVisitorBase):
     def _(self, step: StepEchoMessage, reporter_sink: ReporterSinkBase) -> Report:
         # return step_echo_message_to_githubwf(step, self.wf_job, reporter_sink)
         return Report()  # TODO
+
+    @visit_step.register
+    def _(self, step: StepGetVersionsFromCMakeConfigPackageVersion, reporter_sink: ReporterSinkBase) -> Report:
+        return step_get_versions_from_cmake_config_package_version_to_githubwf(step, self.wf_job, reporter_sink)
+
+    @visit_step.register
+    def _(self, step: StepCreateArchives, reporter_sink: ReporterSinkBase) -> Report:
+        return step_create_archives_to_githubwf(step, self.wf_job, reporter_sink)
+
+    @visit_step.register
+    def _(self, step: StepUploadArtifacts, reporter_sink: ReporterSinkBase) -> Report:
+        return step_upload_artifacts_to_githubwf(step, self.wf_job, reporter_sink)

@@ -208,8 +208,8 @@ def step_cmake_workflow_to_githubwf(
         wf_job.steps.append(
             StepRunCommand(
                 name=f"cmake workflow on {step.name} - ({generator_type.value})",
-                if_str=f"if: {generator_type_matrix} == '{generator_type.value}'",
-                shell_bash=True,
+                if_str=f"{generator_type_matrix} == '{generator_type.value}'",
+                shell_type="bash",
                 run=run_str_list,
                 working_directory=step.source_dir,
             )

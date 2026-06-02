@@ -7,8 +7,14 @@ from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, execute_step_cmake_workflow
+from csorchestrator.step.step_create_archives import StepCreateArchives, execute_step_create_archives
 from csorchestrator.step.step_echo_message import StepEchoMessage, execute_step_echo_message
 from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub, execute_step_get_repository
+from csorchestrator.step.step_get_versions_from_cmake_config_package_version import (
+    StepGetVersionsFromCMakeConfigPackageVersion,
+    execute_step_get_versions_from_cmake_config_package_version,
+)
+from csorchestrator.step.step_upload_artifacts import StepUploadArtifacts, execute_step_upload_artifacts
 
 
 @dataclass
@@ -45,3 +51,15 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
     @visit_step.register
     def _(self, step: StepEchoMessage, reporter_sink: ReporterSinkBase) -> Report:
         return execute_step_echo_message(step, self.context, reporter_sink)
+
+    @visit_step.register
+    def _(self, step: StepGetVersionsFromCMakeConfigPackageVersion, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_get_versions_from_cmake_config_package_version(step, self.context, reporter_sink)
+
+    @visit_step.register
+    def _(self, step: StepCreateArchives, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_create_archives(step, self.context, reporter_sink)
+
+    @visit_step.register
+    def _(self, step: StepUploadArtifacts, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_upload_artifacts(step, self.context, reporter_sink)

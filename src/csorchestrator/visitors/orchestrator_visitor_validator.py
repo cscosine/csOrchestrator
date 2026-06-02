@@ -6,11 +6,17 @@ from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, validate_step_cmake_workflow
+from csorchestrator.step.step_create_archives import StepCreateArchives, validate_step_create_archives
 from csorchestrator.step.step_echo_message import StepEchoMessage
 from csorchestrator.step.step_get_repository import (
     StepGetRepositoryGitHub,
     StepGetRepositoryValidator,
 )
+from csorchestrator.step.step_get_versions_from_cmake_config_package_version import (
+    StepGetVersionsFromCMakeConfigPackageVersion,
+    validate_step_get_versions_from_cmake_config_package_version,
+)
+from csorchestrator.step.step_upload_artifacts import StepUploadArtifacts, validate_step_upload_artifacts
 
 
 @dataclass
@@ -48,3 +54,15 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
     def _(self, step: StepEchoMessage, reporter_sink: ReporterSinkBase) -> Report:
         # for custom message step, there is no validation
         return Report()
+
+    @visit_step.register
+    def _(self, step: StepGetVersionsFromCMakeConfigPackageVersion, reporter_sink: ReporterSinkBase) -> Report:
+        return validate_step_get_versions_from_cmake_config_package_version(step)
+
+    @visit_step.register
+    def _(self, step: StepCreateArchives, reporter_sink: ReporterSinkBase) -> Report:
+        return validate_step_create_archives(step)
+
+    @visit_step.register
+    def _(self, step: StepUploadArtifacts, reporter_sink: ReporterSinkBase) -> Report:
+        return validate_step_upload_artifacts(step)

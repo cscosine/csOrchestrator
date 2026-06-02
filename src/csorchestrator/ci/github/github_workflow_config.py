@@ -280,34 +280,61 @@ class StepCheckoutRepository(Step):
 
 
 @dataclass(frozen=True, slots=True)
+class StepGithubUploadArtifacts(Step):
+    name: str
+    with_name: str
+    with_path: str
+    uses: str = "actions/upload-artifact@v7"
+
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        lines = [f"{_indent(indent)}- name: {self.name}"]
+        lines += [f"{_indent(indent)}  uses: {self.uses}"]
+        lines += [f"{_indent(indent)}  with:"]
+        lines += [f"{_indent(indent)}    name: {self.with_name}"]
+        lines += [f"{_indent(indent)}    path: {self.with_path}"]
+
+        return lines
+
+
+@dataclass(frozen=True, slots=True)
 class StepRunCommand(Step):
     name: str
-    if_str: str | None
-    shell_bash: bool
     run: list[str]
-    working_directory: str
+    id: str | None = None
+    if_str: str | None = None
+    shell_type: str | None = None
+    env: list[str] | None = None
+    working_directory: str | None = None
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         lines = [f"{_indent(indent)}- name: {self.name}"]
 
-        if self.if_str:
-            lines += [f"{_indent(indent)}  {self.if_str}"]
+        if self.id is not None:
+            lines += [f"{_indent(indent)}  id: {self.id}"]
 
-        if self.shell_bash:
-            lines += [f"{_indent(indent)}  shell: bash"]
+        if self.if_str is not None:
+            lines += [f"{_indent(indent)}  if: {self.if_str}"]
+
+        if self.env is not None and len(self.env) > 0:
+            lines += [f"{_indent(indent)}  env:"]
+            for line in self.env:
+                lines += [f"{_indent(indent)}    {line}"]
+
+        if self.shell_type is not None:
+            lines += [f"{_indent(indent)}  shell: {self.shell_type}"]
 
         if len(self.run) > 0:
             lines += [f"{_indent(indent)}  run: {self.run[0]}"]
             for i in range(1, len(self.run)):
                 lines += [f"{_indent(indent)}    {self.run[i]}"]
-        lines += [f"{_indent(indent)}  working-directory: {self.working_directory}"]
+
+        if self.working_directory is not None:
+            lines += [f"{_indent(indent)}  working-directory: {self.working_directory}"]
 
         return lines
 
 
-StepUnionType: TypeAlias = (
-    StepCheckoutRepository | StepRunCommand
-)  # | StepConfigureMSVC | StepConfigureCMake # TODO continue
+StepUnionType: TypeAlias = StepCheckoutRepository | StepRunCommand | StepGithubUploadArtifacts
 
 
 @dataclass
