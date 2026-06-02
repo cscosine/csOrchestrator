@@ -68,15 +68,6 @@ jobs:
             | tee coverage-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.deps }}.txt
         shell: bash
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v6
-        with:
-          files: coverage-${{ matrix.os }}-${{ matrix.python-version }}-${{ matrix.deps }}.xml
-          flags: ${{ matrix.os }}-py${{ matrix.python-version }}-${{ matrix.deps }}
-          name: ${{ matrix.os }}-py${{ matrix.python-version }}-${{ matrix.deps }}
-          token: ${{ secrets.CODECOV_TOKEN }}
-          fail_ci_if_error: true
-
       - name: Upload coverage HTML as artifact
         uses: actions/upload-artifact@v6
         with:
