@@ -62,7 +62,9 @@ def execute_step_create_archives(
         name = item["name"]
         version = item["version"]
         input_path = Path(input_full_dir / Path(name)).resolve()
-        output_path = Path(input_full_dir / Path(name + "-" + version + ".tar.gz")).resolve()
+        output_path = Path(
+            input_full_dir / Path(str(install_subdir) + "-" + name + "-" + version + ".tar.gz")
+        ).resolve()
 
         report.append_info(f"tar.gz {str(input_path)} to {str(output_path)} ")
         with tarfile.open(output_path, "w:gz") as tar:
@@ -77,7 +79,7 @@ def step_create_archives_to_githubwf(
     step: StepCreateArchives, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
 
-    install_subdir = step.base_install_dir / create_context_os_architecture_compiler_generator_string_from_components(
+    install_dir_name = create_context_os_architecture_compiler_generator_string_from_components(
         MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME_EMBRACED,
         MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION_EMBRACED,
         MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_EMBRACED,
@@ -86,6 +88,7 @@ def step_create_archives_to_githubwf(
         MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_VERSION_EMBRACED,
         MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_EMBRACED,
     )
+    install_subdir = step.base_install_dir / install_dir_name
 
     lines = [
         "import json",
@@ -100,7 +103,7 @@ def step_create_archives_to_githubwf(
         "    version = entry['version']",
         f"    install_subdir = Path('{install_subdir}').resolve()",
         "    input_path = Path(install_subdir / Path(name)).resolve()",
-        "    output_path = Path(install_subdir / Path(name + '-' + version + '.tar.gz')).resolve()",
+        f"    output_path = Path(install_subdir / Path('{install_dir_name}' + '-' + name + '-' + version + '.tar.gz')).resolve()",  # noqa: E501
         "    ",
         "    with tarfile.open(output_path, 'w:gz') as tar:",
         "        for path in input_path.rglob('*'):",
