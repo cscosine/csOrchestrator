@@ -360,6 +360,41 @@ class JobOrchestratorMatrixExecution:
         return line_list
 
 
+@dataclass
+class JobReleaseCreationFromArifacts:
+    name: str
+    needs: str
+    runs_on: str
+    if_str: str
+
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        line_list = [f"{_indent(indent)}{self.name}:"]
+        line_list += [f"{_indent(indent + 2)}needs: {self.needs}"]
+        line_list += [f"{_indent(indent + 2)}runs-on: {self.runs_on}"]
+        line_list += [""]
+        line_list += [f"{_indent(indent + 2)}if: {self.if_str}"]
+        line_list += [""]
+        line_list += [f"{_indent(indent + 2)}permissions:"]
+        line_list += [f"{_indent(indent + 4)}contents: write"]
+        line_list += [""]
+        line_list += [f"{_indent(indent + 2)}steps:"]
+        line_list += [f"{_indent(indent + 4)}- name: Download all artifacts"]
+        line_list += [f"{_indent(indent + 6)}uses: actions/download-artifact@v8"]
+        line_list += [f"{_indent(indent + 6)}with:"]
+        line_list += [f"{_indent(indent + 8)}path: artifacts"]
+        line_list += [""]
+        line_list += [f"{_indent(indent + 4)}- name: Show downloaded files"]
+        line_list += [f"{_indent(indent + 6)}run: find artifacts -type f"]
+        line_list += [""]
+        line_list += [f"{_indent(indent + 4)}- name: Create GitHub Release"]
+        line_list += [f"{_indent(indent + 6)}uses: softprops/action-gh-release@v3"]
+        line_list += [f"{_indent(indent + 6)}with:"]
+        line_list += [f"{_indent(indent + 8)}files: |"]
+        line_list += [f"{_indent(indent + 10)}artifacts/**/*    "]
+        line_list += [""]
+        return line_list
+
+
 def create_job_from_matrix_list(
     name: str,
     matrix_list: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude],
@@ -383,7 +418,7 @@ def create_job_from_matrix_list(
 class GitHubWorkflow:
     name: str
     _on: dict[str, TriggerUnion] = field(default_factory=dict)
-    _jobs: list[JobOrchestratorMatrixExecution] = field(default_factory=list)
+    _jobs: list[JobOrchestratorMatrixExecution | JobReleaseCreationFromArifacts] = field(default_factory=list)
 
     # ---------------- PUSH ----------------
 
