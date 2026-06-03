@@ -42,10 +42,12 @@ def step_upload_artifacts_to_githubwf(
         MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_EMBRACED,
     )
 
+    artifact_name = f"{wf_job.orchestrator_desc.name}-{wf_job.orchestrator_desc.version}-{install_subdir}"
+
     wf_job.steps.append(
         StepGithubUploadArtifacts(
             name="Upload Artifacts",
-            with_name=install_subdir,
+            with_name=artifact_name,
             with_path=str(step.base_install_dir / install_subdir / "*.tar.gz"),
         )
     )

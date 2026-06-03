@@ -17,10 +17,11 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
     MatrixSkipExecutionOnNonMatchingContext,
     create_context_os_architecture_compiler_generator_string,
 )
+from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator import Orchestrator, OrchestratorExecutorMinimalDescription
+from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     executor_visit_reports_has_any_error,
@@ -42,9 +43,7 @@ class ExecutionResult:
     report_pre_execution: Report = field(default_factory=Report)
     # description of the execution, which is extracted from the orchestrator
     # before the execution phase
-    execution_description: OrchestratorExecutorMinimalDescription = field(
-        default_factory=OrchestratorExecutorMinimalDescription
-    )
+    execution_description: OrchestratorExecutorMinimalDescription | None = None
 
     # report of each execution phase (can be multiple if matrix is active), which is executed after the validation phase
     # if a matrix cycle is skipped (non executable locally, the list contains a None
@@ -72,7 +71,9 @@ class ExecutionResult:
 OptionalContextLocalExecutionWithReport: TypeAlias = OptionalResultWithReport[ContextLocalExecution]
 
 
-def create_context_local_execution(base_folder_path: str) -> OptionalContextLocalExecutionWithReport:
+def create_context_local_execution(
+    base_folder_path: str, orchestrator_desc: OrchestratorExecutorMinimalDescription
+) -> OptionalContextLocalExecutionWithReport:
     pr = ensure_directory_exists_or_create_and_is_usable(base_folder_path)
 
     report = Report()
@@ -85,7 +86,9 @@ def create_context_local_execution(base_folder_path: str) -> OptionalContextLoca
 
     if pr.result is not None and osaExpected.value is not None:
         return OptionalContextLocalExecutionWithReport.createResultAndReport(
-            ContextLocalExecution(base_folder_path=pr.result, os_architecture=osaExpected.value),
+            ContextLocalExecution(
+                base_folder_path=pr.result, os_architecture=osaExpected.value, orchestrator_desc=orchestrator_desc
+            ),
             report,
         )
     else:
@@ -113,7 +116,9 @@ def validate_and_execute_orchestrator(
 
     # validated orchestrator, create context
 
-    contextWithReport = create_context_local_execution(base_folder_path=target_folder_path)
+    contextWithReport = create_context_local_execution(
+        base_folder_path=target_folder_path, orchestrator_desc=er.execution_description
+    )
     er.report_pre_execution.append_report(contextWithReport.report)
 
     if contextWithReport.result is None:
@@ -247,6 +252,8 @@ def validate_and_generate_github_workflow(
 ) -> ExecutionResult:
 
     res = ExecutionResult()
+    res.execution_description = orchestrator.extract_minimal_description()
+    reporter.report_execution_description(res.execution_description)
 
     orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
     res.report_pre_execution.append_report(orchestratorValidatedOpt.report)
@@ -290,6 +297,7 @@ def validate_and_generate_github_workflow(
     wf_job = create_job_from_matrix_list(
         name="csOrchestratorJob",
         matrix_list=wf_matrix,
+        orchestrator_desc=res.execution_description,
     )
     wf.on_job(job=wf_job)
 

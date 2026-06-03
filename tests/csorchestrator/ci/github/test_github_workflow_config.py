@@ -10,6 +10,7 @@ from csorchestrator.ci.github.github_workflow_config import (
     create_job_from_matrix_list,
 )
 from csorchestrator.context.context_os_architecture import OS
+from csorchestrator.orchestrator.orchestrator import Orchestrator
 
 EXPECTED_LINES_HEADER = [
     "name: test-wf-name",
@@ -74,6 +75,7 @@ def test_workflow_with_triggers_and_one_job():
         .on_job(
             job=JobDescription(
                 name="the_job",
+                orchestrator_desc=Orchestrator("test").extract_minimal_description(),
                 runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED,
                 strategy=JobStrategy(fail_fast=False).on_matrix(
                     MatrixOsArchCompilerGeneratorRunnerEntryInclude(
@@ -122,6 +124,7 @@ def test_workflow_with_creation_helper():
                     runner="ubuntu-22.04",
                 )
             ],
+            orchestrator_desc=Orchestrator("test").extract_minimal_description(),
         )
     )
 

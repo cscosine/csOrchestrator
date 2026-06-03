@@ -2,8 +2,9 @@ from pathlib import Path
 
 import pytest
 
+from csorchestrator.context.orchestrator_minimal_description import PhaseNameWithStepNames
 from csorchestrator.orchestrator.execution import ExecutionResult, validate_and_execute_orchestrator
-from csorchestrator.orchestrator.orchestrator import Orchestrator, PhaseNameWithStepNames
+from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import (
@@ -35,6 +36,7 @@ def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: Rep
         orchestrator, target_folder_path=str(tmp_path), reporter=OrchestratorExecutorReporterDummy()
     )
     assert not er.report_pre_execution.has_errors()
+    assert er.execution_description is not None
     assert er.execution_description.phases_and_steps == [
         PhaseNameWithStepNames(phase_name="repos checkout", step_names=[cfg.repo_name])
     ]

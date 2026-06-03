@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
+from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator import OrchestratorExecutorMinimalDescription
 from csorchestrator.orchestrator.orchestrator_executor import flatten_orchestrator_executor_visit_reports
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports

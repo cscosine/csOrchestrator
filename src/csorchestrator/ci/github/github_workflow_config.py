@@ -2,6 +2,8 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import List, Optional, Self, TypeAlias
 
+from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
+
 # =========================================================
 # Helpers
 # =========================================================
@@ -341,6 +343,7 @@ StepUnionType: TypeAlias = StepCheckoutRepository | StepRunCommand | StepGithubU
 class JobDescription:
     name: str
     runs_on: str
+    orchestrator_desc: OrchestratorExecutorMinimalDescription
     strategy: JobStrategy
     steps: list[StepUnionType] = field(default_factory=list)
 
@@ -358,11 +361,14 @@ class JobDescription:
 
 
 def create_job_from_matrix_list(
-    name: str, matrix_list: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude]
+    name: str,
+    matrix_list: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude],
+    orchestrator_desc: OrchestratorExecutorMinimalDescription,
 ) -> JobDescription:
 
     jd = JobDescription(
         name=name,
+        orchestrator_desc=orchestrator_desc,
         runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED,
         strategy=JobStrategy(fail_fast=False),
     )

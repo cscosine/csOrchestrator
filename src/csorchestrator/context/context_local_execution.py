@@ -5,6 +5,7 @@ from typing import TypeVar
 
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
 from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
+from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 
 
 # base class for extra information that can be provided
@@ -25,6 +26,8 @@ class ContextLocalExecutionActiveMatrixConfig(ContextLocalExecutionExtra):
 class ContextLocalExecution:
     base_folder_path: Path
     os_architecture: ContextOsArchitecture
+    orchestrator_desc: OrchestratorExecutorMinimalDescription
+
     _extras: dict[type, ContextLocalExecutionExtra] = field(
         default_factory=dict,
         kw_only=True,

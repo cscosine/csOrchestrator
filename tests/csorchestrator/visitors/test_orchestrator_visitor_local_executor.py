@@ -44,7 +44,9 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
     orchestrator = orchestratorValidatedOpt.result
     assert orchestrator is not None
 
-    context = create_context_local_execution(base_folder_path=str(tmp_path))
+    context = create_context_local_execution(
+        base_folder_path=str(tmp_path), orchestrator_desc=orchestrator.extract_minimal_description()
+    )
     assert context.result is not None
     ovb = OrchestratorVisitorLocalExecutor(context=context.result)
 
@@ -78,7 +80,9 @@ def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path) -
     orchestrator = orchestratorValidatedOpt.result
     assert orchestrator is not None
 
-    context = create_context_local_execution(base_folder_path=str(tmp_path))
+    context = create_context_local_execution(
+        base_folder_path=str(tmp_path), orchestrator_desc=orchestrator.extract_minimal_description()
+    )
     assert context.result is not None
     ovb = OrchestratorVisitorLocalExecutor(context=context.result)
 

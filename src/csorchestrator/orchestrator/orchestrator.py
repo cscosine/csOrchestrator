@@ -3,22 +3,12 @@ from typing import TypeAlias
 
 from csorchestrator.ci.github.github_workflow_config import CreateGitHubWorkflowConfig, GitHubWorkflow, create_github_wf
 from csorchestrator.context.context_os_architecture_compiler_generator import ExecutionMatrixOsArchCompilerGenerator
+from csorchestrator.context.orchestrator_minimal_description import (
+    OrchestratorExecutorMinimalDescription,
+    PhaseNameWithStepNames,
+)
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.orchestrator.phase import Phase
-
-
-@dataclass(frozen=True)
-class PhaseNameWithStepNames:
-    phase_name: str
-    step_names: list[str] = field(default_factory=list)
-
-
-@dataclass
-class OrchestratorExecutorMinimalDescription:
-    phases_and_steps: list[PhaseNameWithStepNames] = field(
-        default_factory=list
-    )  # a list of phases names and list of step names
-    matrix_description: list[str] = field(default_factory=list)  # a list of string describing the execution matrix
 
 
 @dataclass
@@ -32,6 +22,7 @@ class Orchestrator:
     #   - run cmake workflow / individual steps (config / build / test / install)
 
     name: str
+    version: str = "0.0.0"
     phases: list[Phase] = field(default_factory=list)
     _execution_matrix: ExecutionMatrixOsArchCompilerGenerator | None = None
     default_github_wf: GitHubWorkflow | None = None
@@ -57,7 +48,7 @@ class Orchestrator:
         return self._execution_matrix
 
     def extract_minimal_description(self) -> OrchestratorExecutorMinimalDescription:
-        ret = OrchestratorExecutorMinimalDescription()
+        ret = OrchestratorExecutorMinimalDescription(name=self.name, version=self.version)
         for phase in self.phases:
             phase_desc = PhaseNameWithStepNames(phase.name)
             for step in phase.steps:
