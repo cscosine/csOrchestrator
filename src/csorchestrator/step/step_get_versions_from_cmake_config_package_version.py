@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from csorchestrator.ci.github.github_workflow_config import (
-    JobDescription,
+    JobOrchestratorMatrixExecution,
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     StepRunCommand,
 )
@@ -174,7 +174,9 @@ def execute_step_get_versions_from_cmake_config_package_version(
 
 
 def step_get_versions_from_cmake_config_package_version_to_githubwf(
-    step: StepGetVersionsFromCMakeConfigPackageVersion, wf_job: JobDescription, reporter_sink: ReporterSinkBase
+    step: StepGetVersionsFromCMakeConfigPackageVersion,
+    wf_job: JobOrchestratorMatrixExecution,
+    reporter_sink: ReporterSinkBase,
 ) -> Report:
     header = [
         "from pathlib import Path",

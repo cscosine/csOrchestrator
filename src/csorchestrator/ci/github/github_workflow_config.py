@@ -340,7 +340,7 @@ StepUnionType: TypeAlias = StepCheckoutRepository | StepRunCommand | StepGithubU
 
 
 @dataclass
-class JobDescription:
+class JobOrchestratorMatrixExecution:
     name: str
     runs_on: str
     orchestrator_desc: OrchestratorExecutorMinimalDescription
@@ -364,9 +364,9 @@ def create_job_from_matrix_list(
     name: str,
     matrix_list: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude],
     orchestrator_desc: OrchestratorExecutorMinimalDescription,
-) -> JobDescription:
+) -> JobOrchestratorMatrixExecution:
 
-    jd = JobDescription(
+    jd = JobOrchestratorMatrixExecution(
         name=name,
         orchestrator_desc=orchestrator_desc,
         runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED,
@@ -383,7 +383,7 @@ def create_job_from_matrix_list(
 class GitHubWorkflow:
     name: str
     _on: dict[str, TriggerUnion] = field(default_factory=dict)
-    _jobs: list[JobDescription] = field(default_factory=list)
+    _jobs: list[JobOrchestratorMatrixExecution] = field(default_factory=list)
 
     # ---------------- PUSH ----------------
 
@@ -419,7 +419,7 @@ class GitHubWorkflow:
         return self
 
     # ---------------- SCHEDULE ----------------
-    def on_job(self, *, job: JobDescription) -> Self:
+    def on_job(self, *, job: JobOrchestratorMatrixExecution) -> Self:
         self._jobs.append(job)
         return self
 

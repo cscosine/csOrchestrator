@@ -3,7 +3,7 @@ from csorchestrator.ci.github.github_workflow_config import (
     Cron,
     DayOfWeek,
     GitHubWorkflow,
-    JobDescription,
+    JobOrchestratorMatrixExecution,
     JobStrategy,
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     create_github_wf,
@@ -73,7 +73,7 @@ def test_workflow_with_triggers_and_one_job():
         .on_dispatch()
         .on_schedule(Cron.weekly(DayOfWeek.MON, hour=3))
         .on_job(
-            job=JobDescription(
+            job=JobOrchestratorMatrixExecution(
                 name="the_job",
                 orchestrator_desc=Orchestrator("test").extract_minimal_description(),
                 runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED,

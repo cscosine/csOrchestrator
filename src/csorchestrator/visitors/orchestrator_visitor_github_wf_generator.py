@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from csorchestrator.ci.github.github_workflow_config import JobDescription
+from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
@@ -19,7 +19,7 @@ from csorchestrator.step.step_upload_artifacts import StepUploadArtifacts, step_
 
 @dataclass
 class OrchestratorVisitorGithubWorkflowPreparation(OrchestratorVisitorBase):
-    wf_job: JobDescription
+    wf_job: JobOrchestratorMatrixExecution
 
     def init_visit(self) -> None:
         pass

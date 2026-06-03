@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from csorchestrator.ci.github.github_workflow_config import (
-    JobDescription,
+    JobOrchestratorMatrixExecution,
     StepCheckoutRepository,
     StepCheckoutRepositoryWith,
 )
@@ -112,7 +112,7 @@ def execute_step_get_repository(
 
 
 def step_get_repository_to_githubwf(
-    step: StepGetRepositoryGitHub, wf_job: JobDescription, reporter_sink: ReporterSinkBase
+    step: StepGetRepositoryGitHub, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
     wf_job.steps.append(
         StepCheckoutRepository(

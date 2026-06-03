@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Callable, TextIO
 
 from csorchestrator.ci.github.github_workflow_config import (
-    JobDescription,
+    JobOrchestratorMatrixExecution,
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     StepRunCommand,
 )
@@ -172,7 +172,7 @@ def execute_step_cmake_workflow(
 
 
 def step_cmake_workflow_to_githubwf(
-    step: StepCMakeWorkflow, wf_job: JobDescription, reporter_sink: ReporterSinkBase
+    step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
 
     for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:

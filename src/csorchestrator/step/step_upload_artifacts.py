@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from csorchestrator.ci.github.github_workflow_config import (
-    JobDescription,
+    JobOrchestratorMatrixExecution,
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     StepGithubUploadArtifacts,
 )
@@ -29,7 +29,7 @@ def execute_step_upload_artifacts(
 
 
 def step_upload_artifacts_to_githubwf(
-    step: StepUploadArtifacts, wf_job: JobDescription, reporter_sink: ReporterSinkBase
+    step: StepUploadArtifacts, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
 
     install_subdir = create_context_os_architecture_compiler_generator_string_from_components(
