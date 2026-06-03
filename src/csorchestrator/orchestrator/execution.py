@@ -23,6 +23,7 @@ from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator, OrchestratorExecutorMinimalDescription
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
+    executor_visit_reports_has_any_error,
     flatten_orchestrator_executor_visit_reports,
 )
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
@@ -47,6 +48,10 @@ class ExecutionResult:
 
     # report of each execution phase (can be multiple if matrix is active), which is executed after the validation phase
     # if a matrix cycle is skipped (non executable locally, the list contains a None
+    # if the matrix execution terminates before completing all the cycles (e.g. error in one of the cycle),
+    #   the list contains only the executed cycles report, and then it is terminated
+    #   (e.g. if 3 cycles, and error in the second, the list contains [report_cycle_1, report_cycle_2],
+    #   and then it is terminated, without the report of the cycle 3)
     report_executions: list[OrchestratorExecutorVisitReports | None] = field(default_factory=list)
 
     def is_execution_successful(
@@ -155,6 +160,12 @@ def validate_and_execute_orchestrator(
             )
 
             context.remove_extra(ContextLocalExecutionActiveMatrixConfig)
+
+            if executor_visit_reports_has_any_error(report_execution):
+                reporter.report_execution_report(report_execution)
+                er.report_executions.append(report_execution)
+                break
+
             reporter.report_execution_report(report_execution)
 
             er.report_executions.append(report_execution)

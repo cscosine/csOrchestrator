@@ -7,6 +7,14 @@ from csorchestrator.orchestrator.orchestrator_visitor_base import (
 )
 
 
+def executor_visit_reports_has_any_error(oevr: OrchestratorExecutorVisitReports) -> bool:
+    rl: list[Report] = [report for phase_reports in oevr for report in phase_reports]
+    for report in rl:
+        if report.has_errors():
+            return True
+    return False
+
+
 def flatten_orchestrator_executor_visit_reports(oevr: OrchestratorExecutorVisitReports) -> Report:
     rl: list[Report] = [report for phase_reports in oevr for report in phase_reports]
     r = Report()
