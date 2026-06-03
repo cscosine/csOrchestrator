@@ -27,6 +27,7 @@ class MatrixSkipExecutionOnNonMatchingContext(MatrixExecutionExtra):
 
 @dataclass
 class ExecutionMatrixOsArchCompilerGenerator:
+    name: str
     os_architecture_compiler_generator_list: list[ContextOsArchitectureCompilerGenerator] = field(default_factory=list)
     _extras: dict[type, MatrixExecutionExtra] = field(
         default_factory=dict,

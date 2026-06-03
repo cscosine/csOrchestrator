@@ -295,7 +295,7 @@ def validate_and_generate_github_workflow(
         return res
 
     wf_job = create_job_from_matrix_list(
-        name="csOrchestratorJob",
+        name=matrix.name,
         matrix_list=wf_matrix,
         orchestrator_desc=res.execution_description,
     )
