@@ -3,8 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.orchestrator.execution import create_context_local_execution
-from csorchestrator.orchestrator.orchestrator import Orchestrator
+from csorchestrator.context.context_compiler_generator import Compiler, ContextCompilerGenerator, GeneratorWithType
+from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.orchestrator.execution import create_os_and_path
+from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     flatten_orchestrator_executor_visit_reports,
@@ -35,7 +37,7 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
         repo_ref=cfg.main_branch,
     ).add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
     orchestrator.add_phase(Phase(name="repos checkout").add_step(step))
 
     orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
@@ -44,11 +46,19 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
     orchestrator = orchestratorValidatedOpt.result
     assert orchestrator is not None
 
-    context = create_context_local_execution(
-        base_folder_path=str(tmp_path), orchestrator_desc=orchestrator.extract_minimal_description()
+    os_path_opt = create_os_and_path(str(tmp_path))
+    assert os_path_opt.result is not None
+
+    context = ContextLocalExecution(
+        base_folder_path=os_path_opt.result.path,
+        os_architecture=os_path_opt.result.os_architecture,
+        active_compiler_generator=ContextCompilerGenerator(
+            Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
+        ),
+        orchestrator_desc=orchestrator.extract_minimal_description(),
     )
-    assert context.result is not None
-    ovb = OrchestratorVisitorLocalExecutor(context=context.result)
+
+    ovb = OrchestratorVisitorLocalExecutor(context=context)
 
     # execute the orchestrator visitor, which will execute the step to clone the repo
     report = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
@@ -69,7 +79,7 @@ class StepCustom1(StepBase):
 
 def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path) -> None:
 
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
     orchestrator.add_phase(
         Phase(name="repos checkout").add_step(StepBase(name="unknown step", description="unknown step description"))
     )
@@ -80,11 +90,19 @@ def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path) -
     orchestrator = orchestratorValidatedOpt.result
     assert orchestrator is not None
 
-    context = create_context_local_execution(
-        base_folder_path=str(tmp_path), orchestrator_desc=orchestrator.extract_minimal_description()
+    os_path_opt = create_os_and_path(str(tmp_path))
+    assert os_path_opt.result is not None
+
+    context = ContextLocalExecution(
+        base_folder_path=os_path_opt.result.path,
+        os_architecture=os_path_opt.result.os_architecture,
+        active_compiler_generator=ContextCompilerGenerator(
+            Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
+        ),
+        orchestrator_desc=orchestrator.extract_minimal_description(),
     )
-    assert context.result is not None
-    ovb = OrchestratorVisitorLocalExecutor(context=context.result)
+
+    ovb = OrchestratorVisitorLocalExecutor(context=context)
 
     # execute the orchestrator visitor, which will execute the step to clone the repo
     report = report = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())

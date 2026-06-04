@@ -9,12 +9,15 @@ from csorchestrator.ci.github.github_workflow_config import (
 from csorchestrator.context.context_compiler_generator import Generator
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
-    ContextLocalExecutionActiveMatrixConfig,
 )
-from csorchestrator.context.context_os_architecture import OS, Architecture, detect_context_os_architecture
+from csorchestrator.context.context_os_architecture import (
+    OS,
+    Architecture,
+    ContextOsArchitecture,
+    detect_context_os_architecture,
+)
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     ExecutionMatrixOsArchCompilerGenerator,
-    MatrixSkipExecutionOnNonMatchingContext,
     create_context_os_architecture_compiler_generator_string,
 )
 from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
@@ -68,15 +71,20 @@ class ExecutionResult:
         return True
 
 
-OptionalContextLocalExecutionWithReport: TypeAlias = OptionalResultWithReport[ContextLocalExecution]
+@dataclass
+class OsArchitectureAndPath:
+    os_architecture: ContextOsArchitecture
+    path: Path
 
 
-def create_context_local_execution(
-    base_folder_path: str, orchestrator_desc: OrchestratorExecutorMinimalDescription
-) -> OptionalContextLocalExecutionWithReport:
+OptionalOsArchitectureAndPathWithReport: TypeAlias = OptionalResultWithReport[OsArchitectureAndPath]
+
+
+def create_os_and_path(base_folder_path: str) -> OptionalOsArchitectureAndPathWithReport:
+    report = Report()
+
     pr = ensure_directory_exists_or_create_and_is_usable(base_folder_path)
 
-    report = Report()
     report.append_report(pr.report)
 
     osaExpected = detect_context_os_architecture()
@@ -85,14 +93,12 @@ def create_context_local_execution(
         report.append_error(osaExpected.error)
 
     if pr.result is not None and osaExpected.value is not None:
-        return OptionalContextLocalExecutionWithReport.createResultAndReport(
-            ContextLocalExecution(
-                base_folder_path=pr.result, os_architecture=osaExpected.value, orchestrator_desc=orchestrator_desc
-            ),
+        return OptionalOsArchitectureAndPathWithReport.createResultAndReport(
+            OsArchitectureAndPath(os_architecture=osaExpected.value, path=pr.result),
             report,
         )
     else:
-        return OptionalContextLocalExecutionWithReport.createReport(report)
+        return OptionalOsArchitectureAndPathWithReport.createReport(report)
 
 
 def validate_and_execute_orchestrator(
@@ -116,64 +122,54 @@ def validate_and_execute_orchestrator(
 
     # validated orchestrator, create context
 
-    contextWithReport = create_context_local_execution(
-        base_folder_path=target_folder_path, orchestrator_desc=er.execution_description
-    )
-    er.report_pre_execution.append_report(contextWithReport.report)
+    os_and_path_opt = create_os_and_path(base_folder_path=target_folder_path)
+    er.report_pre_execution.append_report(os_and_path_opt.report)
 
-    if contextWithReport.result is None:
+    if os_and_path_opt.result is None:
         reporter.report_pre_execution_report(er.report_pre_execution)
         reporter.finalize_execution()
         return er
 
-    context = contextWithReport.result
+    os_and_path = os_and_path_opt.result
 
-    matrix = orchestrator.get_execution_matrix()
-    if matrix is None:
-        reporter.report_start_execution("orchestrator execution without matrix")
+    matrix = orchestrator.execution_matrix
+
+    for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
+        match = os_architecture_compiler_generator.context_os_architecture.is_equal_to(os_and_path.os_architecture)
+        if not match:
+            reporter.report_skip_execution(
+                "skip orchestrator execution on not compatible matrix config: "
+                f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
+            )
+            er.report_executions.append(None)
+            continue
+
+        context = ContextLocalExecution(
+            base_folder_path=os_and_path.path,
+            os_architecture=os_and_path.os_architecture,
+            active_compiler_generator=os_architecture_compiler_generator.context_compiler_generator,
+            orchestrator_desc=er.execution_description,
+        )
+
+        # execute
+        reporter.report_start_execution(
+            "orchestrator execution on matrix config: "
+            f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
+        )
+
         # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
         report_execution = execute_orchestrator(
             orchestrator, OrchestratorVisitorLocalExecutor(context=context), reporter=reporter
         )
+
+        if executor_visit_reports_has_any_error(report_execution):
+            reporter.report_execution_report(report_execution)
+            er.report_executions.append(report_execution)
+            break
+
         reporter.report_execution_report(report_execution)
 
         er.report_executions.append(report_execution)
-    else:
-        for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
-            excute_on_matching_context = matrix.get_extra(MatrixSkipExecutionOnNonMatchingContext)
-            if excute_on_matching_context is not None:
-                match = os_architecture_compiler_generator.context_os_architecture.is_equal_to(context.os_architecture)
-                if not match:
-                    reporter.report_skip_execution(
-                        "skip orchestrator execution on not compatible matrix config: "
-                        f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
-                    )
-                    er.report_executions.append(None)
-                    continue
-
-            # execute
-            reporter.report_start_execution(
-                "orchestrator execution on matrix config: "
-                f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
-            )
-
-            context.add_extra(ContextLocalExecutionActiveMatrixConfig(os_architecture_compiler_generator))
-
-            # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
-            report_execution = execute_orchestrator(
-                orchestrator, OrchestratorVisitorLocalExecutor(context=context), reporter=reporter
-            )
-
-            context.remove_extra(ContextLocalExecutionActiveMatrixConfig)
-
-            if executor_visit_reports_has_any_error(report_execution):
-                reporter.report_execution_report(report_execution)
-                er.report_executions.append(report_execution)
-                break
-
-            reporter.report_execution_report(report_execution)
-
-            er.report_executions.append(report_execution)
 
     reporter.finalize_execution()
     return er
@@ -267,12 +263,7 @@ def validate_and_generate_github_workflow(
 
     # validated orchestrator
 
-    matrix = orchestrator.get_execution_matrix()
-    if matrix is None:
-        res.report_pre_execution.append_error("github_workflow requires a execution matrix in the orchestrator")
-        reporter.report_pre_execution_report(res.report_pre_execution)
-        reporter.finalize_execution()
-        return res
+    matrix = orchestrator.execution_matrix
 
     wf_matrix_or_errors = orchestrator_matrix_to_github_wf_matrix(matrix)
     if wf_matrix_or_errors.error is not None:
@@ -298,6 +289,7 @@ def validate_and_generate_github_workflow(
         name=matrix.name,
         matrix_list=wf_matrix,
         orchestrator_desc=res.execution_description,
+        fail_fast=matrix.fail_fast,
     )
     wf.on_job(job=wf_job)
 

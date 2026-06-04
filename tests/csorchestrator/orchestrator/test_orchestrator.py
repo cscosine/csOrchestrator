@@ -1,10 +1,10 @@
-from csorchestrator.orchestrator.orchestrator import Orchestrator
+from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.step.step_echo_message import StepEchoMessage
 
 
 def test_orchestrator_add_phases() -> None:
-    o = Orchestrator("myName")
+    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
 
     p = Phase("phase_1").add_step(StepEchoMessage(name="p1s1", description="p1 step s1", message="phase 1 step 2"))
     p.add_step(StepEchoMessage(name="p1s2", description="p1 step s2", message="phase 1 step 2"))
@@ -28,7 +28,7 @@ def test_orchestrator_add_phases() -> None:
 
 
 def test_orchestrator_executor_minimal_description() -> None:
-    o = Orchestrator("myName")
+    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
 
     o.create_phase("p1").add_step(StepEchoMessage(name="p1s1", description="p1 step s1", message="")).add_step(
         StepEchoMessage(name="p1s2", description="p1 step s2", message="")

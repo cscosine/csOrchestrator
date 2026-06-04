@@ -10,7 +10,6 @@ from csorchestrator.ci.github.github_workflow_config import (
 from csorchestrator.context.context_compiler_generator import GeneratorType
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
-    ContextLocalExecutionActiveMatrixConfig,
 )
 from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
 from csorchestrator.core.expected import Expected
@@ -35,26 +34,6 @@ class StepCMakeWorkflow(StepBase):
 
     config: BuildConfig
 
-    context_os_architecture_compiler_generator: ContextOsArchitectureCompilerGenerator | None = None
-
-    @classmethod
-    def create_from_workflow_description(
-        cls,
-        name: str,
-        description: str,
-        source_dir: str,
-        workflow_description: ContextOsArchitectureCompilerGeneratorConfig,
-    ) -> "StepCMakeWorkflow":
-        return cls(
-            name=name,
-            description=description,
-            source_dir=source_dir,
-            context_os_architecture_compiler_generator=ContextOsArchitectureCompilerGenerator(
-                workflow_description.context_os_architecture, workflow_description.context_compiler_generator
-            ),
-            config=workflow_description.config,
-        )
-
 
 ContextWorkflowsExpected: TypeAlias = Expected[
     tuple[
@@ -67,38 +46,17 @@ ContextWorkflowsExpected: TypeAlias = Expected[
 
 def get_context_and_workflows(
     config: BuildConfig,
-    context_os_architecture_compiler_generator: ContextOsArchitectureCompilerGenerator | None,
-    matrix_config: ContextLocalExecutionActiveMatrixConfig | None,
+    context_os_architecture_compiler_generator: ContextOsArchitectureCompilerGenerator,
 ) -> ContextWorkflowsExpected:
 
-    if context_os_architecture_compiler_generator is None:
-        # no context, inherit it from the matrix config if any
+    workflow_configs = get_all_supported_workflow_descriptions(
+        selected_config=config,
+        os_arch_generator=context_os_architecture_compiler_generator,
+    )
 
-        if matrix_config is None:
-            return ContextWorkflowsExpected.make_error("no matrix config specified")
+    if len(workflow_configs) == 0:
+        return ContextWorkflowsExpected.make_error("no workflows are supported in the current execution context")
 
-        context_os_architecture_compiler_generator = matrix_config.active_os_architecture_compiler_generator
-
-        workflow_configs = get_all_supported_workflow_descriptions(
-            selected_config=config,
-            os_arch_generator=context_os_architecture_compiler_generator,
-        )
-
-        if len(workflow_configs) == 0:
-            return ContextWorkflowsExpected.make_error("no workflows are supported in the current execution context")
-
-    else:
-        # has context, use it as a single workflow config step
-
-        workflow_configs = [
-            ContextOsArchitectureCompilerGeneratorConfig(
-                context_os_architecture_compiler_generator.context_os_architecture,
-                context_os_architecture_compiler_generator.context_compiler_generator,
-                config,
-            )
-        ]
-
-    assert context_os_architecture_compiler_generator is not None
     return ContextWorkflowsExpected.make_value((context_os_architecture_compiler_generator, workflow_configs))
 
 
@@ -110,8 +68,7 @@ def execute_step_cmake_workflow(
     # retrieve the current execution context or infer it from the matrix
     res_or_err = get_context_and_workflows(
         config=step.config,
-        context_os_architecture_compiler_generator=step.context_os_architecture_compiler_generator,
-        matrix_config=context.get_extra(ContextLocalExecutionActiveMatrixConfig),
+        context_os_architecture_compiler_generator=context.get_active_os_architecture_compiler_generator(),
     )
 
     if res_or_err.error is not None:

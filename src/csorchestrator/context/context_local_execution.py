@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypeVar
 
+from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
 from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
 from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
@@ -16,17 +17,16 @@ class ContextLocalExecutionExtra:
 T = TypeVar("T", bound="ContextLocalExecutionExtra")
 
 
-@dataclass(frozen=True)
-class ContextLocalExecutionActiveMatrixConfig(ContextLocalExecutionExtra):
-    active_os_architecture_compiler_generator: ContextOsArchitectureCompilerGenerator
-
-
 # create it with create_local_context to ensure is a valid path pointint to an existing (eventually created) folder
 @dataclass(frozen=True)
 class ContextLocalExecution:
     base_folder_path: Path
     os_architecture: ContextOsArchitecture
+    active_compiler_generator: ContextCompilerGenerator
     orchestrator_desc: OrchestratorExecutorMinimalDescription
+
+    def get_active_os_architecture_compiler_generator(self) -> ContextOsArchitectureCompilerGenerator:
+        return ContextOsArchitectureCompilerGenerator(self.os_architecture, self.active_compiler_generator)
 
     _extras: dict[type, ContextLocalExecutionExtra] = field(
         default_factory=dict,

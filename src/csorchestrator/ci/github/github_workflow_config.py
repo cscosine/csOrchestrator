@@ -399,13 +399,14 @@ def create_job_from_matrix_list(
     name: str,
     matrix_list: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude],
     orchestrator_desc: OrchestratorExecutorMinimalDescription,
+    fail_fast: bool,
 ) -> JobOrchestratorMatrixExecution:
 
     jd = JobOrchestratorMatrixExecution(
         name=name,
         orchestrator_desc=orchestrator_desc,
         runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED,
-        strategy=JobStrategy(fail_fast=False),
+        strategy=JobStrategy(fail_fast=fail_fast),
     )
 
     for matrix in matrix_list:
@@ -454,7 +455,7 @@ class GitHubWorkflow:
         return self
 
     # ---------------- SCHEDULE ----------------
-    def on_job(self, *, job: JobOrchestratorMatrixExecution) -> Self:
+    def on_job(self, job: JobOrchestratorMatrixExecution) -> Self:
         self._jobs.append(job)
         return self
 

@@ -2,7 +2,7 @@ from pathlib import Path
 
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.execution import validate_and_execute_orchestrator
-from csorchestrator.orchestrator.orchestrator import Orchestrator
+from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
 from csorchestrator.reporters.orchestrator_executor_reporter_markdown import OrchestratorExecutorReporterMarkdown
 from csorchestrator.step.step_echo_message import StepEchoMessage
 
@@ -18,7 +18,7 @@ def test_markdown_reporter_produces_valid_file(tmp_path: Path) -> None:
     reporter.report_orchestrator_creation_report(creation_report)
 
     # 2. Test Execution Description
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
     phase = orchestrator.create_phase("Build")
     phase.add_step(StepEchoMessage(name="Compile", description="Compiling...", message="Compiling..."))
 

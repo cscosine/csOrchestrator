@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator import Orchestrator
+from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
 from csorchestrator.orchestrator.orchestrator_executor import execute_orchestrator
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
@@ -80,7 +80,7 @@ def test_composite_reporter_prints_twice(capsys: pytest.CaptureFixture[str]) -> 
     duplicated output (one per reporter).
     """
     # 1. Setup Orchestrator
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -120,7 +120,7 @@ def test_composite_reporter_prints_twice(capsys: pytest.CaptureFixture[str]) -> 
 
 def test_composite_reporter_colored_colorama(capsys: pytest.CaptureFixture[str]) -> None:
     # 1. Setup Orchestrator
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -144,7 +144,7 @@ def test_composite_reporter_colored_colorama(capsys: pytest.CaptureFixture[str])
 
 def test_composite_reporter_markdown(tmp_path: Path) -> None:
     # 1. Setup Orchestrator
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -231,7 +231,7 @@ def test_composite_reporter_report_orchestrator_creation_report(
 
 def test_composite_reporter_step_with_errors(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Orchestrator
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -253,7 +253,7 @@ def test_composite_reporter_step_with_errors(tmp_path: Path, capsys: pytest.Capt
 
 def test_composite_reporter_report_execution_report(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Orchestrator
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -289,7 +289,7 @@ def test_composite_reporter_report_execution_report(tmp_path: Path, capsys: pyte
 
 def test_composite_reporter_report_execution_description(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Orchestrator
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)

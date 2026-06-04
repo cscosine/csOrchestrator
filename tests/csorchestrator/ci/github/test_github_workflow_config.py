@@ -3,14 +3,12 @@ from csorchestrator.ci.github.github_workflow_config import (
     Cron,
     DayOfWeek,
     GitHubWorkflow,
-    JobOrchestratorMatrixExecution,
-    JobStrategy,
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     create_github_wf,
     create_job_from_matrix_list,
 )
 from csorchestrator.context.context_os_architecture import OS
-from csorchestrator.orchestrator.orchestrator import Orchestrator
+from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
 
 EXPECTED_LINES_HEADER = [
     "name: test-wf-name",
@@ -66,6 +64,8 @@ def test_workflow_with_triggers():
 
 
 def test_workflow_with_triggers_and_one_job():
+    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+
     wf = (
         GitHubWorkflow("test-wf-name")
         .on_push(branches=["main", "dev"], tags=["'v*.*.*'"])
@@ -73,11 +73,11 @@ def test_workflow_with_triggers_and_one_job():
         .on_dispatch()
         .on_schedule(Cron.weekly(DayOfWeek.MON, hour=3))
         .on_job(
-            job=JobOrchestratorMatrixExecution(
+            create_job_from_matrix_list(
                 name="the_job",
-                orchestrator_desc=Orchestrator("test").extract_minimal_description(),
-                runs_on=MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED,
-                strategy=JobStrategy(fail_fast=False).on_matrix(
+                orchestrator_desc=o.extract_minimal_description(),
+                fail_fast=False,
+                matrix_list=[
                     MatrixOsArchCompilerGeneratorRunnerEntryInclude(
                         os=OS.LINUX.value,
                         os_version="ubuntu22.04",
@@ -89,8 +89,8 @@ def test_workflow_with_triggers_and_one_job():
                         build_generator_type="single",
                         runner="ubuntu-22.04",
                     )
-                ),
-            )
+                ],
+            ),
         )
     )
 
@@ -111,6 +111,7 @@ def test_workflow_with_creation_helper():
     ).on_job(
         job=create_job_from_matrix_list(
             name="the_job",
+            fail_fast=False,
             matrix_list=[
                 MatrixOsArchCompilerGeneratorRunnerEntryInclude(
                     os=OS.LINUX.value,
@@ -124,7 +125,7 @@ def test_workflow_with_creation_helper():
                     runner="ubuntu-22.04",
                 )
             ],
-            orchestrator_desc=Orchestrator("test").extract_minimal_description(),
+            orchestrator_desc=create_orchestrator_factory("test", "0.0.0", "exec-job").extract_minimal_description(),
         )
     )
 

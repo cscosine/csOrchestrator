@@ -11,7 +11,6 @@ from csorchestrator.ci.github.github_workflow_config import (
 )
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
-    ContextLocalExecutionActiveMatrixConfig,
 )
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
@@ -116,14 +115,7 @@ def execute_step_get_versions_from_cmake_config_package_version(
 ) -> Report:
     report = Report()
 
-    matrix_config = context.get_extra(ContextLocalExecutionActiveMatrixConfig)
-    if matrix_config is None:
-        report.append_error(
-            f"StepGetVersionsFromCMakeConfigPackageVersion, no matrix config specified, cannot execute step {step.name}"
-        )
-        return report
-
-    context_os_architecture_compiler_generator = matrix_config.active_os_architecture_compiler_generator
+    context_os_architecture_compiler_generator = context.get_active_os_architecture_compiler_generator()
     install_subdir = create_context_os_architecture_compiler_generator_string(
         context_os_architecture_compiler_generator
     )

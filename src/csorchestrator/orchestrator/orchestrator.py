@@ -22,9 +22,9 @@ class Orchestrator:
     #   - run cmake workflow / individual steps (config / build / test / install)
 
     name: str
-    version: str = "0.0.0"
+    version: str
+    execution_matrix: ExecutionMatrixOsArchCompilerGenerator
     phases: list[Phase] = field(default_factory=list)
-    _execution_matrix: ExecutionMatrixOsArchCompilerGenerator | None = None
     default_github_wf: GitHubWorkflow | None = None
 
     def create_default_github_workflow(self, config: CreateGitHubWorkflowConfig) -> "Orchestrator":
@@ -40,13 +40,6 @@ class Orchestrator:
         self.phases.append(phase)
         return phase
 
-    def set_execution_matrix(self, matrix: ExecutionMatrixOsArchCompilerGenerator) -> "Orchestrator":
-        self._execution_matrix = matrix
-        return self
-
-    def get_execution_matrix(self) -> ExecutionMatrixOsArchCompilerGenerator | None:
-        return self._execution_matrix
-
     def extract_minimal_description(self) -> OrchestratorExecutorMinimalDescription:
         ret = OrchestratorExecutorMinimalDescription(name=self.name, version=self.version)
         for phase in self.phases:
@@ -54,11 +47,16 @@ class Orchestrator:
             for step in phase.steps:
                 phase_desc.step_names.append(step.name)
             ret.phases_and_steps.append(phase_desc)
-        if self._execution_matrix is None:
-            ret.matrix_description = []
-        else:
-            ret.matrix_description = self._execution_matrix.to_list_string_description()
+            ret.matrix_description = self.execution_matrix.to_list_string_description()
         return ret
+
+
+def create_orchestrator_factory(name: str, version: str, execution_matrix_name: str) -> Orchestrator:
+    return Orchestrator(
+        name=name,
+        version=version,
+        execution_matrix=ExecutionMatrixOsArchCompilerGenerator(execution_matrix_name),
+    )
 
 
 OptionalOrchestratorWithReport: TypeAlias = OptionalResultWithReport[Orchestrator]

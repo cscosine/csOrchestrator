@@ -7,10 +7,7 @@ from typing import Callable, TextIO
 from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution, StepRunCommand
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
-    ContextLocalExecutionActiveMatrixConfig,
 )
-from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
-from csorchestrator.core.expected import Expected
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase, StepSkipExecutionOnNonMatchingContext
@@ -19,7 +16,6 @@ from csorchestrator.orchestrator.step_base import StepBase, StepSkipExecutionOnN
 @dataclass(kw_only=True)
 class StepBashScriptCommand(StepBase):
     cmd: list[str] = field(default_factory=list)
-    context_os_architecture_compiler_generator: ContextOsArchitectureCompilerGenerator | None = None
 
 
 @dataclass(kw_only=True)
@@ -63,32 +59,6 @@ class StepInstallAptPackages(StepBashScriptCommand):
         ]
 
         self.cmd = script
-
-
-# TODO note, in previous impl before sudo apt update
-# sudo sed -i 's|mirror+file:/etc/apt/apt-mirrors.txt|http://archive.ubuntu.com/ubuntu|g' /etc/apt/sources.list
-# was used only for github actions
-
-
-def select_execution_context(
-    context_os_architecture_compiler_generator: ContextOsArchitectureCompilerGenerator | None,
-    matrix_config: ContextLocalExecutionActiveMatrixConfig | None,
-) -> Expected[ContextOsArchitectureCompilerGenerator, str]:
-
-    if context_os_architecture_compiler_generator is None:
-        # no context, inherit it from the matrix config if any
-
-        if matrix_config is None:
-            return Expected[ContextOsArchitectureCompilerGenerator, str].make_error("no matrix config specified")
-
-        context_os_architecture_compiler_generator = matrix_config.active_os_architecture_compiler_generator
-
-    else:
-        # has context, use it as a single workflow config step
-        pass
-
-    assert context_os_architecture_compiler_generator is not None
-    return Expected[ContextOsArchitectureCompilerGenerator, str].make_value(context_os_architecture_compiler_generator)
 
 
 def execute_command(
@@ -154,18 +124,7 @@ def execute_step_custom_command(
 ) -> Report:
     report = Report()
 
-    # retrieve the current execution context or infer it from the matrix
-    res_or_err = select_execution_context(
-        context_os_architecture_compiler_generator=step.context_os_architecture_compiler_generator,
-        matrix_config=context.get_extra(ContextLocalExecutionActiveMatrixConfig),
-    )
-
-    if res_or_err.error is not None:
-        report.append_error(res_or_err.error)
-        return report
-
-    assert res_or_err.value is not None
-    context_os_architecture_compiler_generator = res_or_err.value
+    context_os_architecture_compiler_generator = context.get_active_os_architecture_compiler_generator()
     assert context_os_architecture_compiler_generator is not None
 
     excute_on_matching_context = step.get_extra(StepSkipExecutionOnNonMatchingContext)

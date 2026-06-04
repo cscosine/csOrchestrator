@@ -4,7 +4,7 @@ import pytest
 
 from csorchestrator.context.orchestrator_minimal_description import PhaseNameWithStepNames
 from csorchestrator.orchestrator.execution import ExecutionResult, validate_and_execute_orchestrator
-from csorchestrator.orchestrator.orchestrator import Orchestrator
+from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import (
@@ -20,7 +20,7 @@ from tests.csorchestrator.repo_test_data_config import RepoTestData
 def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: RepoUrlParts) -> None:
     cfg = RepoTestData()
 
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
 
     step = StepGetRepositoryGitHub(
         name=cfg.repo_name,
@@ -54,7 +54,7 @@ def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path) ->
     file_path = tmp_path / "file.txt"
     file_path.write_text("data")
 
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
 
     er: ExecutionResult = validate_and_execute_orchestrator(
         orchestrator, target_folder_path=str(file_path), reporter=OrchestratorExecutorReporterDummy()
@@ -66,7 +66,7 @@ def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path) ->
 def test_validate_and_execute_orchestrator_fail_validation(tmp_path: Path, repo_url: RepoUrlParts) -> None:
     cfg = RepoTestData()
 
-    orchestrator = Orchestrator("myName")
+    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
 
     step = StepGetRepositoryGitHub(
         name=cfg.repo_name,

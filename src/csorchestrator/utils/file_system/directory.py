@@ -7,12 +7,12 @@ from typing import TypeAlias
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
 
-OptionalContextLocalExecutionWithReport: TypeAlias = OptionalResultWithReport[Path]
+OptionalPathWithReport: TypeAlias = OptionalResultWithReport[Path]
 
 
-def ensure_directory_exists_or_create_and_is_usable(path: str) -> OptionalContextLocalExecutionWithReport:
+def ensure_directory_exists_or_create_and_is_usable(path: str) -> OptionalPathWithReport:
     if not path.strip():
-        return OptionalContextLocalExecutionWithReport.createReport(
+        return OptionalPathWithReport.createReport(
             Report().append_error("create_local_context need a non empty base path string")
         )
 
@@ -20,23 +20,17 @@ def ensure_directory_exists_or_create_and_is_usable(path: str) -> OptionalContex
         # Expand ~ and environment variables, then resolve
         p = Path(os.path.expandvars(os.path.expanduser(path))).resolve()
     except Exception as e:
-        return OptionalContextLocalExecutionWithReport.createReport(
-            Report().append_error(f"Invalid path '{path}': {e}")
-        )
+        return OptionalPathWithReport.createReport(Report().append_error(f"Invalid path '{path}': {e}"))
 
     try:
         # Create directory if it does not exist
         p.mkdir(parents=True, exist_ok=True)
     except Exception as e:
-        return OptionalContextLocalExecutionWithReport.createReport(
-            Report().append_error(f"Failed to create directory '{p}': {e}")
-        )
+        return OptionalPathWithReport.createReport(Report().append_error(f"Failed to create directory '{p}': {e}"))
 
     # Ensure it's actually a directory
     if not p.is_dir():
-        return OptionalContextLocalExecutionWithReport.createReport(
-            Report().append_error(f"Path exists but is not a directory: '{p}'")
-        )
+        return OptionalPathWithReport.createReport(Report().append_error(f"Path exists but is not a directory: '{p}'"))
 
     # Check readability & writability by attempting real operations
     try:
@@ -51,8 +45,8 @@ def ensure_directory_exists_or_create_and_is_usable(path: str) -> OptionalContex
         test_subdir.rmdir()
 
     except Exception as e:
-        return OptionalContextLocalExecutionWithReport.createReport(
+        return OptionalPathWithReport.createReport(
             Report().append_error(f"Directory '{p}' is not writable or accessible: {e}")
         )
 
-    return OptionalContextLocalExecutionWithReport.createResultAndReport(p, Report())
+    return OptionalPathWithReport.createResultAndReport(p, Report())

@@ -21,14 +21,11 @@ class MatrixExecutionExtra:
 T = TypeVar("T", bound="MatrixExecutionExtra")
 
 
-class MatrixSkipExecutionOnNonMatchingContext(MatrixExecutionExtra):
-    pass
-
-
 @dataclass
 class ExecutionMatrixOsArchCompilerGenerator:
     name: str
     os_architecture_compiler_generator_list: list[ContextOsArchitectureCompilerGenerator] = field(default_factory=list)
+    fail_fast = False
     _extras: dict[type, MatrixExecutionExtra] = field(
         default_factory=dict,
         kw_only=True,
