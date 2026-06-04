@@ -155,8 +155,18 @@ def step_cmake_workflow_to_githubwf(
     step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
 
-    # create two mutually exclusive steps, one for single config generators and one for multi config
+    # create a step with a if inside base on single/multi config (
+    # - in single config need to launch N cmake workflow if I have to configure/build/test N
+    # - in multi config the command is one
+    run_str_list = ["|", "set -e"]
+    first_cycle = False
     for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:
+        generator_type_matrix = MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_TYPE
+        if_elif_str = "if" if not first_cycle else "elif"
+        run_str_list += [
+            if_elif_str + ' [[ "${{' + generator_type_matrix + '}}" == ' + '"' + generator_type.value + '" ]]; then'
+        ]
+        first_cycle = True
         generator_supported_configs = get_supported_build_configs_for_generator_type(generator_type)
         selected_configs = []
         for supported_config in generator_supported_configs:
@@ -170,7 +180,6 @@ def step_cmake_workflow_to_githubwf(
                 f"Requested config {step.config.value} is not supported for generator type {generator_type.value}"
             )
 
-        run_str_list = ["|", "set -e"]
         for config in selected_configs:
             wf_name = workflow_name_from_components(
                 MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME_EMBRACED,
@@ -182,19 +191,23 @@ def step_cmake_workflow_to_githubwf(
                 MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_EMBRACED,
                 config.value,
             )
-            run_str_list += ["cmake --workflow " + wf_name]
+            run_str_list += ["  cmake --workflow " + wf_name]
+    if not first_cycle:
+        return Report().append_error("Defensive: no generators in for loop in step_cmake_workflow_to_githubwf?!?")
 
-        generator_type_matrix = MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_TYPE
+    run_str_list += ["else"]
+    run_str_list += ['  echo "Unknown generator_type: ${{ matrix.generator_type }}"']
+    run_str_list += ["  exit 1"]
+    run_str_list += ["fi"]
 
-        wf_job.steps.append(
-            StepRunCommand(
-                name=f"cmake workflow on {step.name} - ({generator_type.value})",
-                if_str=f"{generator_type_matrix} == '{generator_type.value}'",
-                shell_type="bash",
-                run=run_str_list,
-                working_directory=step.source_dir,
-            )
+    wf_job.steps.append(
+        StepRunCommand(
+            name=f"cmake workflow on {step.name} for config(s) {step.config.value}",
+            shell_type="bash",
+            run=run_str_list,
+            working_directory=step.source_dir,
         )
+    )
 
     return Report()
 
