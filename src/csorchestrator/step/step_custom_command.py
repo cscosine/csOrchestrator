@@ -17,17 +17,17 @@ from csorchestrator.orchestrator.step_base import StepBase, StepSkipExecutionOnN
 
 
 @dataclass(kw_only=True)
-class StepCustomCommand(StepBase):
+class StepBashScriptCommand(StepBase):
     cmd: list[str] = field(default_factory=list)
     context_os_architecture_compiler_generator: ContextOsArchitectureCompilerGenerator | None = None
 
 
 @dataclass(kw_only=True)
-class StepInstallAptPackages(StepCustomCommand):
+class StepInstallAptPackages(StepBashScriptCommand):
     packages: list[str]
 
     def __post_init__(self) -> None:
-        lines = [
+        script = [
             "set -euo pipefail # enable strict mode",
             "",
             "if [ -t 0 ]; then",
@@ -41,8 +41,8 @@ class StepInstallAptPackages(StepCustomCommand):
             "",
             "packages=(",
         ]
-        lines += self.packages
-        lines += [
+        script += [f"  {p}" for p in self.packages]
+        script += [
             ")",
             "",
             "missing=()",
@@ -62,8 +62,7 @@ class StepInstallAptPackages(StepCustomCommand):
             "fi",
         ]
 
-        script = "\n".join(lines)
-        self.cmd = ["bash", "-c", script]
+        self.cmd = script
 
 
 # TODO note, in previous impl before sudo apt update
@@ -95,8 +94,6 @@ def select_execution_context(
 def execute_command(
     cmd: list[str], working_dir_full_path: Path, reporter_sink: ReporterSinkBase
 ) -> list[str]:  # return errors, if any
-
-    print(cmd)
 
     errors: list[str] = []
 
@@ -153,7 +150,7 @@ def execute_command(
 
 
 def execute_step_custom_command(
-    step: StepCustomCommand, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
+    step: StepBashScriptCommand, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
     report = Report()
 
@@ -177,7 +174,7 @@ def execute_step_custom_command(
         if not match:
             report.append_info(f"Skip '{step.name}', not compatible with the current context")
 
-    errors = execute_command(step.cmd, context.base_folder_path, reporter_sink)
+    errors = execute_command(["bash", "-c", "\n".join(step.cmd)], context.base_folder_path, reporter_sink)
     for e in errors:
         report.append_error(e)
 
@@ -185,7 +182,7 @@ def execute_step_custom_command(
 
 
 def step_custom_command_to_githubwf(
-    step: StepCustomCommand, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+    step: StepBashScriptCommand, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
 
     run_str_list = ["|"]
@@ -203,6 +200,6 @@ def step_custom_command_to_githubwf(
     return Report()
 
 
-def validate_step_custom_command(step: StepCustomCommand) -> Report:
+def validate_step_custom_command(step: StepBashScriptCommand) -> Report:
     report = Report()
     return report

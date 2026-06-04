@@ -12,7 +12,7 @@ from csorchestrator.step.step_cmake_command import (
 )
 from csorchestrator.step.step_create_archives import StepCreateArchives, execute_step_create_archives
 from csorchestrator.step.step_custom_command import (
-    StepCustomCommand,
+    StepBashScriptCommand,
     execute_step_custom_command,
 )
 from csorchestrator.step.step_echo_message import StepEchoMessage, execute_step_echo_message
@@ -72,5 +72,5 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
         return execute_step_upload_artifacts(step, self.context, reporter_sink)
 
     @visit_step.register
-    def _(self, step: StepCustomCommand, reporter_sink: ReporterSinkBase) -> Report:
+    def _(self, step: StepBashScriptCommand, reporter_sink: ReporterSinkBase) -> Report:
         return execute_step_custom_command(step, self.context, reporter_sink)
