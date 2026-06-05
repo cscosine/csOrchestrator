@@ -78,6 +78,17 @@ def create_context_os_architecture_compiler_generator_string_from_components(
     return "-".join(parts)
 
 
+def create_context_os_architecture_string(
+    os_architecture: ContextOsArchitecture,
+) -> str:
+    parts: list[str] = []
+    parts.append(os_architecture.os.value.lower())
+    parts.append(os_architecture.os_version.lower())
+    parts.append(os_architecture.architecture.value.lower())
+    parts.append(os_architecture.architecture_variant.lower())
+    return "-".join(parts)
+
+
 def create_context_os_architecture_compiler_generator_string(
     context_os_architecture_generator: ContextOsArchitectureCompilerGenerator,
 ) -> str:

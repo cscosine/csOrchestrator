@@ -89,8 +89,8 @@ def test_detect_context_os_architecture_architecture_error():
     assert result.error == "Unsupported architecture"
 
 
-# test equal
-def test_context_os_architecture_equal():
+# test can be executed on
+def test_context_os_architecture_can_be_executed_on():
     a1 = ContextOsArchitecture(
         os=OS.LINUX,
         os_version="ubuntu24.04",
@@ -110,5 +110,5 @@ def test_context_os_architecture_equal():
         architecture_variant="xavier",
     )
 
-    assert a1.is_equal_to(a2)
-    assert not a1.is_equal_to(a3)
+    assert a1.can_be_executed_on(a2)
+    assert not a1.can_be_executed_on(a3)

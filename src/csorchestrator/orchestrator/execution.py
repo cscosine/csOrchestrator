@@ -19,6 +19,7 @@ from csorchestrator.context.context_os_architecture import (
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     ExecutionMatrixOsArchCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
+    create_context_os_architecture_string,
 )
 from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.core.expected import Expected
@@ -135,11 +136,14 @@ def validate_and_execute_orchestrator(
     matrix = orchestrator.execution_matrix
 
     for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
-        match = os_architecture_compiler_generator.context_os_architecture.is_equal_to(os_and_path.os_architecture)
+        match = os_architecture_compiler_generator.context_os_architecture.can_be_executed_on(
+            os_and_path.os_architecture
+        )
         if not match:
             reporter.report_skip_execution(
                 "skip orchestrator execution on not compatible matrix config: "
                 f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
+                f", current os and architecture:  {create_context_os_architecture_string(os_and_path.os_architecture)}"
             )
             er.report_executions.append(None)
             continue

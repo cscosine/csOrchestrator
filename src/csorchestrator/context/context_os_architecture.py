@@ -28,13 +28,21 @@ class ContextOsArchitecture:
 
     ARCHITECTURE_VARIANT_GENERIC: str = "generic"
 
-    def is_equal_to(self, other: "ContextOsArchitecture") -> bool:
-        return (
-            self.os == other.os
-            and self.os_version == other.os_version
-            and self.architecture == other.architecture
-            and self.architecture_variant == other.architecture_variant
-        )
+    def can_be_executed_on(self, other: "ContextOsArchitecture") -> bool:
+        if self.os == OS.WINDOWS and other.os == OS.WINDOWS:
+            # do not check version
+            return (
+                self.os == other.os
+                and self.architecture == other.architecture
+                and self.architecture_variant == other.architecture_variant
+            )
+        else:
+            return (
+                self.os == other.os
+                and self.os_version == other.os_version
+                and self.architecture == other.architecture
+                and self.architecture_variant == other.architecture_variant
+            )
 
 
 # =========================================================
