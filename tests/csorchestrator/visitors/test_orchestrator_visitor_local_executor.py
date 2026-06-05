@@ -7,7 +7,6 @@ from csorchestrator.context.context_compiler_generator import Compiler, ContextC
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.orchestrator.execution import create_os_and_path
 from csorchestrator.orchestrator.orchestrator import (
-    create_orchestrator_factory,
     create_orchestrator_factory_all_supported_cases,
 )
 from csorchestrator.orchestrator.orchestrator_executor import (
@@ -40,7 +39,7 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
         repo_ref=cfg.main_branch,
     ).add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = create_orchestrator_factory_all_supported_cases("myName", "0.0.0", "exec-job")
     orchestrator.add_phase(Phase(name="repos checkout").add_step(step))
 
     orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)

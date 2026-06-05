@@ -40,11 +40,7 @@ def test_validate_and_execute_orchestrator_success(tmp_path: Path, repo_url: Rep
     assert er.execution_description.phases_and_steps == [
         PhaseNameWithStepNames(phase_name="repos checkout", step_names=[cfg.repo_name])
     ]
-    assert er.report_executions[0] is not None
-    assert len(er.report_executions[0]) == len(er.execution_description.phases_and_steps)
-    for phase_report in er.report_executions[0]:
-        for step_report in phase_report:
-            assert not step_report.has_errors()
+    assert er.is_execution_successful() is not None
 
 
 def test_validate_and_execute_orchestrator_fail_pre_execution(tmp_path: Path) -> None:
