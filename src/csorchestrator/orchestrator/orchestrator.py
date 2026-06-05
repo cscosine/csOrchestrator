@@ -12,6 +12,7 @@ from csorchestrator.context.orchestrator_minimal_description import (
 )
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.utils.presets.supported_variants import get_supported_context_os_architecture_list
 
 
 @dataclass
@@ -64,6 +65,18 @@ def create_orchestrator_factory(name: str, version: str, execution_matrix_name: 
         version=version,
         execution_matrix=ExecutionMatrixOsArchCompilerGenerator(execution_matrix_name),
     )
+
+
+def create_orchestrator_factory_all_supported_cases(
+    name: str, version: str, execution_matrix_name: str
+) -> Orchestrator:
+    o = Orchestrator(
+        name=name,
+        version=version,
+        execution_matrix=ExecutionMatrixOsArchCompilerGenerator(execution_matrix_name),
+    )
+    o.set_execution_matrix_list(get_supported_context_os_architecture_list())
+    return o
 
 
 OptionalOrchestratorWithReport: TypeAlias = OptionalResultWithReport[Orchestrator]

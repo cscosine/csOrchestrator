@@ -6,7 +6,10 @@ import pytest
 from csorchestrator.context.context_compiler_generator import Compiler, ContextCompilerGenerator, GeneratorWithType
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.orchestrator.execution import create_os_and_path
-from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
+from csorchestrator.orchestrator.orchestrator import (
+    create_orchestrator_factory,
+    create_orchestrator_factory_all_supported_cases,
+)
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     flatten_orchestrator_executor_visit_reports,
@@ -79,7 +82,7 @@ class StepCustom1(StepBase):
 
 def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path) -> None:
 
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = create_orchestrator_factory_all_supported_cases("myName", "0.0.0", "exec-job")
     orchestrator.add_phase(
         Phase(name="repos checkout").add_step(StepBase(name="unknown step", description="unknown step description"))
     )

@@ -3,7 +3,9 @@ from dataclasses import dataclass
 import pytest
 
 from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
+from csorchestrator.orchestrator.orchestrator import (
+    create_orchestrator_factory_all_supported_cases,
+)
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     flatten_orchestrator_executor_visit_reports,
@@ -52,7 +54,7 @@ class OrchestratorVisitorDummy(OrchestratorVisitorBase):
 
 
 def test_orchestrator_executor_invalid_visitor() -> None:
-    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    o = create_orchestrator_factory_all_supported_cases("myName", "0.0.0", "exec-job")
 
     o.create_phase("p1").add_step(StepCustom1(name="p1s1", description="p1 step s1")).add_step(
         StepCustom2(name="p1s2", description="p1 step s2")
@@ -115,7 +117,7 @@ class OrchestratorVisitorConcretePerType(OrchestratorVisitorBase):
 
 
 def test_orchestrator_executor_valid_visitor() -> None:
-    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    o = create_orchestrator_factory_all_supported_cases("myName", "0.0.0", "exec-job")
 
     o.create_phase("p1").add_step(StepCustom1(name="p1s1", description="p1 step s1")).add_step(
         StepCustom2(name="p1s2", description="p1 step s2")
@@ -174,7 +176,7 @@ class OrchestratorVisitorConcreteBaseOnly(OrchestratorVisitorBase):
 
 
 def test_orchestrator_executor_base_only_visitor() -> None:
-    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    o = create_orchestrator_factory_all_supported_cases("myName", "0.0.0", "exec-job")
 
     o.create_phase("p1").add_step(StepCustom1(name="p1s1", description="p1 step s1")).add_step(
         StepCustom2(name="p1s2", description="p1 step s2")
@@ -235,7 +237,7 @@ class OrchestratorVisitorConcreteUseVisitBase(OrchestratorVisitorBase):
 
 
 def test_orchestrator_executor_base_only_visitor_use_visit_step_base() -> None:
-    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    o = create_orchestrator_factory_all_supported_cases("myName", "0.0.0", "exec-job")
 
     o.create_phase("p1").add_step(StepCustom1(name="p1s1", description="p1 step s1")).add_step(
         StepCustom2(name="p1s2", description="p1 step s2")
@@ -307,7 +309,7 @@ class OrchestratorVisitorFailStep(OrchestratorVisitorBase):
 
 
 def test_orchestrator_executor_base_fail_step() -> None:
-    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    o = create_orchestrator_factory_all_supported_cases("myName", "0.0.0", "exec-job")
 
     o.create_phase("p1").add_step(StepCustom1(name="p1s1", description="p1 step s1")).add_step(
         StepCustom2(name="p1s2", description="p1 step s2")

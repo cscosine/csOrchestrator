@@ -39,6 +39,10 @@ def create_validated_orchestrator(o: Orchestrator) -> OptionalValidatedOrchestra
         )
         report.append_report(flatten_orchestrator_executor_visit_reports(visit_report))
 
+    # if there are no execution matrix in the list, return error
+    if len(o.execution_matrix.os_architecture_compiler_generator_list) == 0:
+        report.append_error("execution matrix list is empty")
+
     if len(report.errors) > 0:
         return OptionalValidatedOrchestratorWithReport.createReport(report)
     return OptionalValidatedOrchestratorWithReport.createResultAndReport(o, report)
