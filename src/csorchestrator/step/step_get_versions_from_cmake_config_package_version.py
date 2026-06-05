@@ -115,9 +115,8 @@ def execute_step_get_versions_from_cmake_config_package_version(
 ) -> Report:
     report = Report()
 
-    context_os_architecture_compiler_generator = context.get_active_os_architecture_compiler_generator()
     install_subdir = create_context_os_architecture_compiler_generator_string(
-        context_os_architecture_compiler_generator
+        context.get_active_os_architecture_compiler_generator()
     )
 
     result = []

@@ -38,8 +38,3 @@ class StepBase:
     ) -> "StepBase":
         self._extras.pop(key, None)  # no exception if not exists
         return self
-
-
-@dataclass
-class StepSkipExecutionOnNonMatchingContext(StepExtra):
-    pass

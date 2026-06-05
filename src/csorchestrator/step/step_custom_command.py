@@ -10,7 +10,7 @@ from csorchestrator.context.context_local_execution import (
 )
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepSkipExecutionOnNonMatchingContext
+from csorchestrator.orchestrator.step_base import StepBase
 
 
 @dataclass(kw_only=True)
@@ -123,15 +123,6 @@ def execute_step_custom_command(
     step: StepBashScriptCommand, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
     report = Report()
-
-    context_os_architecture_compiler_generator = context.get_active_os_architecture_compiler_generator()
-    assert context_os_architecture_compiler_generator is not None
-
-    excute_on_matching_context = step.get_extra(StepSkipExecutionOnNonMatchingContext)
-    if excute_on_matching_context is not None:
-        match = context_os_architecture_compiler_generator.context_os_architecture.is_equal_to(context.os_architecture)
-        if not match:
-            report.append_info(f"Skip '{step.name}', not compatible with the current context")
 
     errors = execute_command(["bash", "-c", "\n".join(step.cmd)], context.base_folder_path, reporter_sink)
     for e in errors:

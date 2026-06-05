@@ -32,9 +32,8 @@ def execute_step_create_archives(
 ) -> Report:
     report = Report()
 
-    context_os_architecture_compiler_generator = context.get_active_os_architecture_compiler_generator()
     install_subdir = create_context_os_architecture_compiler_generator_string(
-        context_os_architecture_compiler_generator
+        context.get_active_os_architecture_compiler_generator()
     )
     input_full_dir = Path(context.base_folder_path / step.base_install_dir / install_subdir).resolve()
     input_full_path = Path(input_full_dir / Path(step.input_id + ".ver")).resolve()

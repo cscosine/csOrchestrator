@@ -15,7 +15,7 @@ from csorchestrator.context.context_os_architecture_compiler_generator import Co
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepSkipExecutionOnNonMatchingContext
+from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_custom_command import execute_command
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
@@ -81,15 +81,6 @@ def execute_step_cmake_workflow(
 
     for workflow_config in workflow_configs:
         workflow_name = workflow_name_from_description(workflow_config)
-
-        excute_on_matching_context = step.get_extra(StepSkipExecutionOnNonMatchingContext)
-        if excute_on_matching_context is not None:
-            match = context_os_architecture_compiler_generator.context_os_architecture.is_equal_to(
-                context.os_architecture
-            )
-            if not match:
-                report.append_info(f"Skip '{workflow_name}', not compatible with the current context")
-                continue
 
         target_full_path: Path = context.base_folder_path / step.source_dir
         cmd = [
