@@ -2,7 +2,10 @@ from dataclasses import dataclass, field
 from typing import TypeAlias
 
 from csorchestrator.ci.github.github_workflow_config import CreateGitHubWorkflowConfig, GitHubWorkflow, create_github_wf
-from csorchestrator.context.context_os_architecture_compiler_generator import ExecutionMatrixOsArchCompilerGenerator
+from csorchestrator.context.context_os_architecture_compiler_generator import (
+    ContextOsArchitectureCompilerGenerator,
+    ExecutionMatrixOsArchCompilerGenerator,
+)
 from csorchestrator.context.orchestrator_minimal_description import (
     OrchestratorExecutorMinimalDescription,
     PhaseNameWithStepNames,
@@ -39,6 +42,10 @@ class Orchestrator:
         phase = Phase(phase_name)
         self.phases.append(phase)
         return phase
+
+    def set_execution_matrix_list(self, matrix_list: list[ContextOsArchitectureCompilerGenerator]) -> "Orchestrator":
+        self.execution_matrix.os_architecture_compiler_generator_list = matrix_list
+        return self
 
     def extract_minimal_description(self) -> OrchestratorExecutorMinimalDescription:
         ret = OrchestratorExecutorMinimalDescription(name=self.name, version=self.version)
