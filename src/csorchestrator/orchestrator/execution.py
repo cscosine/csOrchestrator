@@ -9,6 +9,7 @@ from csorchestrator.ci.github.github_workflow_config import (
 from csorchestrator.context.context_compiler_generator import Generator
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
+    ContextLocalExecutionExtra,
 )
 from csorchestrator.context.context_os_architecture import (
     OS,
@@ -138,6 +139,8 @@ def validate_and_execute_orchestrator(
 
     matrix = orchestrator.execution_matrix
 
+    matrix_extras: dict[type, ContextLocalExecutionExtra] = {}
+
     for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
         match = os_architecture_compiler_generator.context_os_architecture.can_be_executed_on(
             os_and_path.os_architecture
@@ -156,6 +159,7 @@ def validate_and_execute_orchestrator(
             os_architecture=os_and_path.os_architecture,
             active_compiler_generator=os_architecture_compiler_generator.context_compiler_generator,
             orchestrator_desc=er.execution_description,
+            matrix_extras=matrix_extras,
         )
 
         # execute
@@ -177,6 +181,8 @@ def validate_and_execute_orchestrator(
         reporter.report_execution_report(report_execution)
 
         er.report_executions.append(report_execution)
+
+        matrix_extras = context.matrix_extras
 
     reporter.finalize_execution()
     return er

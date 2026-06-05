@@ -7,6 +7,11 @@ class StepExtra:
     pass
 
 
+@dataclass
+class StepExecuteOnlyOncePerMatrix(StepExtra):
+    pass
+
+
 T = TypeVar("T", bound="StepExtra")
 
 
