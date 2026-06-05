@@ -13,9 +13,40 @@ class OS(Enum):
     MACOS = "macos"
 
 
+OS_PLATFORM_MACOS: str = "darwin"
+
+VERSION_STRING_PREFIX = "v"
+
+
+class WINDOWS_VERSIONS(Enum):
+    WIN10 = "v10"
+
+
+UBUNTU_STRING_PREFIX = "ubuntu"
+
+
+class UBUNTU_VERSIONS(Enum):
+    UBUNTU_22_04 = UBUNTU_STRING_PREFIX + "22.04"
+    UBUNTU_24_04 = UBUNTU_STRING_PREFIX + "24.04"
+
+
 class Architecture(Enum):
     X64 = "x64"
     ARM64 = "arm64"
+
+
+class MachineArchitecture(Enum):
+    AMD64 = "amd64"
+    X86_64 = "x86_64"
+    X64 = "x64"
+    AARCH64 = "aarch64"
+    ARM64 = "arm64"
+
+
+ARCHITECTURE_VARIANT_GENERIC: str = "generic"
+ARCHITECTURE_VARIANT_ARM64_ORIN: str = "orin"
+ARCHITECTURE_VARIANT_ARM64_XAVIER: str = "xavier"
+ARCHITECTURE_VARIANT_ARM64_NANO: str = "nano"
 
 
 @dataclass(frozen=True)
@@ -24,9 +55,7 @@ class ContextOsArchitecture:
     os_version: str
 
     architecture: Architecture
-    architecture_variant: str  # generic orin xavier nano
-
-    ARCHITECTURE_VARIANT_GENERIC: str = "generic"
+    architecture_variant: str  # GENERIC ORIN XAVIER NANO
 
     def can_be_executed_on(self, other: "ContextOsArchitecture") -> bool:
         if self.os == OS.WINDOWS and other.os == OS.WINDOWS:
@@ -59,10 +88,10 @@ def detect_os() -> Expected[tuple[OS, str], str]:
     # WINDOWS
     # -----------------------------------------------------
 
-    if system == "windows":
+    if system == OS.WINDOWS.value:
         version = platform.release()
 
-        return Expected[tuple[OS, str], str].make_value((OS.WINDOWS, "v" + version))
+        return Expected[tuple[OS, str], str].make_value((OS.WINDOWS, VERSION_STRING_PREFIX + version))
 
     # -----------------------------------------------------
     # LINUX
@@ -83,9 +112,9 @@ def detect_os() -> Expected[tuple[OS, str], str]:
             else:
                 return Expected[tuple[OS, str], str].make_error(f"Unsupported linux with /etc/os-release: {content}")
 
-    if system == "darwin":
+    if system == OS_PLATFORM_MACOS:
         version = platform.mac_ver()[0]
-        return Expected[tuple[OS, str], str].make_value((OS.MACOS, "v" + version))
+        return Expected[tuple[OS, str], str].make_value((OS.MACOS, VERSION_STRING_PREFIX + version))
 
     return Expected[tuple[OS, str], str].make_error(f"Unsupported OS: {system}")
 
@@ -98,16 +127,14 @@ def detect_architecture() -> Expected[tuple[Architecture, str], str]:
     # X64
     # -----------------------------------------------------
 
-    if machine in ["amd64", "x86_64", "x64"]:
-        return Expected[tuple[Architecture, str], str].make_value(
-            (Architecture.X64, ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC)
-        )
+    if machine in [MachineArchitecture.AMD64.value, MachineArchitecture.X86_64.value, MachineArchitecture.X64.value]:
+        return Expected[tuple[Architecture, str], str].make_value((Architecture.X64, ARCHITECTURE_VARIANT_GENERIC))
 
     # -----------------------------------------------------
     # ARM64
     # -----------------------------------------------------
 
-    if machine in ["aarch64", "arm64"]:
+    if machine in [MachineArchitecture.AARCH64.value, MachineArchitecture.ARM64.value]:
         variant = detect_arm64_variant()
 
         return Expected[tuple[Architecture, str], str].make_value((Architecture.ARM64, variant))
@@ -127,19 +154,19 @@ def detect_arm64_variant() -> str:
         try:
             model = model_file.read_text().lower()
 
-            if "orin" in model:
-                return "orin"
+            if ARCHITECTURE_VARIANT_ARM64_ORIN in model:
+                return ARCHITECTURE_VARIANT_ARM64_ORIN
 
-            if "xavier" in model:
-                return "xavier"
+            if ARCHITECTURE_VARIANT_ARM64_XAVIER in model:
+                return ARCHITECTURE_VARIANT_ARM64_XAVIER
 
-            if "nano" in model:
-                return "nano"
+            if ARCHITECTURE_VARIANT_ARM64_NANO in model:
+                return ARCHITECTURE_VARIANT_ARM64_NANO
 
         except Exception:
             pass
 
-    return ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC
+    return ARCHITECTURE_VARIANT_GENERIC
 
 
 # =========================================================

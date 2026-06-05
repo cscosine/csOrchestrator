@@ -37,7 +37,7 @@ csOrchestrator/
 
 #### Fastest Way (Using Setup Scripts)
 
-**Linux/macOS:**
+**LINUX/MACOS:**
 ```bash
 ./setup.sh              # Run ONCE to set up venv, deps, and pre-commit hooks
 ./open-code.sh         # Open VS Code with venv activated

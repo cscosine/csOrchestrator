@@ -1,6 +1,12 @@
 from unittest.mock import patch
 
-from csorchestrator.context.context_os_architecture import ContextOsArchitecture, detect_arm64_variant
+from csorchestrator.context.context_os_architecture import (
+    ARCHITECTURE_VARIANT_ARM64_NANO,
+    ARCHITECTURE_VARIANT_ARM64_ORIN,
+    ARCHITECTURE_VARIANT_ARM64_XAVIER,
+    ARCHITECTURE_VARIANT_GENERIC,
+    detect_arm64_variant,
+)
 
 # =========================================================
 # NVIDIA JETSON VARIANTS
@@ -17,7 +23,7 @@ def test_detect_arm64_variant_orin():
     ):
         result = detect_arm64_variant()
 
-    assert result == "orin"
+    assert result == ARCHITECTURE_VARIANT_ARM64_ORIN
 
 
 def test_detect_arm64_variant_xavier():
@@ -30,7 +36,7 @@ def test_detect_arm64_variant_xavier():
     ):
         result = detect_arm64_variant()
 
-    assert result == "xavier"
+    assert result == ARCHITECTURE_VARIANT_ARM64_XAVIER
 
 
 def test_detect_arm64_variant_nano():
@@ -43,7 +49,7 @@ def test_detect_arm64_variant_nano():
     ):
         result = detect_arm64_variant()
 
-    assert result == "nano"
+    assert result == ARCHITECTURE_VARIANT_ARM64_NANO
 
 
 # =========================================================
@@ -55,7 +61,7 @@ def test_detect_arm64_variant_generic_when_file_missing():
     with patch("pathlib.Path.exists", return_value=False):
         result = detect_arm64_variant()
 
-    assert result == ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC
+    assert result == ARCHITECTURE_VARIANT_GENERIC
 
 
 def test_detect_arm64_variant_generic_unknown_model():
@@ -68,7 +74,7 @@ def test_detect_arm64_variant_generic_unknown_model():
     ):
         result = detect_arm64_variant()
 
-    assert result == ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC
+    assert result == ARCHITECTURE_VARIANT_GENERIC
 
 
 def test_detect_arm64_variant_generic_on_exception():
@@ -78,4 +84,4 @@ def test_detect_arm64_variant_generic_on_exception():
     ):
         result = detect_arm64_variant()
 
-    assert result == ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC
+    assert result == ARCHITECTURE_VARIANT_GENERIC

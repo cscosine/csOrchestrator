@@ -5,8 +5,17 @@ from csorchestrator.context.context_compiler_generator import (
     GeneratorType,
     GeneratorWithType,
 )
-from csorchestrator.context.context_os_architecture import OS, Architecture, ContextOsArchitecture
+from csorchestrator.context.context_os_architecture import (
+    ARCHITECTURE_VARIANT_ARM64_ORIN,
+    ARCHITECTURE_VARIANT_GENERIC,
+    OS,
+    UBUNTU_VERSIONS,
+    WINDOWS_VERSIONS,
+    Architecture,
+    ContextOsArchitecture,
+)
 from csorchestrator.context.context_os_architecture_compiler_generator import (
+    CS_ORCHESTRATOR_SCHEMA_VERSION,
     ContextOsArchitectureCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
 )
@@ -15,9 +24,9 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
 def test_basic_linux_ninja_clang():
     context_os = ContextOsArchitecture(
         os=OS.LINUX,
-        os_version="ubuntu24.04",
+        os_version=UBUNTU_VERSIONS.UBUNTU_24_04.value,
         architecture=Architecture.ARM64,
-        architecture_variant="orin",
+        architecture_variant=ARCHITECTURE_VARIANT_ARM64_ORIN,
     )
 
     context_compiler = ContextCompilerGenerator(
@@ -30,15 +39,26 @@ def test_basic_linux_ninja_clang():
         ContextOsArchitectureCompilerGenerator(context_os, context_compiler)
     )
 
-    assert result == "csv1-linux-ubuntu24.04-arm64-orin-clang-default-ninja"
+    assert result == "-".join(
+        [
+            CS_ORCHESTRATOR_SCHEMA_VERSION,
+            OS.LINUX.value,
+            UBUNTU_VERSIONS.UBUNTU_24_04.value,
+            Architecture.ARM64.value,
+            ARCHITECTURE_VARIANT_ARM64_ORIN,
+            Compiler.CLANG.value,
+            ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+            Generator.NINJA.value,
+        ]
+    )
 
 
 def test_windows_msvc_vs_generator():
     context_os = ContextOsArchitecture(
         os=OS.WINDOWS,
-        os_version="v10",
+        os_version=WINDOWS_VERSIONS.WIN10.value,
         architecture=Architecture.X64,
-        architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
+        architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
     )
 
     context_compiler = ContextCompilerGenerator(
@@ -51,7 +71,18 @@ def test_windows_msvc_vs_generator():
         ContextOsArchitectureCompilerGenerator(context_os, context_compiler)
     )
 
-    assert result == "csv1-windows-v10-x64-generic-msvc-default-msvc2022"
+    assert result == "-".join(
+        [
+            CS_ORCHESTRATOR_SCHEMA_VERSION,
+            OS.WINDOWS.value,
+            WINDOWS_VERSIONS.WIN10.value,
+            Architecture.X64.value,
+            ARCHITECTURE_VARIANT_GENERIC,
+            Compiler.MSVC.value,
+            ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+            Generator.MSVC_17_2022.value,
+        ]
+    )
 
 
 def test_macos_appleclang_ninja_multiconfig():
@@ -59,7 +90,7 @@ def test_macos_appleclang_ninja_multiconfig():
         os=OS.MACOS,
         os_version="v14",
         architecture=Architecture.ARM64,
-        architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
+        architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
     )
 
     context_compiler = ContextCompilerGenerator(
@@ -72,16 +103,28 @@ def test_macos_appleclang_ninja_multiconfig():
         ContextOsArchitectureCompilerGenerator(context_os, context_compiler)
     )
 
-    assert result == "csv1-macos-v14-arm64-generic-appleclang-default-ninjamulticonfig"
+    assert result == "-".join(
+        [
+            CS_ORCHESTRATOR_SCHEMA_VERSION,
+            OS.MACOS.value,
+            "v14",
+            Architecture.ARM64.value,
+            ARCHITECTURE_VARIANT_GENERIC,
+            Compiler.APPLE_CLANG.value,
+            ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+            Generator.NINJA_MULTI.value,
+        ]
+    )
 
 
 def test_lowercasing_behavior():
     context_os = ContextOsArchitecture(
         os=OS.LINUX,
-        os_version="UbUnTu24.04",
+        os_version=UBUNTU_VERSIONS.UBUNTU_24_04.value,
         architecture=Architecture.ARM64,
-        architecture_variant="OrIn",
+        architecture_variant=ARCHITECTURE_VARIANT_ARM64_ORIN.upper(),
     )
+    # test that uppercasing does not affect the result
 
     context_compiler = ContextCompilerGenerator(
         compiler_family=Compiler.CLANG,
@@ -93,7 +136,18 @@ def test_lowercasing_behavior():
         ContextOsArchitectureCompilerGenerator(context_os, context_compiler)
     )
 
-    assert result == "csv1-linux-ubuntu24.04-arm64-orin-clang-default-ninja"
+    assert result == "-".join(
+        [
+            CS_ORCHESTRATOR_SCHEMA_VERSION,
+            OS.LINUX.value,
+            UBUNTU_VERSIONS.UBUNTU_24_04.value,
+            Architecture.ARM64.value,
+            ARCHITECTURE_VARIANT_ARM64_ORIN,
+            Compiler.CLANG.value,
+            ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+            Generator.NINJA.value,
+        ]
+    )
 
 
 def test_all_generators_supported():
@@ -101,14 +155,14 @@ def test_all_generators_supported():
         os=OS.LINUX,
         os_version="5.0",
         architecture=Architecture.X64,
-        architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
+        architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
     )
 
     for gen, expected in [
-        (GeneratorWithType(Generator.NINJA, GeneratorType.SINGLE_CONFIG), "ninja"),
-        (GeneratorWithType(Generator.NINJA_MULTI, GeneratorType.MULTI_CONFIG), "ninjamulticonfig"),
-        (GeneratorWithType(Generator.MSVC_17_2022, GeneratorType.MULTI_CONFIG), "msvc2022"),
-        (GeneratorWithType(Generator.MSVC_18_2026, GeneratorType.MULTI_CONFIG), "msvc2026"),
+        (GeneratorWithType(Generator.NINJA, GeneratorType.SINGLE_CONFIG), Generator.NINJA.value),
+        (GeneratorWithType(Generator.NINJA_MULTI, GeneratorType.MULTI_CONFIG), Generator.NINJA_MULTI.value),
+        (GeneratorWithType(Generator.MSVC_17_2022, GeneratorType.MULTI_CONFIG), Generator.MSVC_17_2022.value),
+        (GeneratorWithType(Generator.MSVC_18_2026, GeneratorType.MULTI_CONFIG), Generator.MSVC_18_2026.value),
     ]:
         context_compiler = ContextCompilerGenerator(
             compiler_family=Compiler.GCC,

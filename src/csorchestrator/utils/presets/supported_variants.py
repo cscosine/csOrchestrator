@@ -8,7 +8,10 @@ from csorchestrator.context.context_compiler_generator import (
     GeneratorWithType,
 )
 from csorchestrator.context.context_os_architecture import (
+    ARCHITECTURE_VARIANT_GENERIC,
     OS,
+    UBUNTU_VERSIONS,
+    WINDOWS_VERSIONS,
     Architecture,
     ContextOsArchitecture,
 )
@@ -28,11 +31,11 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
 
 def get_supported_os_version_list(os: OS) -> list[str]:
     if os == OS.LINUX:
-        return ["ubuntu22.04", "ubuntu24.04"]
+        return [UBUNTU_VERSIONS.UBUNTU_22_04.value, UBUNTU_VERSIONS.UBUNTU_24_04.value]
     elif os == OS.WINDOWS:
-        return ["v10"]
+        return [WINDOWS_VERSIONS.WIN10.value]
     elif os == OS.MACOS:
-        return []  # TODO add macos support
+        return []  # TODO add MACOS support
     else:
         return []
 
@@ -110,7 +113,7 @@ def get_supported_context_os_architecture_list() -> list[ContextOsArchitectureCo
             os=OS.LINUX,
             os_version=os_version,
             architecture=Architecture.X64,
-            architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
+            architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
         )
         generators = get_supported_generators_per_os(os_arch.os)
         compilers = get_supported_compilers_per_os(os_arch.os)
@@ -134,7 +137,7 @@ def get_supported_context_os_architecture_list() -> list[ContextOsArchitectureCo
             os=OS.WINDOWS,
             os_version=os_version,
             architecture=Architecture.X64,
-            architecture_variant=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
+            architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
         )
 
         generators = get_supported_generators_per_os(os_arch.os)
@@ -154,7 +157,7 @@ def get_supported_context_os_architecture_list() -> list[ContextOsArchitectureCo
                 )
     ## MACOS
     # for os_version in get_supported_os_version_list(OS.MACOS):
-    #     _ = os_version  # TODO add macos support
+    #     _ = os_version  # TODO add MACOS support
 
     return retList
 

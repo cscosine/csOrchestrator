@@ -4,7 +4,7 @@ from typing import TypeVar
 from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
 
-cs_orchestrator_schema_version = "csv1"
+CS_ORCHESTRATOR_SCHEMA_VERSION = "csv1"
 
 
 @dataclass
@@ -67,7 +67,7 @@ def create_context_os_architecture_compiler_generator_string_from_components(
     build_generator: str,
 ) -> str:
     parts: list[str] = []
-    parts.append(cs_orchestrator_schema_version.lower())
+    parts.append(CS_ORCHESTRATOR_SCHEMA_VERSION.lower())
     parts.append(os.lower())
     parts.append(os_version.lower())
     parts.append(architecture.lower())
@@ -94,12 +94,6 @@ def create_context_os_architecture_compiler_generator_string(
 ) -> str:
     """
     Creates canonical CS orchestrator ID.
-
-    Examples:
-
-        csv1-linux-ubuntu24.04-arm64-orin-clang-ninja
-        csv1-windows-11-x64-generic-msvc-msvc2022
-        csv1-macos-14-arm64-generic-appleclang-ninjamulticonfig
     """
 
     context_os_architecture = context_os_architecture_generator.context_os_architecture

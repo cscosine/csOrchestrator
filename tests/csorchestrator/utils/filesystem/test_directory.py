@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytest
 
+from csorchestrator.context.context_os_architecture import OS
 from csorchestrator.utils.file_system.directory import ensure_directory_exists_or_create_and_is_usable
 
 
@@ -113,7 +114,9 @@ def test_directory_is_writable(tmp_path: Path) -> None:
     assert test_file.exists()
 
 
-@pytest.mark.skipif(platform.system() == "Windows", reason="Permission test unreliable on Windows")
+@pytest.mark.skipif(
+    platform.system().lower() == OS.WINDOWS.value, reason="Permission test unreliable on " + OS.WINDOWS.value
+)
 def test_permission_error(tmp_path: Path) -> None:
     target = tmp_path / "restricted"
     target.mkdir()

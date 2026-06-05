@@ -4,7 +4,15 @@ from unittest.mock import patch
 
 import pytest
 
-from csorchestrator.context.context_os_architecture import Architecture, ContextOsArchitecture, detect_architecture
+from csorchestrator.context.context_os_architecture import (
+    ARCHITECTURE_VARIANT_ARM64_NANO,
+    ARCHITECTURE_VARIANT_ARM64_ORIN,
+    ARCHITECTURE_VARIANT_ARM64_XAVIER,
+    ARCHITECTURE_VARIANT_GENERIC,
+    Architecture,
+    MachineArchitecture,
+    detect_architecture,
+)
 
 # =========================================================
 # X64
@@ -14,9 +22,9 @@ from csorchestrator.context.context_os_architecture import Architecture, Context
 @pytest.mark.parametrize(
     "machine",
     [
-        "x86_64",
-        "amd64",
-        "x64",
+        MachineArchitecture.X86_64.value,
+        MachineArchitecture.AMD64.value,
+        MachineArchitecture.X64.value,
     ],
 )
 def test_detect_architecture_x64(machine):
@@ -24,7 +32,7 @@ def test_detect_architecture_x64(machine):
         result = detect_architecture()
 
     assert result.error is None
-    assert result.value == (Architecture.X64, ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC)
+    assert result.value == (Architecture.X64, ARCHITECTURE_VARIANT_GENERIC)
 
 
 # =========================================================
@@ -35,8 +43,8 @@ def test_detect_architecture_x64(machine):
 @pytest.mark.parametrize(
     "machine",
     [
-        "aarch64",
-        "arm64",
+        MachineArchitecture.AARCH64.value,
+        MachineArchitecture.ARM64.value,
     ],
 )
 def test_detect_architecture_arm64_generic(machine):
@@ -44,26 +52,26 @@ def test_detect_architecture_arm64_generic(machine):
         patch("platform.machine", return_value=machine),
         patch(
             "csorchestrator.context.context_os_architecture.detect_arm64_variant",
-            return_value=ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC,
+            return_value=ARCHITECTURE_VARIANT_GENERIC,
         ),
     ):
         result = detect_architecture()
 
     assert result.error is None
-    assert result.value == (Architecture.ARM64, ContextOsArchitecture.ARCHITECTURE_VARIANT_GENERIC)
+    assert result.value == (Architecture.ARM64, ARCHITECTURE_VARIANT_GENERIC)
 
 
 @pytest.mark.parametrize(
     ("variant", "expected"),
     [
-        ("orin", "orin"),
-        ("xavier", "xavier"),
-        ("nano", "nano"),
+        (ARCHITECTURE_VARIANT_ARM64_ORIN, ARCHITECTURE_VARIANT_ARM64_ORIN),
+        (ARCHITECTURE_VARIANT_ARM64_XAVIER, ARCHITECTURE_VARIANT_ARM64_XAVIER),
+        (ARCHITECTURE_VARIANT_ARM64_NANO, ARCHITECTURE_VARIANT_ARM64_NANO),
     ],
 )
 def test_detect_architecture_arm64_variants(variant, expected):
     with (
-        patch("platform.machine", return_value="aarch64"),
+        patch("platform.machine", return_value=MachineArchitecture.AARCH64.value),
         patch("csorchestrator.context.context_os_architecture.detect_arm64_variant", return_value=variant),
     ):
         result = detect_architecture()

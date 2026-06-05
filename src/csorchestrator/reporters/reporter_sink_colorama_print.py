@@ -4,7 +4,7 @@ from colorama import Fore, Style, init
 
 from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrintBase
 
-init()  # enables ANSI on Windows cmd
+init()  # enables ANSI on WINDOWS cmd
 
 
 @dataclass

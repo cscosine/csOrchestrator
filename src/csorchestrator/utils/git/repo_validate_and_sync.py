@@ -99,7 +99,7 @@ def validate_and_sync_repo(repo_url: str, repo_ref: str, target_path: Path) -> R
                 return report
 
         finally:
-            # ensure to close files, important in windows
+            # ensure to close files, important in WINDOWS
             tmp_repo.close()
 
     return report

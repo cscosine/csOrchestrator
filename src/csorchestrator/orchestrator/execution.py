@@ -12,6 +12,9 @@ from csorchestrator.context.context_local_execution import (
 )
 from csorchestrator.context.context_os_architecture import (
     OS,
+    UBUNTU_STRING_PREFIX,
+    UBUNTU_VERSIONS,
+    WINDOWS_VERSIONS,
     Architecture,
     ContextOsArchitecture,
     detect_context_os_architecture,
@@ -183,22 +186,27 @@ OrchestratorMatrixToGitHubWFExpected: TypeAlias = Expected[
     list[MatrixOsArchCompilerGeneratorRunnerEntryInclude], list[str]
 ]  # str is the error messages
 
+GITHUB_RUNNER_UBUNTU_22_04 = UBUNTU_STRING_PREFIX + "-22.04"
+GITHUB_RUNNER_UBUNTU_24_04 = UBUNTU_STRING_PREFIX + "-24.04"
+GITHUB_RUNNER_WINDOWS_2022 = OS.WINDOWS.value + "-2022"
+GITHUB_RUNNER_WINDOWS_2025_VS2026 = OS.WINDOWS.value + "-2025-vs2026"
+
 
 def get_runner(os: OS, os_version: str, arch: Architecture, generator: Generator) -> Expected[str, str]:
     if os == OS.LINUX:
-        if os_version == "ubuntu22.04":
+        if os_version == UBUNTU_VERSIONS.UBUNTU_22_04.value:
             if arch == Architecture.X64:
-                return Expected[str, str].make_value("ubuntu-22.04")
-        elif os_version == "ubuntu24.04":
+                return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_22_04)
+        elif os_version == UBUNTU_VERSIONS.UBUNTU_24_04.value:
             if arch == Architecture.X64:
-                return Expected[str, str].make_value("ubuntu-24.04")
+                return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_24_04)
     elif os == OS.WINDOWS:
-        if os_version == "v10":
+        if os_version == WINDOWS_VERSIONS.WIN10.value:
             if arch == Architecture.X64:
                 if generator == Generator.MSVC_17_2022:
-                    return Expected[str, str].make_value("windows-2022")
+                    return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2022)
                 elif generator == Generator.MSVC_18_2026:
-                    return Expected[str, str].make_value("windows-2025-vs2026")
+                    return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2025_VS2026)
 
     return Expected[str, str].make_error(
         f"unsupported config os: {os.value}, os_version: {os_version}, arch: {arch.value}, generator: {generator.value}"

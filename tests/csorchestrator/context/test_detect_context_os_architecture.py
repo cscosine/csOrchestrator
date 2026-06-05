@@ -1,7 +1,10 @@
 from unittest.mock import patch
 
 from csorchestrator.context.context_os_architecture import (
+    ARCHITECTURE_VARIANT_ARM64_ORIN,
+    ARCHITECTURE_VARIANT_ARM64_XAVIER,
     OS,
+    UBUNTU_VERSIONS,
     Architecture,
     ContextOsArchitecture,
     detect_context_os_architecture,
@@ -20,7 +23,7 @@ def test_detect_context_os_architecture_success():
             return_value=Expected.make_value(
                 (
                     OS.LINUX,
-                    "ubuntu24.04",
+                    UBUNTU_VERSIONS.UBUNTU_24_04.value,
                 )
             ),
         ),
@@ -29,7 +32,7 @@ def test_detect_context_os_architecture_success():
             return_value=Expected.make_value(
                 (
                     Architecture.ARM64,
-                    "orin",
+                    ARCHITECTURE_VARIANT_ARM64_ORIN,
                 )
             ),
         ),
@@ -40,9 +43,9 @@ def test_detect_context_os_architecture_success():
 
     assert result.value == ContextOsArchitecture(
         os=OS.LINUX,
-        os_version="ubuntu24.04",
+        os_version=UBUNTU_VERSIONS.UBUNTU_24_04.value,
         architecture=Architecture.ARM64,
-        architecture_variant="orin",
+        architecture_variant=ARCHITECTURE_VARIANT_ARM64_ORIN,
     )
 
 
@@ -74,7 +77,7 @@ def test_detect_context_os_architecture_architecture_error():
             return_value=Expected.make_value(
                 (
                     OS.LINUX,
-                    "ubuntu24.04",
+                    UBUNTU_VERSIONS.UBUNTU_24_04,
                 )
             ),
         ),
@@ -93,21 +96,21 @@ def test_detect_context_os_architecture_architecture_error():
 def test_context_os_architecture_can_be_executed_on():
     a1 = ContextOsArchitecture(
         os=OS.LINUX,
-        os_version="ubuntu24.04",
+        os_version=UBUNTU_VERSIONS.UBUNTU_24_04.value,
         architecture=Architecture.ARM64,
-        architecture_variant="orin",
+        architecture_variant=ARCHITECTURE_VARIANT_ARM64_ORIN,
     )
     a2 = ContextOsArchitecture(
         os=OS.LINUX,
-        os_version="ubuntu24.04",
+        os_version=UBUNTU_VERSIONS.UBUNTU_24_04.value,
         architecture=Architecture.ARM64,
-        architecture_variant="orin",
+        architecture_variant=ARCHITECTURE_VARIANT_ARM64_ORIN,
     )
     a3 = ContextOsArchitecture(
         os=OS.LINUX,
-        os_version="ubuntu24.04",
+        os_version=UBUNTU_VERSIONS.UBUNTU_24_04.value,
         architecture=Architecture.ARM64,
-        architecture_variant="xavier",
+        architecture_variant=ARCHITECTURE_VARIANT_ARM64_XAVIER,
     )
 
     assert a1.can_be_executed_on(a2)

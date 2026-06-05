@@ -1,5 +1,5 @@
 from csorchestrator.context.context_compiler_generator import GeneratorType
-from csorchestrator.context.context_os_architecture import OS
+from csorchestrator.context.context_os_architecture import OS, UBUNTU_VERSIONS, WINDOWS_VERSIONS
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
     get_all_supported_workflow_descriptions,
@@ -142,14 +142,14 @@ def test_workflow_name_from_description() -> None:
 def test_get_supported_os_version_list() -> None:
     linux_versions = get_supported_os_version_list(OS.LINUX)
     assert len(linux_versions) > 0
-    assert "ubuntu24.04" in linux_versions
+    assert UBUNTU_VERSIONS.UBUNTU_24_04.value in linux_versions
 
     windows_versions = get_supported_os_version_list(OS.WINDOWS)
     assert len(windows_versions) > 0
-    assert "v10" in windows_versions
+    assert WINDOWS_VERSIONS.WIN10.value in windows_versions
 
     macos_versions = get_supported_os_version_list(OS.MACOS)
-    assert len(macos_versions) == 0  # TODO add macos support
+    assert len(macos_versions) == 0  # TODO add MACOS support
 
     invalid_versions = get_supported_os_version_list("INVALID")  # type: ignore
     assert len(invalid_versions) == 0
