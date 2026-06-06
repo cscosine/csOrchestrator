@@ -218,7 +218,7 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
 
     search_path_base = step.base_install_dir / install_subdir
     lines += ["for name in repos_auto_search_list:"]
-    lines += [f"  search_path: Path = Path('{str(search_path_base)}') / name"]
+    lines += [f"  search_path: Path = Path('{search_path_base.as_posix()}') / name"]
     lines += ["  path_or_err = find_cmake_config_version(search_path=search_path, name=name)"]
     lines += ["  if path_or_err[0] is not None:"]
     lines += ["    path = path_or_err[0]"]

@@ -92,7 +92,7 @@ def step_create_archives_to_githubwf(
         "for entry in versions:",
         "    name = entry['name']",
         "    version = entry['version']",
-        f"    install_subdir = Path('{install_subdir}').resolve()",
+        f"    install_subdir = Path('{install_subdir.as_posix()}').resolve()",
         "    input_path = Path(install_subdir / Path(name)).resolve()",
         f"    output_path = Path(install_subdir / Path('{install_dir_name}' + '-' + name + '-' + version + '.tar.gz')).resolve()",  # noqa: E501
         "    ",

@@ -48,7 +48,7 @@ def step_upload_artifacts_to_githubwf(
         StepGithubUploadArtifacts(
             name="Upload Artifacts",
             with_name=artifact_name,
-            with_path=str(step.base_install_dir / install_subdir / "*.tar.gz"),
+            with_path=(step.base_install_dir / install_subdir / "*.tar.gz").as_posix(),
         )
     )
 
