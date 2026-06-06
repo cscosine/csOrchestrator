@@ -179,6 +179,9 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
     # deps: TODO add deps when we will need to install python packages
 
     # embraced
+    MATRIX_OS_NAME: str = "matrix.os"
+    MATRIX_OS_VERSION: str = "matrix.os_version"
+
     MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED: str = "${{ matrix.runner }}"
     MATRIX_OS_NAME_EMBRACED: str = "${{ matrix.os }}"
     MATRIX_OS_VERSION_EMBRACED: str = "${{ matrix.os_version }}"

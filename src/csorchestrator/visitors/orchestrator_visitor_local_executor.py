@@ -1,17 +1,19 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Callable, TypeVar
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution, ContextLocalExecutionExtra
+from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepExecuteOnlyOncePerMatrix, StepSkipExecutionOnLocal
+from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, execute_step_cmake_workflow
 from csorchestrator.step.step_create_archives import StepCreateArchives, execute_step_create_archives
 from csorchestrator.step.step_custom_command import (
     StepBashScriptCommand,
+    StepWinPSCommand,
     execute_step_custom_command,
+    execute_step_win_ps_command,
 )
 from csorchestrator.step.step_echo_message import StepEchoMessage, execute_step_echo_message
 from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub, execute_step_get_repository
@@ -20,11 +22,7 @@ from csorchestrator.step.step_get_versions_from_cmake_config_package_version imp
     execute_step_get_versions_from_cmake_config_package_version,
 )
 from csorchestrator.step.step_upload_artifacts import StepUploadArtifacts, execute_step_upload_artifacts
-
-
-@dataclass
-class StepGetRepositoryExecuteOnlyOncePerMatrixContextLocalExecutionExtra(ContextLocalExecutionExtra):
-    already_executed_on_phase_step: set[tuple[str, str]] = field(default_factory=set)
+from csorchestrator.step.step_utils import StepExecuteOnlyOn, StepExecuteOnlyOncePerMatrix, StepSkipExecutionOnLocal
 
 
 @dataclass
@@ -58,20 +56,20 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
         # manage skip on local execution
         if step.get_extra(StepSkipExecutionOnLocal) is not None:
             return "Step is marked to be skipped on local execution"
+
+        # manage skip on non matching OS
+        execute_only_on_extra = step.get_extra(StepExecuteOnlyOn)
+        if execute_only_on_extra is not None:
+            result = execute_only_on_extra.evaluate_local_exec(self.context)
+            if result is not None:
+                return result
+
         # manage single execution per matrix
-        if step.get_extra(StepExecuteOnlyOncePerMatrix) is not None:
-            matrix_extra = self.context.get_matrix_extra(
-                StepGetRepositoryExecuteOnlyOncePerMatrixContextLocalExecutionExtra
-            )
-
-            if matrix_extra is None:
-                matrix_extra = StepGetRepositoryExecuteOnlyOncePerMatrixContextLocalExecutionExtra()
-                self.context.add_matrix_extra(matrix_extra)
-
-            if (self._current_phase_name, step.name) in matrix_extra.already_executed_on_phase_step:
-                return "Step is already executed on this matrix"
-
-            matrix_extra.already_executed_on_phase_step.add((self._current_phase_name, step.name))
+        exec_only_one = step.get_extra(StepExecuteOnlyOncePerMatrix)
+        if exec_only_one is not None:
+            result = exec_only_one.evaluate_local_exec(self.context, self._current_phase_name, step.name)
+            if result is not None:
+                return result
         return None
 
     TStep = TypeVar("TStep", bound=StepBase)
@@ -117,3 +115,7 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
     @visit_step.register
     def _(self, step: StepBashScriptCommand, reporter_sink: ReporterSinkBase) -> Report:
         return self._run_step(execute_step_custom_command, step, reporter_sink)
+
+    @visit_step.register
+    def _(self, step: StepWinPSCommand, reporter_sink: ReporterSinkBase) -> Report:
+        return self._run_step(execute_step_win_ps_command, step, reporter_sink)

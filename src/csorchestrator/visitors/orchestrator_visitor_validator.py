@@ -7,7 +7,12 @@ from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, validate_step_cmake_workflow
 from csorchestrator.step.step_create_archives import StepCreateArchives, validate_step_create_archives
-from csorchestrator.step.step_custom_command import StepBashScriptCommand, validate_step_custom_command
+from csorchestrator.step.step_custom_command import (
+    StepBashScriptCommand,
+    StepWinPSCommand,
+    validate_step_custom_command,
+    validate_step_win_ps_command,
+)
 from csorchestrator.step.step_echo_message import StepEchoMessage
 from csorchestrator.step.step_get_repository import (
     StepGetRepositoryGitHub,
@@ -71,3 +76,7 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
     @visit_step.register
     def _(self, step: StepBashScriptCommand, reporter_sink: ReporterSinkBase) -> Report:
         return validate_step_custom_command(step)
+
+    @visit_step.register
+    def _(self, step: StepWinPSCommand, reporter_sink: ReporterSinkBase) -> Report:
+        return validate_step_win_ps_command(step)

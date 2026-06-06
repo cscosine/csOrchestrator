@@ -4,17 +4,27 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, TextIO
 
-from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution, StepRunCommand
+from csorchestrator.ci.github.github_workflow_config import (
+    JobOrchestratorMatrixExecution,
+    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    StepRunCommand,
+)
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.step.step_utils import StepExecuteOnlyOn
 
 
 @dataclass(kw_only=True)
 class StepBashScriptCommand(StepBase):
+    cmd: list[str] = field(default_factory=list)
+
+
+@dataclass(kw_only=True)
+class StepWinPSCommand(StepBase):
     cmd: list[str] = field(default_factory=list)
 
 
@@ -131,6 +141,20 @@ def execute_step_custom_command(
     return report
 
 
+def get_if_str(step: StepBase) -> str | None:
+    if step.get_extra(StepExecuteOnlyOn) is not None:
+        execute_only_on_extra = step.get_extra(StepExecuteOnlyOn)
+        if execute_only_on_extra is not None:
+            os_str = execute_only_on_extra.os.value.lower()
+            if execute_only_on_extra.version_starts_with is not None:
+                # if: ${{ matrix.os == 'linux' && startsWith(matrix.os, 'ubuntu') }}
+                if_str = f"${{{{ {MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME} == '{os_str}' && startsWith({MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION}, '{execute_only_on_extra.version_starts_with}') }}}}"  # noqa: E501
+            else:
+                if_str = f"${{{{ {MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME} == '{os_str}' }}}}"
+            return if_str
+    return None
+
+
 def step_custom_command_to_githubwf(
     step: StepBashScriptCommand, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
@@ -141,7 +165,7 @@ def step_custom_command_to_githubwf(
     wf_job.steps.append(
         StepRunCommand(
             name=f"Run command {step.name}",
-            # if_str=, #TODO add if on OS
+            if_str=get_if_str(step),
             shell_type="bash",
             run=run_str_list,
         )
@@ -151,5 +175,44 @@ def step_custom_command_to_githubwf(
 
 
 def validate_step_custom_command(step: StepBashScriptCommand) -> Report:
+    report = Report()
+    return report
+
+
+# ------------------------------
+
+
+def execute_step_win_ps_command(
+    step: StepWinPSCommand, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
+) -> Report:
+    report = Report()
+
+    errors = execute_command(["powershell", "-Command", "; ".join(step.cmd)], context.base_folder_path, reporter_sink)
+    for e in errors:
+        report.append_error(e)
+
+    return report
+
+
+def step_win_ps_command_to_githubwf(
+    step: StepWinPSCommand, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+) -> Report:
+
+    run_str_list = ["|"]
+    run_str_list += step.cmd
+
+    wf_job.steps.append(
+        StepRunCommand(
+            name=f"Run command {step.name}",
+            if_str=get_if_str(step),
+            shell_type="powershell",
+            run=run_str_list,
+        )
+    )
+
+    return Report()
+
+
+def validate_step_win_ps_command(step: StepWinPSCommand) -> Report:
     report = Report()
     return report
