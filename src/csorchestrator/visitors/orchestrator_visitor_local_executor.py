@@ -6,7 +6,7 @@ from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepExecuteOnlyOncePerMatrix
+from csorchestrator.orchestrator.step_base import StepBase, StepExecuteOnlyOncePerMatrix, StepSkipExecutionOnLocal
 from csorchestrator.step.step_cmake_command import StepCMakeWorkflow, execute_step_cmake_workflow
 from csorchestrator.step.step_create_archives import StepCreateArchives, execute_step_create_archives
 from csorchestrator.step.step_custom_command import (
@@ -51,10 +51,13 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
 
     visit_step = OrchestratorVisitorBase.create_visit_dispatch()
 
-    def should_execute_step(self, step: StepBase) -> bool:  # None is non expected error
+    def should_execute_step(self, step: StepBase) -> None | str:  # None is non expected error
         if self._current_phase_name is None:
-            raise Exception("Failed to determine current phase - unexpected error in should_execute_step")
+            return "Failed to determine current phase - unexpected error in should_execute_step"
 
+        # manage skip on local execution
+        if step.get_extra(StepSkipExecutionOnLocal) is not None:
+            return "Step is marked to be skipped on local execution"
         # manage single execution per matrix
         if step.get_extra(StepExecuteOnlyOncePerMatrix) is not None:
             matrix_extra = self.context.get_matrix_extra(
@@ -66,10 +69,10 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
                 self.context.add_matrix_extra(matrix_extra)
 
             if (self._current_phase_name, step.name) in matrix_extra.already_executed_on_phase_step:
-                return False
+                return "Step is already executed on this matrix"
 
             matrix_extra.already_executed_on_phase_step.add((self._current_phase_name, step.name))
-        return True
+        return None
 
     TStep = TypeVar("TStep", bound=StepBase)
 
@@ -79,14 +82,10 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
         step: TStep,
         reporter_sink: ReporterSinkBase,
     ) -> Report:
-        if not self.should_execute_step(step):
-            if self._current_phase_name is None:
-                return Report().append_error(
-                    "Failed to determine current phase - unexpected error in should_execute_step"
-                )
+        skip_reason = self.should_execute_step(step)
+        if skip_reason is not None:
             return Report().append_info(
-                f"skipping execution of step {step.name} of type {type(step).__name__} "
-                f"since it is already executed on this matrix"
+                f"skipping execution of step {step.name} of type {type(step).__name__} since {skip_reason}"
             )
 
         return executor(step, self.context, reporter_sink)

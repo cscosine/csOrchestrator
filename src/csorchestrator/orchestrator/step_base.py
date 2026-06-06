@@ -12,6 +12,11 @@ class StepExecuteOnlyOncePerMatrix(StepExtra):
     pass
 
 
+@dataclass
+class StepSkipExecutionOnLocal(StepExtra):
+    pass
+
+
 T = TypeVar("T", bound="StepExtra")
 
 
