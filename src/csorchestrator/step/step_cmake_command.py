@@ -89,6 +89,7 @@ def execute_step_cmake_workflow(
             "--preset",
             workflow_name,
         ]
+        report.append_info(f"Run cmake workflow with command: {' '.join(cmd)} in {target_full_path}")
         errors = execute_command(cmd, target_full_path, reporter_sink)
         for e in errors:
             report.append_error(e)
