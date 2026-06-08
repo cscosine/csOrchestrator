@@ -7,7 +7,11 @@ from csorchestrator.ci.github.github_workflow_config import (
     create_github_wf,
     create_job_from_matrix_list,
 )
-from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
+from csorchestrator.context.context_compiler_generator import (
+    ContextCompilerGenerator,
+    Generator,
+    get_cmake_generator_name,
+)
 from csorchestrator.context.context_os_architecture import (
     ARCHITECTURE_VARIANT_GENERIC,
     OS,
@@ -53,6 +57,7 @@ EXPECTED_LINES = EXPECTED_LINES_HEADER + [
     f"            compiler_version: {ContextCompilerGenerator.COMPILER_VERSION_DEFAULT}",
     "            generator: ninja",
     "            generator_type: single",
+    "            generator_cmake: Ninja",
     f"            runner: {GITHUB_RUNNER_UBUNTU_22_04}",
     "",
 ]
@@ -95,6 +100,7 @@ def test_workflow_with_triggers_and_one_job():
                         build_generator="ninja",
                         build_generator_type="single",
                         runner=GITHUB_RUNNER_UBUNTU_22_04,
+                        generator_cmake=get_cmake_generator_name(Generator.NINJA) or "",
                     )
                 ],
             ),
@@ -130,6 +136,7 @@ def test_workflow_with_creation_helper():
                     build_generator="ninja",
                     build_generator_type="single",
                     runner=GITHUB_RUNNER_UBUNTU_22_04,
+                    generator_cmake=get_cmake_generator_name(Generator.NINJA) or "",
                 )
             ],
             orchestrator_desc=create_orchestrator_factory("test", "0.0.0", "exec-job").extract_minimal_description(),

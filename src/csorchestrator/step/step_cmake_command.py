@@ -110,10 +110,10 @@ def step_cmake_workflow_to_githubwf(
     run_str_list = ["|", "set -e"]
     first_cycle = False
     for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:
-        generator_type_matrix = MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_TYPE
+        generator_type_matrix_embraced = MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_TYPE_EMBRACED
         if_elif_str = "if" if not first_cycle else "elif"
         run_str_list += [
-            if_elif_str + ' [[ "${{' + generator_type_matrix + '}}" == ' + '"' + generator_type.value + '" ]]; then'
+            if_elif_str + ' [[ "' + generator_type_matrix_embraced + '" == ' + '"' + generator_type.value + '" ]]; then'
         ]
         first_cycle = True
         generator_supported_configs = get_supported_build_configs_for_generator_type(generator_type)
@@ -145,7 +145,10 @@ def step_cmake_workflow_to_githubwf(
         return Report().append_error("Defensive: no generators in for loop in step_cmake_workflow_to_githubwf?!?")
 
     run_str_list += ["else"]
-    run_str_list += ['  echo "Unknown generator_type: ${{ matrix.generator_type }}"']
+    run_str_list += [
+        '  echo "Unknown generator_type: '
+        f'{MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_TYPE_EMBRACED}"'
+    ]
     run_str_list += ["  exit 1"]
     run_str_list += ["fi"]
 

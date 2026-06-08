@@ -11,11 +11,35 @@ class Compiler(Enum):
     APPLE_CLANG = "appleclang"
 
 
+def get_c_cpp_compiler(compiler: Compiler) -> tuple[str | None, str | None]:
+    if compiler == Compiler.GCC:
+        return ("gcc", "g++")
+    elif compiler == Compiler.CLANG:
+        return ("clang", "clang++")
+    if compiler == Compiler.APPLE_CLANG:
+        return ("clang", "clang++")
+    else:
+        return (None, None)
+
+
 class Generator(Enum):
     NINJA = "ninja"
     NINJA_MULTI = "ninjamulticonfig"
     MSVC_17_2022 = "msvc2022"
     MSVC_18_2026 = "msvc2026"
+
+
+def get_cmake_generator_name(generator: Generator) -> str | None:
+    if generator == Generator.NINJA:
+        return "Ninja"
+    elif generator == Generator.NINJA_MULTI:
+        return "Ninja Multi-Config"
+    elif generator == Generator.MSVC_17_2022:
+        return "Visual Studio 17 2022"
+    elif generator == Generator.MSVC_18_2026:
+        return "Visual Studio 18 2026"
+    else:
+        return None
 
 
 class GeneratorType(Enum):

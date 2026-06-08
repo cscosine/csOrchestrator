@@ -2,6 +2,9 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import List, Optional, Self, TypeAlias
 
+from csorchestrator.context.context_os_architecture_compiler_generator import (
+    create_context_os_architecture_compiler_generator_string_from_components,
+)
 from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 
 # =========================================================
@@ -175,13 +178,17 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
     compiler_version: str
     build_generator: str
     build_generator_type: str
+    generator_cmake: str
     runner: str
+    c_compiler: str | None = None
+    cpp_compiler: str | None = None
     # deps: TODO add deps when we will need to install python packages
 
-    # embraced
+    # not embraced
     MATRIX_OS_NAME: str = "matrix.os"
     MATRIX_OS_VERSION: str = "matrix.os_version"
 
+    # embraced
     MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED: str = "${{ matrix.runner }}"
     MATRIX_OS_NAME_EMBRACED: str = "${{ matrix.os }}"
     MATRIX_OS_VERSION_EMBRACED: str = "${{ matrix.os_version }}"
@@ -190,22 +197,38 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
     MATRIX_COMPILER_EMBRACED: str = "${{ matrix.compiler }}"
     MATRIX_COMPILER_VERSION_EMBRACED: str = "${{ matrix.compiler_version }}"
     MATRIX_GENERATOR_EMBRACED: str = "${{ matrix.generator }}"
-
-    # not embraced
-    MATRIX_GENERATOR_TYPE: str = "matrix.generator_type"
+    MATRIX_GENERATOR_TYPE_EMBRACED: str = "${{ matrix.generator_type }}"
+    MATRIX_GENERATOR_CMAKE_EMBRACED: str = "${{ matrix.generator_cmake }}"
+    C_COMPILER_EMBRACED: str = "${{ matrix.c_compiler }}"
+    CPP_COMPILER_EMBRACED: str = "${{ matrix.cpp_compiler }}"
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
-        return [
+        list_str = [
             f"{_indent(indent)}- os: {self.os}",
             f"{_indent(indent)}  os_version: {self.os_version}",
             f"{_indent(indent)}  architecture: {self.architecture}",
             f"{_indent(indent)}  architecture_variant: {self.architecture_variant}",
             f"{_indent(indent)}  compiler: {self.compiler}",
+        ]
+
+        if self.c_compiler is not None:
+            list_str += [
+                f"{_indent(indent)}  c_compiler: {self.c_compiler}",
+            ]
+
+        if self.cpp_compiler is not None:
+            list_str += [
+                f"{_indent(indent)}  cpp_compiler: {self.cpp_compiler}",
+            ]
+
+        list_str += [
             f"{_indent(indent)}  compiler_version: {self.compiler_version}",
             f"{_indent(indent)}  generator: {self.build_generator}",
             f"{_indent(indent)}  generator_type: {self.build_generator_type}",
+            f"{_indent(indent)}  generator_cmake: {self.generator_cmake}",
             f"{_indent(indent)}  runner: {self.runner}",
         ]
+        return list_str
 
 
 @dataclass
@@ -229,6 +252,18 @@ class JobStrategy:
     def on_matrix(self, entry: MatrixOsArchCompilerGeneratorRunnerEntryInclude) -> "JobStrategy":
         self._matrix_includes.append(entry)
         return self
+
+
+def create_context_os_architecture_compiler_generator_string_github_matrix() -> str:
+    return create_context_os_architecture_compiler_generator_string_from_components(
+        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME_EMBRACED,
+        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION_EMBRACED,
+        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_EMBRACED,
+        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
+        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_EMBRACED,
+        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_VERSION_EMBRACED,
+        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_EMBRACED,
+    )
 
 
 # =========================================================

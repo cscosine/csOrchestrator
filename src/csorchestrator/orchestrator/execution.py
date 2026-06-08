@@ -6,7 +6,7 @@ from csorchestrator.ci.github.github_workflow_config import (
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     create_job_from_matrix_list,
 )
-from csorchestrator.context.context_compiler_generator import Generator
+from csorchestrator.context.context_compiler_generator import Generator, get_c_cpp_compiler, get_cmake_generator_name
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
     ContextLocalExecutionExtra,
@@ -241,6 +241,16 @@ def orchestrator_matrix_to_github_wf_matrix(
         assert runner_or_err.value is not None
         runner = runner_or_err.value
 
+        generator_cmake = get_cmake_generator_name(entry.context_compiler_generator.build_generator.generator)
+        if generator_cmake is None:
+            errors.append(
+                f"generator {entry.context_compiler_generator.build_generator.generator.value.lower()} does not have a "
+                "CMake defined correspondent generator"
+            )
+            continue
+
+        c_cpp_compiler = get_c_cpp_compiler(entry.context_compiler_generator.compiler_family)
+
         res.append(
             MatrixOsArchCompilerGeneratorRunnerEntryInclude(
                 os=entry.context_os_architecture.os.value.lower(),
@@ -252,6 +262,9 @@ def orchestrator_matrix_to_github_wf_matrix(
                 build_generator=entry.context_compiler_generator.build_generator.generator.value.lower(),
                 build_generator_type=entry.context_compiler_generator.build_generator.generator_type.value.lower(),
                 runner=runner,
+                generator_cmake=generator_cmake,
+                c_compiler=c_cpp_compiler[0],
+                cpp_compiler=c_cpp_compiler[1],
             )
         )
     if len(errors) > 0:

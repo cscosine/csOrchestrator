@@ -275,6 +275,7 @@ def workflow_name_from_components(
     build_generator: str,
     config_string: str,
 ) -> str:
+
     supported_build_config_string = create_context_os_architecture_compiler_generator_string_from_components(
         os, os_version, architecture, architecture_variant, compiler, compiler_version, build_generator
     )

@@ -6,15 +6,14 @@ from pathlib import Path
 
 from csorchestrator.ci.github.github_workflow_config import (
     JobOrchestratorMatrixExecution,
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     StepRunCommand,
+    create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
-    create_context_os_architecture_compiler_generator_string_from_components,
 )
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.report import Report
@@ -183,15 +182,7 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
 
     lines = header + body1 + [""] + body2 + [""]
 
-    install_subdir = create_context_os_architecture_compiler_generator_string_from_components(
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_VERSION_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_EMBRACED,
-    )
+    install_subdir = create_context_os_architecture_compiler_generator_string_github_matrix()
 
     lines += ["files = {"]
     for repo in step.repos_config_file_list:

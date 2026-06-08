@@ -5,15 +5,14 @@ from pathlib import Path
 
 from csorchestrator.ci.github.github_workflow_config import (
     JobOrchestratorMatrixExecution,
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     StepRunCommand,
+    create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
-    create_context_os_architecture_compiler_generator_string_from_components,
 )
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
@@ -70,15 +69,7 @@ def step_create_archives_to_githubwf(
     step: StepCreateArchives, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
 
-    install_dir_name = create_context_os_architecture_compiler_generator_string_from_components(
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_VERSION_EMBRACED,
-        MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_EMBRACED,
-    )
+    install_dir_name = create_context_os_architecture_compiler_generator_string_github_matrix()
     install_subdir = step.base_install_dir / install_dir_name
 
     lines = [
