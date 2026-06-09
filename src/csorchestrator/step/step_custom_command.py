@@ -15,6 +15,7 @@ from csorchestrator.context.context_compiler_generator import (
     GeneratorType,
     get_c_cpp_compiler,
     get_cmake_generator_name,
+    get_cmake_toolset,
 )
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
@@ -143,6 +144,7 @@ def execute_command(
 
 def evaluate_cmd_variable_subst_local(cmd: list[str], context: ContextLocalExecution) -> list[str]:
     c_cpp_compiler = get_c_cpp_compiler(context.active_compiler_generator.compiler_family)
+    toolset = get_cmake_toolset(context.active_compiler_generator.compiler_family)
 
     subst: dict[str, str] = {
         "CS_DIR_FROM_MATRIX": create_context_os_architecture_compiler_generator_string(
@@ -163,6 +165,7 @@ def evaluate_cmd_variable_subst_local(cmd: list[str], context: ContextLocalExecu
         or "",
         "CS_C_COMPILER": c_cpp_compiler[0] or "",
         "CS_CPP_COMPILER": c_cpp_compiler[1] or "",
+        "CS_TOOLSET": toolset or "",
     }
     subst_cmd = [Template(c).safe_substitute(subst) for c in cmd]
     return subst_cmd
@@ -184,6 +187,7 @@ def evaluate_cmd_variable_subst_github_wf(cmd: list[str]) -> list[str]:
         "CS_GENERATOR_CMAKE": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_CMAKE_EMBRACED,
         "CS_C_COMPILER": MatrixOsArchCompilerGeneratorRunnerEntryInclude.C_COMPILER_EMBRACED,
         "CS_CPP_COMPILER": MatrixOsArchCompilerGeneratorRunnerEntryInclude.CPP_COMPILER_EMBRACED,
+        "CS_TOOLSET": MatrixOsArchCompilerGeneratorRunnerEntryInclude.TOOLSET_EMBRACED,
     }
     subst_cmd = []
     for c in cmd:

@@ -73,37 +73,48 @@ def get_supported_build_configs_for_generator_type(
         return []
 
 
-def get_supported_generators_per_os(os: OS) -> list[GeneratorWithType]:
-    if os == OS.LINUX:
+def get_supported_generators_linux() -> list[GeneratorWithType]:
+    return [
+        GeneratorWithType.NINJA,
+        GeneratorWithType.NINJA_MULTI,
+    ]
+
+
+def get_supported_generators_windows(use_ninja: bool) -> list[GeneratorWithType]:
+    if use_ninja:
         return [
             GeneratorWithType.NINJA,
             GeneratorWithType.NINJA_MULTI,
         ]
-    elif os == OS.WINDOWS:
+    else:
         return [
             GeneratorWithType.MSVC_17_2022,
             GeneratorWithType.MSVC_18_2026,
         ]
-    elif os == OS.MACOS:
-        # TODO support macos
-        return []
+
+
+def get_supported_compilers_linux() -> list[Compiler]:
+    return [Compiler.GCC, Compiler.CLANG]
+
+
+def get_supported_compilers_windows(use_ninja: bool) -> list[tuple[Compiler, str]]:
+    if not use_ninja:
+        return [
+            (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT),
+            (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT),
+        ]
     else:
-        return []
+        return [
+            (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2022_17),
+            (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2022_17),
+            (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2026_18),
+            (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2026_18),
+        ]
 
 
-def get_supported_compilers_per_os(os: OS) -> list[Compiler]:
-    if os == OS.LINUX:
-        return [Compiler.GCC, Compiler.CLANG]
-    elif os == OS.WINDOWS:
-        return [Compiler.MSVC, Compiler.MSVC_CLANG]
-    elif os == OS.MACOS:
-        # TODO support macos
-        return []
-    else:
-        return []
-
-
-def get_supported_context_os_architecture_list() -> list[ContextOsArchitectureCompilerGenerator]:
+def get_supported_context_os_architecture_list(
+    use_ninja_for_windows: bool,
+) -> list[ContextOsArchitectureCompilerGenerator]:
 
     retList: list[ContextOsArchitectureCompilerGenerator] = []
 
@@ -115,8 +126,8 @@ def get_supported_context_os_architecture_list() -> list[ContextOsArchitectureCo
             architecture=Architecture.X64,
             architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
         )
-        generators = get_supported_generators_per_os(os_arch.os)
-        compilers = get_supported_compilers_per_os(os_arch.os)
+        generators = get_supported_generators_linux()
+        compilers = get_supported_compilers_linux()
 
         for compiler in compilers:
             for generator in generators:
@@ -140,14 +151,14 @@ def get_supported_context_os_architecture_list() -> list[ContextOsArchitectureCo
             architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
         )
 
-        generators = get_supported_generators_per_os(os_arch.os)
-        compilers = get_supported_compilers_per_os(os_arch.os)
+        generators = get_supported_generators_windows(use_ninja=use_ninja_for_windows)
+        compilers_and_version = get_supported_compilers_windows(use_ninja=use_ninja_for_windows)
 
-        for compiler in compilers:
+        for compiler, version in compilers_and_version:
             for generator in generators:
                 ccg = ContextCompilerGenerator(
                     compiler_family=compiler,
-                    compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+                    compiler_version=version,
                     build_generator=generator,
                 )
                 retList.append(
@@ -168,19 +179,10 @@ class ContextOsArchitectureCompilerGeneratorConfig(ContextOsArchitectureCompiler
 
 
 def get_supported_context_os_architecture_config_list(
-    src: ContextOsArchitectureCompilerGenerator | list[ContextOsArchitectureCompilerGenerator] | None = None,
+    src_list: list[ContextOsArchitectureCompilerGenerator],
 ) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
 
     retList: list[ContextOsArchitectureCompilerGeneratorConfig] = []
-
-    if src is None:
-        src_list = get_supported_context_os_architecture_list()
-    elif isinstance(src, list) and all(isinstance(x, ContextOsArchitectureCompilerGenerator) for x in src):
-        src_list = src
-    elif isinstance(src, ContextOsArchitectureCompilerGenerator):
-        src_list = [src]
-    else:
-        raise ValueError("get_supported_context_os_architecture_config_list argument input error")
 
     for src in src_list:
         configs_per_generator_type = get_supported_build_configs_for_generator_type(
@@ -286,11 +288,11 @@ def workflow_name_from_components(
 
 def get_all_supported_workflow_descriptions(
     selected_config: BuildConfig,
-    os_arch_generator: ContextOsArchitectureCompilerGenerator | None = None,
+    os_arch_generator: ContextOsArchitectureCompilerGenerator,
 ) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
     workflow_list: list[ContextOsArchitectureCompilerGeneratorConfig] = []
 
-    for supported_build_config in get_supported_context_os_architecture_config_list(os_arch_generator):
+    for supported_build_config in get_supported_context_os_architecture_config_list([os_arch_generator]):
         if not is_config_selected_for_generator(
             supported_build_config.context_compiler_generator.build_generator.generator_type,
             supported_build_config.config,

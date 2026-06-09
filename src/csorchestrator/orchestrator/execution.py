@@ -6,7 +6,13 @@ from csorchestrator.ci.github.github_workflow_config import (
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     create_job_from_matrix_list,
 )
-from csorchestrator.context.context_compiler_generator import Generator, get_c_cpp_compiler, get_cmake_generator_name
+from csorchestrator.context.context_compiler_generator import (
+    ContextCompilerGenerator,
+    Generator,
+    get_c_cpp_compiler,
+    get_cmake_generator_name,
+    get_cmake_toolset,
+)
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
     ContextLocalExecutionExtra,
@@ -21,6 +27,7 @@ from csorchestrator.context.context_os_architecture import (
     detect_context_os_architecture,
 )
 from csorchestrator.context.context_os_architecture_compiler_generator import (
+    ContextOsArchitectureCompilerGenerator,
     ExecutionMatrixOsArchCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
     create_context_os_architecture_string,
@@ -200,7 +207,13 @@ GITHUB_RUNNER_WINDOWS_2022 = OS.WINDOWS.value + "-2022"
 GITHUB_RUNNER_WINDOWS_2025_VS2026 = OS.WINDOWS.value + "-2025-vs2026"
 
 
-def get_runner(os: OS, os_version: str, arch: Architecture, generator: Generator) -> Expected[str, str]:
+def get_runner(entry: ContextOsArchitectureCompilerGenerator) -> Expected[str, str]:
+    os = entry.context_os_architecture.os
+    os_version = entry.context_os_architecture.os_version
+    arch = entry.context_os_architecture.architecture
+    generator = entry.context_compiler_generator.build_generator.generator
+    compiler_version = entry.context_compiler_generator.compiler_version
+
     if os == OS.LINUX:
         if os_version == UBUNTU_VERSIONS.UBUNTU_22_04.value:
             if arch == Architecture.X64:
@@ -215,6 +228,11 @@ def get_runner(os: OS, os_version: str, arch: Architecture, generator: Generator
                     return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2022)
                 elif generator == Generator.MSVC_18_2026:
                     return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2025_VS2026)
+                elif generator == Generator.NINJA or generator == Generator.NINJA_MULTI:
+                    if compiler_version == ContextCompilerGenerator.COMPILER_VERSION_MSVC_2026_18:
+                        return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2025_VS2026)
+                    elif compiler_version == ContextCompilerGenerator.COMPILER_VERSION_MSVC_2022_17:
+                        return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2022)
 
     return Expected[str, str].make_error(
         f"unsupported config os: {os.value}, os_version: {os_version}, arch: {arch.value}, generator: {generator.value}"
@@ -228,12 +246,7 @@ def orchestrator_matrix_to_github_wf_matrix(
     errors: list[str] = []
 
     for entry in orchestrator_matrix.os_architecture_compiler_generator_list:
-        runner_or_err = get_runner(
-            entry.context_os_architecture.os,
-            entry.context_os_architecture.os_version,
-            entry.context_os_architecture.architecture,
-            entry.context_compiler_generator.build_generator.generator,
-        )
+        runner_or_err = get_runner(entry)
         if runner_or_err.error is not None:
             errors.append(runner_or_err.error)
             continue
@@ -250,6 +263,7 @@ def orchestrator_matrix_to_github_wf_matrix(
             continue
 
         c_cpp_compiler = get_c_cpp_compiler(entry.context_compiler_generator.compiler_family)
+        toolset = get_cmake_toolset(entry.context_compiler_generator.compiler_family)
 
         res.append(
             MatrixOsArchCompilerGeneratorRunnerEntryInclude(
@@ -265,6 +279,7 @@ def orchestrator_matrix_to_github_wf_matrix(
                 generator_cmake=generator_cmake,
                 c_compiler=c_cpp_compiler[0],
                 cpp_compiler=c_cpp_compiler[1],
+                toolset=toolset,
             )
         )
     if len(errors) > 0:

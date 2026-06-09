@@ -1,21 +1,29 @@
-from csorchestrator.context.context_compiler_generator import GeneratorType
-from csorchestrator.context.context_os_architecture import OS, UBUNTU_VERSIONS, WINDOWS_VERSIONS
+from csorchestrator.context.context_compiler_generator import (
+    Compiler,
+    ContextCompilerGenerator,
+    GeneratorType,
+    GeneratorWithType,
+)
+from csorchestrator.context.context_os_architecture import (
+    ARCHITECTURE_VARIANT_GENERIC,
+    OS,
+    UBUNTU_VERSIONS,
+    WINDOWS_VERSIONS,
+    Architecture,
+    ContextOsArchitecture,
+)
+from csorchestrator.context.context_os_architecture_compiler_generator import (
+    ContextOsArchitectureCompilerGenerator,
+)
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
     get_all_supported_workflow_descriptions,
-    get_supported_context_os_architecture_config_list,
     get_supported_os_version_list,
     is_config_selected_for_generator,
     is_config_selected_multi_config_generator,
     is_config_selected_single_config_generator,
     workflow_name_from_description,
 )
-
-
-def test_get_supported_context_os_architecture_config_list():
-
-    supported_list = get_supported_context_os_architecture_config_list()
-    assert len(supported_list) > 0
 
 
 def test_is_config_selected_multi_config_generator() -> None:
@@ -26,7 +34,8 @@ def test_is_config_selected_multi_config_generator() -> None:
     assert is_config_selected_multi_config_generator(BuildConfig.PARANOID, BuildConfig.PARANOID)
     assert is_config_selected_multi_config_generator(BuildConfig.DEBUG_RELEASE, BuildConfig.DEBUG_RELEASE)
     assert is_config_selected_multi_config_generator(
-        BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID, BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID
+        BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
+        BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
     )
 
     assert not is_config_selected_multi_config_generator(BuildConfig.RELEASE, BuildConfig.DEBUG)
@@ -45,17 +54,25 @@ def test_is_config_selected_for_generator() -> None:
         requested_config=BuildConfig.DEBUG,
     )
     assert is_config_selected_for_generator(
-        GeneratorType.SINGLE_CONFIG, current_config=BuildConfig.DEBUG, requested_config=BuildConfig.DEBUG
+        GeneratorType.SINGLE_CONFIG,
+        current_config=BuildConfig.DEBUG,
+        requested_config=BuildConfig.DEBUG,
     )
     assert not is_config_selected_for_generator(
-        GeneratorType.SINGLE_CONFIG, current_config=BuildConfig.DEBUG, requested_config=BuildConfig.PARANOID
+        GeneratorType.SINGLE_CONFIG,
+        current_config=BuildConfig.DEBUG,
+        requested_config=BuildConfig.PARANOID,
     )
 
     assert is_config_selected_for_generator(
-        GeneratorType.MULTI_CONFIG, current_config=BuildConfig.DEBUG, requested_config=BuildConfig.DEBUG
+        GeneratorType.MULTI_CONFIG,
+        current_config=BuildConfig.DEBUG,
+        requested_config=BuildConfig.DEBUG,
     )
     assert not is_config_selected_for_generator(
-        GeneratorType.MULTI_CONFIG, current_config=BuildConfig.DEBUG, requested_config=BuildConfig.PARANOID
+        GeneratorType.MULTI_CONFIG,
+        current_config=BuildConfig.DEBUG,
+        requested_config=BuildConfig.PARANOID,
     )
 
 
@@ -69,7 +86,8 @@ def test_is_config_selected_single_config_generator() -> None:
         current_config=BuildConfig.RELEASE, requested_config=BuildConfig.RELEASE
     )
     assert is_config_selected_single_config_generator(
-        current_config=BuildConfig.RELWITHDEBINFO, requested_config=BuildConfig.RELWITHDEBINFO
+        current_config=BuildConfig.RELWITHDEBINFO,
+        requested_config=BuildConfig.RELWITHDEBINFO,
     )
     assert is_config_selected_single_config_generator(
         current_config=BuildConfig.PARANOID, requested_config=BuildConfig.PARANOID
@@ -93,24 +111,30 @@ def test_is_config_selected_single_config_generator() -> None:
         current_config=BuildConfig.PARANOID, requested_config=BuildConfig.DEBUG_RELEASE
     )
     assert not is_config_selected_single_config_generator(
-        current_config=BuildConfig.RELWITHDEBINFO, requested_config=BuildConfig.DEBUG_RELEASE
+        current_config=BuildConfig.RELWITHDEBINFO,
+        requested_config=BuildConfig.DEBUG_RELEASE,
     )
 
     # if we request all, all are ok
     assert is_config_selected_single_config_generator(
-        current_config=BuildConfig.DEBUG, requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID
+        current_config=BuildConfig.DEBUG,
+        requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
     )
     assert is_config_selected_single_config_generator(
-        current_config=BuildConfig.RELEASE, requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID
+        current_config=BuildConfig.RELEASE,
+        requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
     )
     assert is_config_selected_single_config_generator(
-        current_config=BuildConfig.PARANOID, requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID
+        current_config=BuildConfig.PARANOID,
+        requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
     )
     assert is_config_selected_single_config_generator(
-        current_config=BuildConfig.RELWITHDEBINFO, requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID
+        current_config=BuildConfig.RELWITHDEBINFO,
+        requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
     )
     assert not is_config_selected_single_config_generator(
-        current_config=BuildConfig.DEBUG_RELEASE, requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID
+        current_config=BuildConfig.DEBUG_RELEASE,
+        requested_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
     )
     assert not is_config_selected_single_config_generator(
         current_config=BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
@@ -123,16 +147,28 @@ def test_is_config_selected_single_config_generator() -> None:
 
 
 def test_get_all_supported_workflow_descriptions() -> None:
-    assert len(get_all_supported_workflow_descriptions(BuildConfig.DEBUG)) > 0
-    assert len(get_all_supported_workflow_descriptions(BuildConfig.RELEASE)) > 0
-    assert len(get_all_supported_workflow_descriptions(BuildConfig.RELWITHDEBINFO)) > 0
-    assert len(get_all_supported_workflow_descriptions(BuildConfig.PARANOID)) > 0
-    assert len(get_all_supported_workflow_descriptions(BuildConfig.DEBUG_RELEASE)) > 0
-    assert len(get_all_supported_workflow_descriptions(BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID)) > 0
+    context = ContextOsArchitectureCompilerGenerator(
+        context_os_architecture=ContextOsArchitecture(
+            os=OS.LINUX,
+            os_version=UBUNTU_VERSIONS.UBUNTU_22_04.value,
+            architecture=Architecture.X64,
+            architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
+        ),
+        context_compiler_generator=ContextCompilerGenerator(
+            compiler_family=Compiler.GCC,
+            compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+            build_generator=GeneratorWithType.NINJA,
+        ),
+    )
 
+    assert len(get_all_supported_workflow_descriptions(BuildConfig.DEBUG, context)) > 0
+    assert len(get_all_supported_workflow_descriptions(BuildConfig.RELEASE, context)) > 0
+    assert len(get_all_supported_workflow_descriptions(BuildConfig.RELWITHDEBINFO, context)) > 0
+    assert len(get_all_supported_workflow_descriptions(BuildConfig.PARANOID, context)) > 0
+    assert len(get_all_supported_workflow_descriptions(BuildConfig.DEBUG_RELEASE, context)) > 0
+    assert len(get_all_supported_workflow_descriptions(BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID, context)) > 0
 
-def test_workflow_name_from_description() -> None:
-    list = get_all_supported_workflow_descriptions(BuildConfig.DEBUG)
+    list = get_all_supported_workflow_descriptions(BuildConfig.DEBUG, context)
     for desc in list:
         name = workflow_name_from_description(desc)
         assert name.startswith("workflow-")

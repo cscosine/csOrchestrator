@@ -68,14 +68,14 @@ def create_orchestrator_factory(name: str, version: str, execution_matrix_name: 
 
 
 def create_orchestrator_factory_all_supported_cases(
-    name: str, version: str, execution_matrix_name: str
+    name: str, version: str, execution_matrix_name: str, use_ninja_for_windows: bool = False
 ) -> Orchestrator:
     o = Orchestrator(
         name=name,
         version=version,
         execution_matrix=ExecutionMatrixOsArchCompilerGenerator(execution_matrix_name),
     )
-    o.set_execution_matrix_list(get_supported_context_os_architecture_list())
+    o.set_execution_matrix_list(get_supported_context_os_architecture_list(use_ninja_for_windows=use_ninja_for_windows))
     return o
 
 

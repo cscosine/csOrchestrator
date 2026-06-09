@@ -182,6 +182,7 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
     runner: str
     c_compiler: str | None = None
     cpp_compiler: str | None = None
+    toolset: str | None = None
     # deps: TODO add deps when we will need to install python packages
 
     # not embraced
@@ -201,6 +202,7 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
     MATRIX_GENERATOR_CMAKE_EMBRACED: str = "${{ matrix.generator_cmake }}"
     C_COMPILER_EMBRACED: str = "${{ matrix.c_compiler }}"
     CPP_COMPILER_EMBRACED: str = "${{ matrix.cpp_compiler }}"
+    TOOLSET_EMBRACED: str = "${{ matrix.toolset }}"
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         list_str = [
@@ -219,6 +221,11 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
         if self.cpp_compiler is not None:
             list_str += [
                 f"{_indent(indent)}  cpp_compiler: {self.cpp_compiler}",
+            ]
+
+        if self.toolset is not None:
+            list_str += [
+                f"{_indent(indent)}  toolset: {self.toolset}",
             ]
 
         list_str += [

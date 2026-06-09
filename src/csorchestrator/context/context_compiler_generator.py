@@ -29,6 +29,12 @@ class Generator(Enum):
     MSVC_18_2026 = "msvc2026"
 
 
+def get_cmake_toolset(compiler: Compiler) -> str | None:
+    if compiler == Compiler.MSVC_CLANG:
+        return "ClangCL"
+    return None
+
+
 def get_cmake_generator_name(generator: Generator) -> str | None:
     if generator == Generator.NINJA:
         return "Ninja"
@@ -89,3 +95,6 @@ class ContextCompilerGenerator:
     build_generator: GeneratorWithType
 
     COMPILER_VERSION_DEFAULT: str = "default"
+
+    COMPILER_VERSION_MSVC_2026_18: str = "MSVC_2026_18"
+    COMPILER_VERSION_MSVC_2022_17: str = "MSVC_2022_17"
