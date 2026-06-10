@@ -47,7 +47,7 @@ from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorEx
 from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.utils.file_system.directory import ensure_directory_exists_or_create_and_is_usable
 from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import (
-    OrchestratorVisitorGithubWorkflowPreparation,
+    OrchestratorVisitorGitHubWorkflowPreparation,
 )
 from csorchestrator.visitors.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
 
@@ -147,7 +147,7 @@ def validate_and_execute_orchestrator(
     matrix = orchestrator.execution_matrix
 
     matrix_extras: dict[type, ContextLocalExecutionExtra] = {}
-
+    counter: int = 0
     for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
         match = os_architecture_compiler_generator.context_os_architecture.can_be_executed_on(
             os_and_path.os_architecture
@@ -169,6 +169,7 @@ def validate_and_execute_orchestrator(
             active_compiler_generator=os_architecture_compiler_generator.context_compiler_generator,
             orchestrator_desc=er.execution_description,
             matrix_extras=matrix_extras,
+            matrix_execution_id=str(counter),
         )
 
         # execute
@@ -192,6 +193,7 @@ def validate_and_execute_orchestrator(
         er.report_executions.append(report_execution)
 
         matrix_extras = context.matrix_extras
+        counter += 1
 
     reporter.finalize_execution()
     return er
@@ -245,6 +247,7 @@ def orchestrator_matrix_to_github_wf_matrix(
     res: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude] = []
     errors: list[str] = []
 
+    counter: int = 0
     for entry in orchestrator_matrix.os_architecture_compiler_generator_list:
         runner_or_err = get_runner(entry)
         if runner_or_err.error is not None:
@@ -267,6 +270,7 @@ def orchestrator_matrix_to_github_wf_matrix(
 
         res.append(
             MatrixOsArchCompilerGeneratorRunnerEntryInclude(
+                execution_id=str(counter),
                 os=entry.context_os_architecture.os.value.lower(),
                 os_version=entry.context_os_architecture.os_version.lower(),
                 architecture=entry.context_os_architecture.architecture.value.lower(),
@@ -282,6 +286,7 @@ def orchestrator_matrix_to_github_wf_matrix(
                 toolset=toolset,
             )
         )
+        counter += 1
     if len(errors) > 0:
         return OrchestratorMatrixToGitHubWFExpected.make_error(errors)
 
@@ -344,7 +349,7 @@ def validate_and_generate_github_workflow(
     reporter.report_start_execution("orchestrator execution without matrix")
     # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
     report_execution = execute_orchestrator(
-        orchestrator, OrchestratorVisitorGithubWorkflowPreparation(wf_job), reporter=reporter
+        orchestrator, OrchestratorVisitorGitHubWorkflowPreparation(wf_job), reporter=reporter
     )
     reporter.report_execution_report(report_execution)
 

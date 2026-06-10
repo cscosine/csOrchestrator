@@ -22,6 +22,7 @@ from csorchestrator.step.step_get_versions_from_cmake_config_package_version imp
     StepGetVersionsFromCMakeConfigPackageVersion,
     validate_step_get_versions_from_cmake_config_package_version,
 )
+from csorchestrator.step.step_github_action import StepAddGitHubAction, validate_step_add_github_action
 from csorchestrator.step.step_upload_artifacts import StepUploadArtifacts, validate_step_upload_artifacts
 
 
@@ -80,3 +81,7 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
     @visit_step.register
     def _(self, step: StepWinPSCommand, reporter_sink: ReporterSinkBase) -> Report:
         return validate_step_win_ps_command(step)
+
+    @visit_step.register
+    def _(self, step: StepAddGitHubAction, reporter_sink: ReporterSinkBase) -> Report:
+        return validate_step_add_github_action(step)

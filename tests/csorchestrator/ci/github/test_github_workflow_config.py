@@ -49,7 +49,8 @@ EXPECTED_LINES = EXPECTED_LINES_HEADER + [
     "      fail-fast: false",
     "      matrix:",
     "        include:",
-    "          - os: linux",
+    "          - execution_id: 1",
+    "            os: linux",
     "            os_version: ubuntu22.04",
     f"            architecture: {Architecture.X64.value}",
     f"            architecture_variant: {ARCHITECTURE_VARIANT_GENERIC}",
@@ -91,6 +92,7 @@ def test_workflow_with_triggers_and_one_job():
                 fail_fast=False,
                 matrix_list=[
                     MatrixOsArchCompilerGeneratorRunnerEntryInclude(
+                        execution_id="1",
                         os=OS.LINUX.value,
                         os_version=UBUNTU_VERSIONS.UBUNTU_22_04.value,
                         architecture=Architecture.X64.value,
@@ -127,6 +129,7 @@ def test_workflow_with_creation_helper():
             fail_fast=False,
             matrix_list=[
                 MatrixOsArchCompilerGeneratorRunnerEntryInclude(
+                    execution_id="1",
                     os=OS.LINUX.value,
                     os_version=UBUNTU_VERSIONS.UBUNTU_22_04.value,
                     architecture=Architecture.X64.value,

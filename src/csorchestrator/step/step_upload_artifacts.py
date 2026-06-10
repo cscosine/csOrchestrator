@@ -3,7 +3,7 @@ from pathlib import Path
 
 from csorchestrator.ci.github.github_workflow_config import (
     JobOrchestratorMatrixExecution,
-    StepGithubUploadArtifacts,
+    StepGitHubUploadArtifacts,
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.context.context_local_execution import (
@@ -34,7 +34,7 @@ def step_upload_artifacts_to_githubwf(
     artifact_name = f"{wf_job.orchestrator_desc.name}-{wf_job.orchestrator_desc.version}-{install_subdir}"
 
     wf_job.steps.append(
-        StepGithubUploadArtifacts(
+        StepGitHubUploadArtifacts(
             name="Upload Artifacts",
             with_name=artifact_name,
             with_path=(step.base_install_dir / install_subdir / "*.tar.gz").as_posix(),

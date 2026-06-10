@@ -24,6 +24,7 @@ class ContextLocalExecution:
     os_architecture: ContextOsArchitecture
     active_compiler_generator: ContextCompilerGenerator
     orchestrator_desc: OrchestratorExecutorMinimalDescription
+    matrix_execution_id: str
 
     def get_active_os_architecture_compiler_generator(self) -> ContextOsArchitectureCompilerGenerator:
         return ContextOsArchitectureCompilerGenerator(self.os_architecture, self.active_compiler_generator)

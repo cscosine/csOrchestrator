@@ -20,11 +20,12 @@ from csorchestrator.step.step_get_versions_from_cmake_config_package_version imp
     StepGetVersionsFromCMakeConfigPackageVersion,
     step_get_versions_from_cmake_config_package_version_to_githubwf,
 )
+from csorchestrator.step.step_github_action import StepAddGitHubAction, step_add_github_action_to_githubwf
 from csorchestrator.step.step_upload_artifacts import StepUploadArtifacts, step_upload_artifacts_to_githubwf
 
 
 @dataclass
-class OrchestratorVisitorGithubWorkflowPreparation(OrchestratorVisitorBase):
+class OrchestratorVisitorGitHubWorkflowPreparation(OrchestratorVisitorBase):
     wf_job: JobOrchestratorMatrixExecution
 
     def init_visit(self) -> None:
@@ -41,7 +42,7 @@ class OrchestratorVisitorGithubWorkflowPreparation(OrchestratorVisitorBase):
 
     def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         return Report().append_error(
-            f"OrchestratorVisitorGithubWorkflowPreparation cannot handle step {step.name} of type {type(step).__name__}"
+            f"OrchestratorVisitorGitHubWorkflowPreparation cannot handle step {step.name} of type {type(step).__name__}"
         )
 
     visit_step = OrchestratorVisitorBase.create_visit_dispatch()
@@ -78,3 +79,7 @@ class OrchestratorVisitorGithubWorkflowPreparation(OrchestratorVisitorBase):
     @visit_step.register
     def _(self, step: StepWinPSCommand, reporter_sink: ReporterSinkBase) -> Report:
         return step_win_ps_command_to_githubwf(step, self.wf_job, reporter_sink)
+
+    @visit_step.register
+    def _(self, step: StepAddGitHubAction, reporter_sink: ReporterSinkBase) -> Report:
+        return step_add_github_action_to_githubwf(step, self.wf_job, reporter_sink)

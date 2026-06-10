@@ -170,6 +170,7 @@ TriggerUnion: TypeAlias = PushTrigger | PullRequestTrigger | WorkflowDispatchTri
 # =========================================================
 @dataclass(frozen=True)
 class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
+    execution_id: str
     os: str
     os_version: str
     architecture: str
@@ -190,6 +191,7 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
     MATRIX_OS_VERSION: str = "matrix.os_version"
 
     # embraced
+    MATRIX_EXECUTION_ID_EMBRACED: str = "${{ matrix.execution_id }}"
     MATRIX_RUNS_ON_RUNNER_NAME_EMBRACED: str = "${{ matrix.runner }}"
     MATRIX_OS_NAME_EMBRACED: str = "${{ matrix.os }}"
     MATRIX_OS_VERSION_EMBRACED: str = "${{ matrix.os_version }}"
@@ -206,7 +208,8 @@ class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         list_str = [
-            f"{_indent(indent)}- os: {self.os}",
+            f"{_indent(indent)}- execution_id: {self.execution_id}",
+            f"{_indent(indent)}  os: {self.os}",
             f"{_indent(indent)}  os_version: {self.os_version}",
             f"{_indent(indent)}  architecture: {self.architecture}",
             f"{_indent(indent)}  architecture_variant: {self.architecture_variant}",
@@ -284,6 +287,25 @@ class Step:
 
 
 @dataclass
+class StepGitHubAction(Step):
+    name: str
+    uses: str
+    if_str: str | None = None
+    with_list: list[str] = field(default_factory=list)
+
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        lines = [f"{_indent(indent)}- name: {self.name}"]
+        lines += [f"{_indent(indent)}  uses: {self.uses}"]
+        if self.if_str is not None:
+            lines += [f"{_indent(indent)}  if: {self.if_str}"]
+        if len(self.with_list) > 0:
+            lines += [f"{_indent(indent)}  with:"]
+            for w in self.with_list:
+                lines += [f"{_indent(indent + 2)}  {w}"]
+        return lines
+
+
+@dataclass
 class StepCheckoutRepositoryWith:
     repository: str | None
     path: str | None
@@ -327,7 +349,7 @@ class StepCheckoutRepository(Step):
 
 
 @dataclass(frozen=True, slots=True)
-class StepGithubUploadArtifacts(Step):
+class StepGitHubUploadArtifacts(Step):
     name: str
     with_name: str
     with_path: str
@@ -381,7 +403,7 @@ class StepRunCommand(Step):
         return lines
 
 
-StepUnionType: TypeAlias = StepCheckoutRepository | StepRunCommand | StepGithubUploadArtifacts
+StepUnionType: TypeAlias = StepCheckoutRepository | StepRunCommand | StepGitHubUploadArtifacts | StepGitHubAction
 
 
 @dataclass

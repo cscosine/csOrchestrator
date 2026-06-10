@@ -58,6 +58,7 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
             Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
         ),
         orchestrator_desc=orchestrator.extract_minimal_description(),
+        matrix_execution_id="1",
     )
 
     ovb = OrchestratorVisitorLocalExecutor(context=context)
@@ -102,6 +103,7 @@ def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path) -
             Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
         ),
         orchestrator_desc=orchestrator.extract_minimal_description(),
+        matrix_execution_id="1",
     )
 
     ovb = OrchestratorVisitorLocalExecutor(context=context)

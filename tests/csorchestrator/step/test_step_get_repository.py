@@ -168,6 +168,7 @@ def test_execute_step_get_repository_success(
             Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
         ),
         orchestrator_desc=orchestrator.extract_minimal_description(),
+        matrix_execution_id="1",
     )
 
     # execute the step for the first time, to clone the repo
@@ -236,6 +237,7 @@ def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: Repo
             Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
         ),
         orchestrator_desc=orchestrator.extract_minimal_description(),
+        matrix_execution_id="1",
     )
 
     # execute the step for the first time, to clone the repo

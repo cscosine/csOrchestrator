@@ -49,14 +49,6 @@ class StepInstallAptPackages(StepBashScriptCommand):
         script = [
             "set -euo pipefail # enable strict mode",
             "",
-            "if [ -t 0 ]; then",
-            "    # if running in interactive terminal, ask for password if needed",
-            '    SUDO="sudo"',
-            "else",
-            "    # if running in a non-interactive terminal (e.g. in CI workflows), use sudo without ",
-            "    #   password prompt (fail if password is needed)",
-            '    SUDO="sudo -n"',
-            "fi",
             "",
             "packages=(",
         ]
@@ -151,6 +143,7 @@ def evaluate_cmd_variable_subst_local(cmd: list[str], context: ContextLocalExecu
             context.get_active_os_architecture_compiler_generator()
         ),
         # variables
+        "CS_MATRIX_EXEC_ID": str(context.matrix_execution_id),
         "CS_OS": context.os_architecture.os.value.lower(),
         "CS_OS_VERSION": context.os_architecture.os_version.lower(),
         "CS_ARCHITECTURE": context.os_architecture.architecture.value.lower(),
@@ -173,6 +166,7 @@ def evaluate_cmd_variable_subst_local(cmd: list[str], context: ContextLocalExecu
 
 def evaluate_cmd_variable_subst_github_wf(cmd: list[str]) -> list[str]:
     subst: dict[str, str] = {
+        "CS_MATRIX_EXEC_ID": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_EXECUTION_ID_EMBRACED,
         "CS_DIR_FROM_MATRIX": create_context_os_architecture_compiler_generator_string_github_matrix(),
         "CS_OS": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME_EMBRACED,
         "CS_OS_VERSION": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION_EMBRACED,

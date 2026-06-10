@@ -73,19 +73,25 @@ def get_supported_build_configs_for_generator_type(
         return []
 
 
-def get_supported_generators_linux() -> list[GeneratorWithType]:
-    return [
-        GeneratorWithType.NINJA,
-        GeneratorWithType.NINJA_MULTI,
-    ]
-
-
-def get_supported_generators_windows(use_ninja: bool) -> list[GeneratorWithType]:
+def get_supported_generators_linux(
+    use_ninja: bool,
+    use_ninjamulti: bool,
+) -> list[GeneratorWithType]:
+    lst: list[GeneratorWithType] = []
     if use_ninja:
-        return [
-            GeneratorWithType.NINJA,
-            GeneratorWithType.NINJA_MULTI,
-        ]
+        lst += [GeneratorWithType.NINJA]
+    if use_ninjamulti:
+        lst += [GeneratorWithType.NINJA_MULTI]
+    return lst
+
+
+def get_supported_generators_windows(
+    use_ninja_for_windows: bool,
+    use_ninja: bool = True,
+    use_ninjamulti: bool = True,
+) -> list[GeneratorWithType]:
+    if use_ninja_for_windows:
+        return get_supported_generators_linux(use_ninja, use_ninjamulti)
     else:
         return [
             GeneratorWithType.MSVC_17_2022,
@@ -97,8 +103,8 @@ def get_supported_compilers_linux() -> list[Compiler]:
     return [Compiler.GCC, Compiler.CLANG]
 
 
-def get_supported_compilers_windows(use_ninja: bool) -> list[tuple[Compiler, str]]:
-    if not use_ninja:
+def get_supported_compilers_windows(use_ninja_for_windows: bool) -> list[tuple[Compiler, str]]:
+    if not use_ninja_for_windows:
         return [
             (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT),
             (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT),
@@ -114,6 +120,8 @@ def get_supported_compilers_windows(use_ninja: bool) -> list[tuple[Compiler, str
 
 def get_supported_context_os_architecture_list(
     use_ninja_for_windows: bool,
+    use_ninja: bool,
+    use_ninjamulti: bool,
 ) -> list[ContextOsArchitectureCompilerGenerator]:
 
     retList: list[ContextOsArchitectureCompilerGenerator] = []
@@ -126,7 +134,7 @@ def get_supported_context_os_architecture_list(
             architecture=Architecture.X64,
             architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
         )
-        generators = get_supported_generators_linux()
+        generators = get_supported_generators_linux(use_ninja=use_ninja, use_ninjamulti=use_ninjamulti)
         compilers = get_supported_compilers_linux()
 
         for compiler in compilers:
@@ -151,8 +159,10 @@ def get_supported_context_os_architecture_list(
             architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
         )
 
-        generators = get_supported_generators_windows(use_ninja=use_ninja_for_windows)
-        compilers_and_version = get_supported_compilers_windows(use_ninja=use_ninja_for_windows)
+        generators = get_supported_generators_windows(
+            use_ninja_for_windows=use_ninja_for_windows, use_ninja=use_ninja, use_ninjamulti=use_ninjamulti
+        )
+        compilers_and_version = get_supported_compilers_windows(use_ninja_for_windows=use_ninja_for_windows)
 
         for compiler, version in compilers_and_version:
             for generator in generators:

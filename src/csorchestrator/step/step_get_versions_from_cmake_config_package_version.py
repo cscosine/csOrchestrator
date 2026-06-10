@@ -158,7 +158,7 @@ def execute_step_get_versions_from_cmake_config_package_version(
 
     output_file = context.base_folder_path / step.base_install_dir / install_subdir / Path(step.id + ".ver")
     with open(output_file, "w", encoding="utf-8") as f:
-        f.write(f"{step.output_dict_name}={json.dumps(result)}")
+        f.write(f"{step.output_dict_name}={json.dumps(result)}\n")
 
     return report
 
@@ -218,9 +218,9 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
     lines += ["      version = v_or_err[0]"]
     lines += ["      result.append({'name': name,'version': version})"]
     lines += ["    elif v_or_err[1] is not None:"]
-    lines += ["      sys.exit(f'ERROR: processing {name} at {filename}: {v_or_err[1]}')"]
+    lines += ["      sys.exit(f'ERROR: processing {name} at {path}: {v_or_err[1]}')"]
     lines += ["    else:"]
-    lines += ["      sys.exit('ERROR: unexpected behavior of grep_package_version processing {name} at {filename}')"]
+    lines += ["      sys.exit('ERROR: unexpected behavior of grep_package_version processing {name} at {path}')"]
     lines += ["  elif path_or_err[1] is not None:"]
     lines += ["      sys.exit(f'ERROR: processing {name} : {path_or_err[1]}')"]
     lines += ["  else:"]
@@ -230,7 +230,7 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
     lines += [""]
     lines += ['output_file = os.environ["GITHUB_OUTPUT"]']
     lines += ['with open(output_file, "w", encoding="utf-8") as f:']
-    lines += [f'    f.write(f"{step.output_dict_name}={{json.dumps(result)}}")']
+    lines += [f'    f.write(f"{step.output_dict_name}={{json.dumps(result)}}\\n")']
     lines += [""]
 
     # produce output

@@ -1,0 +1,42 @@
+from dataclasses import dataclass, field
+
+from csorchestrator.ci.github.github_workflow_config import (
+    JobOrchestratorMatrixExecution,
+    StepGitHubAction,
+)
+from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.core.report import Report
+from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.step.step_custom_command import get_if_str
+
+
+@dataclass
+class StepAddGitHubAction(StepBase):
+    name: str
+    uses: str
+    with_list: list[str] = field(default_factory=list)
+
+
+def execute_step_add_github_action(
+    repo_step: StepAddGitHubAction, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
+) -> Report:
+    return Report().append_info("StepAddGitHubAction is no-op in local execution")
+
+
+def step_add_github_action_to_githubwf(
+    step: StepAddGitHubAction, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+) -> Report:
+    wf_job.steps.append(
+        StepGitHubAction(
+            name=step.name,
+            uses=step.uses,
+            if_str=get_if_str(step),
+            with_list=step.with_list,
+        )
+    )
+    return Report()
+
+
+def validate_step_add_github_action(step: StepAddGitHubAction) -> Report:
+    return Report()

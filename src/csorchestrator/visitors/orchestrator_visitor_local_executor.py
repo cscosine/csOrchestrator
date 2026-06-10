@@ -21,6 +21,7 @@ from csorchestrator.step.step_get_versions_from_cmake_config_package_version imp
     StepGetVersionsFromCMakeConfigPackageVersion,
     execute_step_get_versions_from_cmake_config_package_version,
 )
+from csorchestrator.step.step_github_action import StepAddGitHubAction, execute_step_add_github_action
 from csorchestrator.step.step_upload_artifacts import StepUploadArtifacts, execute_step_upload_artifacts
 from csorchestrator.step.step_utils import StepExecuteOnlyOn, StepExecuteOnlyOncePerMatrix, StepSkipExecutionOnLocal
 
@@ -119,3 +120,7 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
     @visit_step.register
     def _(self, step: StepWinPSCommand, reporter_sink: ReporterSinkBase) -> Report:
         return self._run_step(execute_step_win_ps_command, step, reporter_sink)
+
+    @visit_step.register
+    def _(self, step: StepAddGitHubAction, reporter_sink: ReporterSinkBase) -> Report:
+        return self._run_step(execute_step_add_github_action, step, reporter_sink)
