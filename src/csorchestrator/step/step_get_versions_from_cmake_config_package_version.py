@@ -27,6 +27,12 @@ class CMakeConfigPackageVersionGrep:
     version_file: Path
 
 
+@dataclass(frozen=True)
+class CMakeConfigPackageVersion:
+    name: str
+    version: str
+
+
 @dataclass
 class StepGetVersionsFromCMakeConfigPackageVersion(StepBase):
     id: str
@@ -34,6 +40,7 @@ class StepGetVersionsFromCMakeConfigPackageVersion(StepBase):
     base_install_dir: Path
     repos_config_file_list: list[CMakeConfigPackageVersionGrep] = field(default_factory=list)
     repos_auto_search_list: list[str] = field(default_factory=list)  # name of repos only,
+    repos_version: list[CMakeConfigPackageVersion] = field(default_factory=list)
     # will look for {name}-config-version.cmake or {name}ConfigVersion.cmake
 
 
@@ -119,6 +126,12 @@ def execute_step_get_versions_from_cmake_config_package_version(
     )
 
     result = []
+    # fixed versions
+    for repo_v in step.repos_version:
+        report.append_info(f"version of {repo_v.name} is {repo_v.version}")
+        result.append({"name": repo_v.name, "version": repo_v.version})
+
+    # repo with version with file hint
     for repo in step.repos_config_file_list:
         target_full_path: Path = context.base_folder_path / step.base_install_dir / install_subdir / repo.version_file
         version_or_err = grep_package_version_expected(target_full_path)
@@ -132,6 +145,7 @@ def execute_step_get_versions_from_cmake_config_package_version(
             report.append_info(f"version of {repo.name} is {version}")
             result.append({"name": repo.name, "version": version})
 
+    # repo with version autosearch
     for name in step.repos_auto_search_list:
         search_path: Path = context.base_folder_path / step.base_install_dir / install_subdir / name
         path_or_err = find_cmake_config_version_expected(search_path=search_path, name=name)
@@ -191,6 +205,13 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
     lines += ["}", ""]
 
     lines += ["result = []"]
+    lines += [""]
+
+    # fixed versions
+    for repo_v in step.repos_version:
+        lines += [f"result.append({{'name': '{repo_v.name}','version': '{repo_v.version}'}})"]
+
+    lines += [""]
     lines += ["for name, filename in files.items():"]
     lines += ["  v_or_err = grep_package_version(filename=filename)"]
     lines += ["  if v_or_err[0] is not None:"]
