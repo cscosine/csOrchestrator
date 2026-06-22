@@ -2,13 +2,15 @@ from dataclasses import dataclass
 
 import pytest
 
+from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
 from csorchestrator.orchestrator.orchestrator_executor import execute_orchestrator
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
 from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
 
@@ -17,6 +19,16 @@ from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
 class MockStep(StepBase):
     name: str
     should_fail: bool = False
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
 
 
 class MockVisitor(OrchestratorVisitorBase):

@@ -27,14 +27,60 @@
       "type": "shell",
       "command": "pre-commit install",
       "problemMatcher": [],
-      "detail": "#Setup # Install pre-commit hooks"
+      "detail": "#Setup # Install pre-commit hooks",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     },
     {
-      "label": "Pre-commit run (all files)",
+      "label": "Pre-commit run ALL (all files)",
       "type": "shell",
       "command": "pre-commit run --all-files",
       "problemMatcher": [],
-      "detail": "#Pre-Commit # Run pre-commit hooks on all files"
+      "detail": "#Pre-Commit # Run pre-commit ALL hooks on all files",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Pre-commit run mypy (all files)",
+      "type": "shell",
+      "command": "pre-commit run mypy --all-files",
+      "problemMatcher": [],
+      "detail": "#Pre-Commit # Run pre-commit hooks mypy on all files",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Pre-commit run ruff (all files)",
+      "type": "shell",
+      "command": "pre-commit run ruff --all-files",
+      "problemMatcher": [],
+      "detail": "#Pre-Commit # Run pre-commit hooks ruff on all files",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
+      "label": "Pre-commit run ruff-format (all files)",
+      "type": "shell",
+      "command": "pre-commit run ruff-format --all-files",
+      "problemMatcher": [],
+      "detail": "#Pre-Commit # Run pre-commit hooks ruff-format on all files",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     },
     {
       "label": "Setup Project",
@@ -52,28 +98,48 @@
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest",
       "problemMatcher": [],
-      "detail": "#Testing # Run pytest (fast)"
+      "detail": "#Testing # Run pytest (fast)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     },
     {
       "label": "Pytest (coverage)",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest --cov=csorchestrator --cov-branch --cov-report=html",
       "problemMatcher": [],
-      "detail": "#Testing # Run pytest (all) with coverage"
+      "detail": "#Testing # Run pytest (all) with coverage",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     },
     {
       "label": "Pytest (run-all)",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest --run-all",
       "problemMatcher": [],
-      "detail": "#Testing # Run pytest (all)"
+      "detail": "#Testing # Run pytest (all)",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     },
     {
       "label": "Pytest (run-all & coverage)",
       "type": "shell",
       "command": "${command:python.interpreterPath} -m pytest --cov=csorchestrator --cov-branch --cov-report=html --run-all",
       "problemMatcher": [],
-      "detail": "#Testing # Run pytest (all) with coverage"
+      "detail": "#Testing # Run pytest (all) with coverage",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     },
     {
       "label": "Git Stash Untracked",

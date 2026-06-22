@@ -9,7 +9,7 @@ from csorchestrator.ci.github.github_workflow_config import (
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepExtra
+from csorchestrator.orchestrator.step_base import StepBase, StepExtra, StepValidatorBase
 from csorchestrator.utils.file_system.path import is_clean_relative_path, resolve_path
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
@@ -47,6 +47,16 @@ class StepGetRepositoryGitHub(StepBase):
 
     def resolved_target_directory_path(self) -> Path:
         return resolve_path(self.target_directory)
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_get_repository(self, context, reporter_sink)
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_get_repository_to_githubwf(self, wf_job, reporter_sink)
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepGetRepositoryValidator()
 
 
 @dataclass
@@ -131,13 +141,18 @@ def validate_step_get_repository(step: StepGetRepositoryGitHub) -> Report:
 
 
 @dataclass
-class StepGetRepositoryValidator:
+class StepGetRepositoryValidator(StepValidatorBase):
     _collected_step_get_repository_target_directories: set[Path] = field(default_factory=set)
 
-    def clear(self) -> None:
-        self._collected_step_get_repository_target_directories.clear()
+    def validate(self, step: StepBase) -> Report:
+        if not isinstance(step, StepGetRepositoryGitHub):
+            r = Report()
+            r.append_error(f"expected StepGetRepositoryGitHub, got {type(step).__name__}")
+            return r
 
-    def validate_step_get_repository(self, step: StepGetRepositoryGitHub) -> Report:
+        return self._validate_step_get_repository(step)
+
+    def _validate_step_get_repository(self, step: StepGetRepositoryGitHub) -> Report:
         r = validate_step_get_repository(step)
         if not r.has_errors():
             target_directory_path = step.resolved_target_directory_path()

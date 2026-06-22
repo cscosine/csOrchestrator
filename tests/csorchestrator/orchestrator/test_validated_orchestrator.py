@@ -1,10 +1,31 @@
+from dataclasses import dataclass
+
+from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory_all_supported_cases
 from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 from csorchestrator.orchestrator.validated_orchestrator import (
     create_validated_orchestrator,
 )
-from csorchestrator.step.step_echo_message import StepEchoMessage
 from csorchestrator.step.step_get_repository import RepoUrlParts, StepGetRepositoryGitHub
+
+
+@dataclass
+class StepEchoMessage(StepBase):
+    message: str
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
 
 
 def test_orchestrator_valid() -> None:

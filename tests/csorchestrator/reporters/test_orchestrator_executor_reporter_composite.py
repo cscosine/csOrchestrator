@@ -3,13 +3,15 @@ from pathlib import Path
 
 import pytest
 
+from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
 from csorchestrator.orchestrator.orchestrator_executor import execute_orchestrator
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 from csorchestrator.reporters.orchestrator_executor_reporter_composite import OrchestratorExecutorReporterComposite
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.reporters.orchestrator_executor_reporter_markdown import OrchestratorExecutorReporterMarkdown
@@ -20,7 +22,15 @@ from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkCol
 
 @dataclass
 class MockStep(StepBase):
-    pass
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
 
 
 @dataclass
@@ -39,7 +49,7 @@ class MockVisitor(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         pass
 
-    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
+    def visit_step(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         # By design of the visitor base, visit_step falls back to this
         report = Report()
         reporter_sink.info(f"Visiting {step.name} [I]")
@@ -65,7 +75,7 @@ class MockVisitorReport(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         pass
 
-    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
+    def visit_step(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         # By design of the visitor base, visit_step falls back to this
         report = Report()
         report.append_info(f"Visiting {step.name} [I]")

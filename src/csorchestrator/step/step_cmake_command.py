@@ -15,7 +15,7 @@ from csorchestrator.context.context_os_architecture_compiler_generator import Co
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 from csorchestrator.step.step_custom_command import execute_command
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
@@ -33,6 +33,16 @@ class StepCMakeWorkflow(StepBase):
     source_dir: str
 
     config: BuildConfig
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_cmake_workflow(self, context, reporter_sink)
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_cmake_workflow_to_githubwf(self, wf_job, reporter_sink)
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
 
 
 ContextWorkflowsExpected: TypeAlias = Expected[
@@ -162,8 +172,3 @@ def step_cmake_workflow_to_githubwf(
     )
 
     return Report()
-
-
-def validate_step_cmake_workflow(step: StepCMakeWorkflow) -> Report:
-    report = Report()
-    return report

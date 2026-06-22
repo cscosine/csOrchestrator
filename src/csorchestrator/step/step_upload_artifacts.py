@@ -11,12 +11,22 @@ from csorchestrator.context.context_local_execution import (
 )
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 
 
 @dataclass
 class StepUploadArtifacts(StepBase):
     base_install_dir: Path
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_upload_artifacts(self, context, reporter_sink)
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_upload_artifacts_to_githubwf(self, wf_job, reporter_sink)
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
 
 
 def execute_step_upload_artifacts(
@@ -42,8 +52,3 @@ def step_upload_artifacts_to_githubwf(
     )
 
     return Report()
-
-
-def validate_step_upload_artifacts(step: StepUploadArtifacts) -> Report:
-    report = Report()
-    return report

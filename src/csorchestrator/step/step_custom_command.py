@@ -25,7 +25,7 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
 )
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 from csorchestrator.step.step_utils import StepExecuteOnlyOn
 
 
@@ -34,11 +34,31 @@ class StepBashScriptCommand(StepBase):
     cmd: list[str] = field(default_factory=list)
     dry_run: bool = False
 
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_custom_command(self, context, reporter_sink)
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_custom_command_to_githubwf(self, wf_job, reporter_sink)
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
+
 
 @dataclass(kw_only=True)
 class StepWinPSCommand(StepBase):
     cmd: list[str] = field(default_factory=list)
     dry_run: bool = False
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_win_ps_command(self, context, reporter_sink)
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_win_ps_command_to_githubwf(self, wf_job, reporter_sink)
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
 
 
 @dataclass(kw_only=True)
@@ -245,11 +265,6 @@ def step_custom_command_to_githubwf(
     return Report()
 
 
-def validate_step_custom_command(step: StepBashScriptCommand) -> Report:
-    report = Report()
-    return report
-
-
 # ------------------------------
 
 
@@ -289,8 +304,3 @@ def step_win_ps_command_to_githubwf(
     )
 
     return Report()
-
-
-def validate_step_win_ps_command(step: StepWinPSCommand) -> Report:
-    report = Report()
-    return report

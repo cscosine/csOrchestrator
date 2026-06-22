@@ -2222,16 +2222,6 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/visitors/test_orchestrator_visitor_local_executor \u2192 test_orchestrator_visitor_local_executor_fail_unknown_step",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/visitors/test_orchestrator_visitor_local_executor.py::test_orchestrator_visitor_local_executor_fail_unknown_step"
-      ],
-      "justMyCode": false
-    },
-    {
       "name": "\ud83e\uddea tests/csorchestrator/visitors/test_orchestrator_visitor_local_executor \u2192 test_orchestrator_visitor_local_executor_succeed",
       "type": "debugpy",
       "request": "launch",

@@ -18,7 +18,7 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 
 
 @dataclass(frozen=True)
@@ -42,6 +42,16 @@ class StepGetVersionsFromCMakeConfigPackageVersion(StepBase):
     repos_auto_search_list: list[str] = field(default_factory=list)  # name of repos only,
     repos_version: list[CMakeConfigPackageVersion] = field(default_factory=list)
     # will look for {name}-config-version.cmake or {name}ConfigVersion.cmake
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_get_versions_from_cmake_config_package_version(self, context, reporter_sink)
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_get_versions_from_cmake_config_package_version_to_githubwf(self, wf_job, reporter_sink)
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
 
 
 # return a tuple bc we do not want dependencies from Expected in github wf
@@ -269,10 +279,3 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
     )
 
     return Report()
-
-
-def validate_step_get_versions_from_cmake_config_package_version(
-    step: StepGetVersionsFromCMakeConfigPackageVersion,
-) -> Report:
-    report = Report()
-    return report

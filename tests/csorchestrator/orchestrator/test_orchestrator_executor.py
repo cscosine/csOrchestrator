@@ -2,6 +2,8 @@ from dataclasses import dataclass
 
 import pytest
 
+from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import (
     create_orchestrator_factory_all_supported_cases,
@@ -16,7 +18,7 @@ from csorchestrator.orchestrator.orchestrator_visitor_base import (
 )
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 from csorchestrator.orchestrator.validated_orchestrator import (
     create_validated_orchestrator,
 )
@@ -25,12 +27,36 @@ from csorchestrator.reporters.orchestrator_executor_reporter_dummy import Orches
 
 @dataclass
 class StepCustom1(StepBase):
-    pass
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
+
+    def visit(self, ov: "OrchestratorVisitorConcretePerType") -> Report:
+        ov.visited_steps_1 += 1
+        return Report()
 
 
 @dataclass
 class StepCustom2(StepBase):
-    pass
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report()
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
+
+    def visit(self, ov: "OrchestratorVisitorConcretePerType") -> Report:
+        ov.visited_steps_2 += 1
+        return Report()
 
 
 DUMMY_UNHANDLED_ERROR = "DummyVisitor does not handle this step type"
@@ -49,7 +75,7 @@ class OrchestratorVisitorDummy(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         pass
 
-    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
+    def visit_step(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         raise NotImplementedError(DUMMY_UNHANDLED_ERROR)
 
 
@@ -100,20 +126,8 @@ class OrchestratorVisitorConcretePerType(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         self.phase_end_count += 1
 
-    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
-        raise NotImplementedError(f"Unhandled step type: {type(step).__name__}")
-
-    visit_step = OrchestratorVisitorBase.create_visit_dispatch()
-
-    @visit_step.register
-    def _(self, step: StepCustom1, reporter_sink: ReporterSinkBase) -> Report:
-        self.visited_steps_1 += 1
-        return Report()
-
-    @visit_step.register
-    def _(self, step: StepCustom2, reporter_sink: ReporterSinkBase) -> Report:
-        self.visited_steps_2 += 1
-        return Report()
+    def visit_step(self, step, reporter_sink):
+        return step.visit(self)
 
 
 def test_orchestrator_executor_valid_visitor() -> None:
@@ -170,7 +184,7 @@ class OrchestratorVisitorConcreteBaseOnly(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         self.phase_end_count += 1
 
-    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
+    def visit_step(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         self.visited_steps += 1
         return Report()
 
@@ -228,12 +242,9 @@ class OrchestratorVisitorConcreteUseVisitBase(OrchestratorVisitorBase):
     def end_phase(self, phase_complete: bool) -> None:
         self.phase_end_count += 1
 
-    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
+    def visit_step(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         self.visited_steps += 1
         return Report()
-
-    # create the visit dispatch but do not register any handler, so all steps fall through to visit_step_base
-    visit_step = OrchestratorVisitorBase.create_visit_dispatch()
 
 
 def test_orchestrator_executor_base_only_visitor_use_visit_step_base() -> None:
@@ -297,15 +308,12 @@ class OrchestratorVisitorFailStep(OrchestratorVisitorBase):
         self.phase_complete = phase_complete
         self.phase_end_count += 1
 
-    def visit_step_base(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
+    def visit_step(self, step: StepBase, reporter_sink: ReporterSinkBase) -> Report:
         r = Report()
         if self.failing_step == self.visited_steps:
             r.append_error("FAIL")
         self.visited_steps += 1
         return r
-
-    # create the visit dispatch but do not register any handler, so all steps fall through to visit_step_base
-    visit_step = OrchestratorVisitorBase.create_visit_dispatch()
 
 
 def test_orchestrator_executor_base_fail_step() -> None:

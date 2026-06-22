@@ -16,7 +16,7 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
 )
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 
 
 @dataclass
@@ -24,6 +24,16 @@ class StepCreateArchives(StepBase):
     input_id: str
     input_dict: str
     base_install_dir: Path
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_create_archives(self, context, reporter_sink)
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_create_archives_to_githubwf(self, wf_job, reporter_sink)
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
 
 
 def execute_step_create_archives(
@@ -107,8 +117,3 @@ def step_create_archives_to_githubwf(
     )
 
     return Report()
-
-
-def validate_step_create_archives(step: StepCreateArchives) -> Report:
-    report = Report()
-    return report

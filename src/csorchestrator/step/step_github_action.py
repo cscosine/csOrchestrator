@@ -7,7 +7,7 @@ from csorchestrator.ci.github.github_workflow_config import (
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
 from csorchestrator.step.step_custom_command import get_if_str
 
 
@@ -16,6 +16,16 @@ class StepAddGitHubAction(StepBase):
     name: str
     uses: str
     with_list: list[str] = field(default_factory=list)
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_add_github_action(self, context, reporter_sink)
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_add_github_action_to_githubwf(self, wf_job, reporter_sink)
+
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase:
+        return StepValidatorNoOp()
 
 
 def execute_step_add_github_action(
@@ -35,8 +45,4 @@ def step_add_github_action_to_githubwf(
             with_list=step.with_list,
         )
     )
-    return Report()
-
-
-def validate_step_add_github_action(step: StepAddGitHubAction) -> Report:
     return Report()

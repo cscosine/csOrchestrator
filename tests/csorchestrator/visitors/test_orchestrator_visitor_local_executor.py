@@ -1,4 +1,3 @@
-from dataclasses import dataclass
 from pathlib import Path
 
 import pytest
@@ -14,7 +13,6 @@ from csorchestrator.orchestrator.orchestrator_executor import (
     flatten_orchestrator_executor_visit_reports,
 )
 from csorchestrator.orchestrator.phase import Phase
-from csorchestrator.orchestrator.step_base import StepBase
 from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import (
@@ -73,44 +71,3 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
     report = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
     flatten_report = flatten_orchestrator_executor_visit_reports(report)
     assert not flatten_report.has_errors()
-
-
-@dataclass
-class StepCustom1(StepBase):
-    pass
-
-
-def test_orchestrator_visitor_local_executor_fail_unknown_step(tmp_path: Path) -> None:
-
-    orchestrator = create_orchestrator_factory_all_supported_cases("myName", "0.0.0", "exec-job")
-    orchestrator.add_phase(
-        Phase(name="repos checkout").add_step(StepBase(name="unknown step", description="unknown step description"))
-    )
-
-    orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
-
-    assert orchestratorValidatedOpt.result is not None
-    orchestrator = orchestratorValidatedOpt.result
-    assert orchestrator is not None
-
-    os_path_opt = create_os_and_path(str(tmp_path))
-    assert os_path_opt.result is not None
-
-    context = ContextLocalExecution(
-        base_folder_path=os_path_opt.result.path,
-        os_architecture=os_path_opt.result.os_architecture,
-        active_compiler_generator=ContextCompilerGenerator(
-            Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
-        ),
-        orchestrator_desc=orchestrator.extract_minimal_description(),
-        matrix_execution_id="1",
-    )
-
-    ovb = OrchestratorVisitorLocalExecutor(context=context)
-
-    # execute the orchestrator visitor, which will execute the step to clone the repo
-    report = report = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
-    flatten_report = flatten_orchestrator_executor_visit_reports(report)
-
-    assert flatten_report.has_errors()
-    assert "OrchestratorVisitorLocalExecutor cannot handle step" in flatten_report.errors[0]
