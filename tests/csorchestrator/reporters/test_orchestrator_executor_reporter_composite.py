@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.cli.factory import create_orchestrator_factory
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
+from csorchestrator.execution.factory import create_orchestrator_factory
 from csorchestrator.orchestrator.orchestrator_executor import execute_orchestrator
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase

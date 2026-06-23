@@ -2,7 +2,6 @@ from csorchestrator.ci.github.github_workflow_config import (
     GitHubWorkflow,
     create_job_from_matrix_list,
 )
-from csorchestrator.cli.execution import GITHUB_RUNNER_UBUNTU_22_04, create_github_wf
 from csorchestrator.context.context_compiler_generator import (
     ContextCompilerGenerator,
     Generator,
@@ -14,6 +13,7 @@ from csorchestrator.context.context_os_architecture import (
     UBUNTU_VERSIONS,
     Architecture,
 )
+from csorchestrator.execution.execution import GITHUB_RUNNER_UBUNTU_22_04, create_github_wf
 from csorchestrator.orchestrator.workflow_config import (
     Cron,
     DayOfWeek,

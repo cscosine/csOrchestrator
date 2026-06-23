@@ -3,9 +3,9 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.cli.execution import create_os_and_path
 from csorchestrator.context.context_compiler_generator import Compiler, ContextCompilerGenerator, GeneratorWithType
 from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.execution.execution import create_os_and_path
 from csorchestrator.orchestrator.step_base import StepExtra
 from csorchestrator.reporters.reporter_sink_dummy import ReporterSinkDummy
 from csorchestrator.step.step_get_repository import (

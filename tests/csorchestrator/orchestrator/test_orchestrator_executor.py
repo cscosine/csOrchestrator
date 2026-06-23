@@ -2,12 +2,12 @@ from dataclasses import dataclass
 
 import pytest
 
-from csorchestrator.cli.factory import create_orchestrator_factory_all_supported_cases
-from csorchestrator.cli.validated_orchestrator import (
-    create_validated_orchestrator,
-)
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
+from csorchestrator.execution.factory import create_orchestrator_factory_all_supported_cases
+from csorchestrator.execution.validated_orchestrator import (
+    create_validated_orchestrator,
+)
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     flatten_orchestrator_executor_visit_reports,

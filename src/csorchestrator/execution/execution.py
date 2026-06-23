@@ -7,7 +7,6 @@ from csorchestrator.ci.github.github_workflow_config import (
     create_job_from_matrix_list,
 )
 from csorchestrator.ci.github.github_workflow_job_create_release import JobReleaseCreationFromArifacts
-from csorchestrator.cli.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.context.context_compiler_generator import (
     ContextCompilerGenerator,
     Generator,
@@ -37,11 +36,11 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
+from csorchestrator.execution.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     executor_visit_reports_has_any_error,
-    flatten_orchestrator_executor_visit_reports,
 )
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
@@ -80,7 +79,7 @@ class ExecutionResult:
 
         for exec in self.report_executions:
             if exec is not None:
-                if flatten_orchestrator_executor_visit_reports(exec).has_errors():
+                if executor_visit_reports_has_any_error(exec):
                     return False
         return True
 

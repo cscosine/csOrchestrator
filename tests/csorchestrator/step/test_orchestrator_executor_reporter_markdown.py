@@ -1,10 +1,10 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from csorchestrator.cli.execution import validate_and_execute_orchestrator
-from csorchestrator.cli.factory import create_orchestrator_factory
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
+from csorchestrator.execution.execution import validate_and_execute_orchestrator
+from csorchestrator.execution.factory import create_orchestrator_factory
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import (
     JobOrchestratorMatrixExecution,
