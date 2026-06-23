@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
-from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
+from csorchestrator.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase

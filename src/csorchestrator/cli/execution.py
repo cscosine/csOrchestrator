@@ -3,9 +3,11 @@ from pathlib import Path
 from typing import TypeAlias
 
 from csorchestrator.ci.github.github_workflow_config import (
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    GitHubWorkflow,
     create_job_from_matrix_list,
 )
+from csorchestrator.ci.github.github_workflow_job_create_release import JobReleaseCreationFromArifacts
+from csorchestrator.cli.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.context.context_compiler_generator import (
     ContextCompilerGenerator,
     Generator,
@@ -32,7 +34,6 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
     create_context_os_architecture_string,
 )
-from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
@@ -43,8 +44,9 @@ from csorchestrator.orchestrator.orchestrator_executor import (
     flatten_orchestrator_executor_visit_reports,
 )
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
+from csorchestrator.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
-from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
+from csorchestrator.orchestrator.workflow_config import MatrixOsArchCompilerGeneratorRunnerEntryInclude, WorkflowConfig
 from csorchestrator.utils.file_system.directory import ensure_directory_exists_or_create_and_is_usable
 from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import (
     OrchestratorVisitorGitHubWorkflowPreparation,
@@ -167,7 +169,6 @@ def validate_and_execute_orchestrator(
             base_folder_path=os_and_path.path,
             os_architecture=os_architecture_compiler_generator.context_os_architecture,
             active_compiler_generator=os_architecture_compiler_generator.context_compiler_generator,
-            orchestrator_desc=er.execution_description,
             matrix_extras=matrix_extras,
             matrix_execution_id=str(counter),
         )
@@ -293,6 +294,20 @@ def orchestrator_matrix_to_github_wf_matrix(
     return OrchestratorMatrixToGitHubWFExpected.make_value(res)
 
 
+def create_github_wf(name: str, *, config: WorkflowConfig) -> GitHubWorkflow:
+
+    gwf = GitHubWorkflow(name)
+    if config.on_push_branches is not None or config.on_push_tags is not None:
+        gwf.on_push(branches=config.on_push_branches, tags=config.on_push_tags)
+    if config.on_pull_request_branches is not None:
+        gwf.on_pull_request(branches=config.on_pull_request_branches)
+    if config.on_dispatch:  # not None and true
+        gwf.on_dispatch()
+    if config.on_schedule is not None:
+        gwf.on_schedule(config.on_schedule)
+    return gwf
+
+
 def validate_and_generate_github_workflow(
     orchestrator: Orchestrator,
     script_folder_path: Path,
@@ -329,22 +344,30 @@ def validate_and_generate_github_workflow(
     assert wf_matrix_or_errors.value is not None
     wf_matrix = wf_matrix_or_errors.value
 
-    wf = orchestrator.default_github_wf  # TODO(wf) need a deep copy!
-    if wf is None:
-        res.report_pre_execution.append_error(
-            "github_workflow requires setting up the default_github_wf in orchestrator"
-        )
+    if orchestrator.wf_config is None:
+        res.report_pre_execution.append_error("github_workflow requires setting up the wf_config in orchestrator")
         reporter.report_pre_execution_report(res.report_pre_execution)
         reporter.finalize_execution()
         return res
 
+    wf = create_github_wf(orchestrator.name, config=orchestrator.wf_config)
+
+    if orchestrator.wf_config.create_release_on_tag is not None:
+        wf.on_job_create_release_on_tag(
+            JobReleaseCreationFromArifacts(
+                name=orchestrator.wf_config.create_release_on_tag.name,
+                needs=orchestrator.execution_matrix.name,
+                runs_on="ubuntu-latest",
+                if_str="${{ github.ref_type == 'tag' }}",
+            )
+        )
+
     wf_job = create_job_from_matrix_list(
         name=matrix.name,
         matrix_list=wf_matrix,
-        orchestrator_desc=res.execution_description,
         fail_fast=matrix.fail_fast,
     )
-    wf.on_job(job=wf_job)
+    wf.on_job_matrix_exec(job=wf_job)
 
     reporter.report_start_execution("orchestrator execution without matrix")
     # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...

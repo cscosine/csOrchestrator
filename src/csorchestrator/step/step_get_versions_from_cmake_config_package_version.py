@@ -4,9 +4,8 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from csorchestrator.ci.github.github_workflow_config import (
-    JobOrchestratorMatrixExecution,
-    StepRunCommand,
+from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.ci.github.guthub_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.context.context_local_execution import (
@@ -18,7 +17,12 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
+from csorchestrator.orchestrator.step_base import (
+    JobOrchestratorMatrixExecution,
+    StepBase,
+    StepValidatorBase,
+    StepValidatorNoOp,
+)
 
 
 @dataclass(frozen=True)

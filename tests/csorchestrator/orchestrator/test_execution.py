@@ -2,9 +2,9 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.context.orchestrator_minimal_description import PhaseNameWithStepNames
-from csorchestrator.orchestrator.execution import ExecutionResult, validate_and_execute_orchestrator
-from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory_all_supported_cases
+from csorchestrator.cli.execution import ExecutionResult, validate_and_execute_orchestrator
+from csorchestrator.cli.factory import create_orchestrator_factory_all_supported_cases
+from csorchestrator.orchestrator.orchestrator_minimal_description import PhaseNameWithStepNames
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import (

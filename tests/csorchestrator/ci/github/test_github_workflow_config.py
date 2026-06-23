@@ -1,12 +1,8 @@
 from csorchestrator.ci.github.github_workflow_config import (
-    CreateGitHubWorkflowConfig,
-    Cron,
-    DayOfWeek,
     GitHubWorkflow,
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
-    create_github_wf,
     create_job_from_matrix_list,
 )
+from csorchestrator.cli.execution import GITHUB_RUNNER_UBUNTU_22_04, create_github_wf
 from csorchestrator.context.context_compiler_generator import (
     ContextCompilerGenerator,
     Generator,
@@ -18,8 +14,12 @@ from csorchestrator.context.context_os_architecture import (
     UBUNTU_VERSIONS,
     Architecture,
 )
-from csorchestrator.orchestrator.execution import GITHUB_RUNNER_UBUNTU_22_04
-from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
+from csorchestrator.orchestrator.workflow_config import (
+    Cron,
+    DayOfWeek,
+    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    WorkflowConfig,
+)
 
 EXPECTED_LINES_HEADER = [
     "name: test-wf-name",
@@ -77,7 +77,6 @@ def test_workflow_with_triggers():
 
 
 def test_workflow_with_triggers_and_one_job():
-    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
 
     wf = (
         GitHubWorkflow("test-wf-name")
@@ -85,10 +84,9 @@ def test_workflow_with_triggers_and_one_job():
         .on_pull_request(branches=["main"])
         .on_dispatch()
         .on_schedule(Cron.weekly(DayOfWeek.MON, hour=3))
-        .on_job(
+        .on_job_matrix_exec(
             create_job_from_matrix_list(
                 name="the_job",
-                orchestrator_desc=o.extract_minimal_description(),
                 fail_fast=False,
                 matrix_list=[
                     MatrixOsArchCompilerGeneratorRunnerEntryInclude(
@@ -116,14 +114,14 @@ def test_workflow_with_creation_helper():
 
     wf = create_github_wf(
         name="test-wf-name",
-        config=CreateGitHubWorkflowConfig(
+        config=WorkflowConfig(
             on_push_branches=["main", "dev"],
             on_push_tags=["'v*.*.*'"],
             on_pull_request_branches=["main"],
             on_dispatch=True,
             on_schedule=Cron.weekly(DayOfWeek.MON, hour=3),
         ),
-    ).on_job(
+    ).on_job_matrix_exec(
         job=create_job_from_matrix_list(
             name="the_job",
             fail_fast=False,
@@ -142,7 +140,6 @@ def test_workflow_with_creation_helper():
                     generator_cmake=get_cmake_generator_name(Generator.NINJA) or "",
                 )
             ],
-            orchestrator_desc=create_orchestrator_factory("test", "0.0.0", "exec-job").extract_minimal_description(),
         )
     )
 

@@ -2,18 +2,16 @@ from pathlib import Path
 
 import pytest
 
+from csorchestrator.cli.execution import create_os_and_path
+from csorchestrator.cli.factory import create_orchestrator_factory_all_supported_cases
+from csorchestrator.cli.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.context.context_compiler_generator import Compiler, ContextCompilerGenerator, GeneratorWithType
 from csorchestrator.context.context_local_execution import ContextLocalExecution
-from csorchestrator.orchestrator.execution import create_os_and_path
-from csorchestrator.orchestrator.orchestrator import (
-    create_orchestrator_factory_all_supported_cases,
-)
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     flatten_orchestrator_executor_visit_reports,
 )
 from csorchestrator.orchestrator.phase import Phase
-from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import (
     RepoUrlParts,
@@ -55,7 +53,6 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
         active_compiler_generator=ContextCompilerGenerator(
             Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
         ),
-        orchestrator_desc=orchestrator.extract_minimal_description(),
         matrix_execution_id="1",
     )
 

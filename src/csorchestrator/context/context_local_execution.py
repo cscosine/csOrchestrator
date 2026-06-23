@@ -6,7 +6,6 @@ from typing import TypeVar
 from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
 from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
-from csorchestrator.context.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 
 
 # base class for extra information that can be provided
@@ -23,7 +22,6 @@ class ContextLocalExecution:
     base_folder_path: Path
     os_architecture: ContextOsArchitecture
     active_compiler_generator: ContextCompilerGenerator
-    orchestrator_desc: OrchestratorExecutorMinimalDescription
     matrix_execution_id: str
 
     def get_active_os_architecture_compiler_generator(self) -> ContextOsArchitectureCompilerGenerator:

@@ -1,14 +1,18 @@
 from dataclasses import dataclass
 
-from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.cli.factory import create_orchestrator_factory_all_supported_cases
+from csorchestrator.cli.validated_orchestrator import (
+    create_validated_orchestrator,
+)
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory_all_supported_cases
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
-from csorchestrator.orchestrator.validated_orchestrator import (
-    create_validated_orchestrator,
+from csorchestrator.orchestrator.step_base import (
+    JobOrchestratorMatrixExecution,
+    StepBase,
+    StepValidatorBase,
+    StepValidatorNoOp,
 )
 from csorchestrator.step.step_get_repository import RepoUrlParts, StepGetRepositoryGitHub
 

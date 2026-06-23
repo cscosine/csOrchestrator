@@ -2,10 +2,10 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import TypeVar
 
-from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.orchestrator.workflow_config import MatrixOsArchCompilerGeneratorRunnerEntryInclude
 
 
 # base class for extra information that can be provided
@@ -14,6 +14,29 @@ class StepExtra:
 
 
 T = TypeVar("T", bound="StepExtra")
+
+
+@dataclass
+class JobStrategy:
+    fail_fast: bool
+    _matrix_includes: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude] = field(default_factory=list)
+
+    def add_matrix_include(self, entry: MatrixOsArchCompilerGeneratorRunnerEntryInclude) -> "JobStrategy":
+        self._matrix_includes.append(entry)
+        return self
+
+
+class StepToStringLines:
+    def to_string_lines(self, indent: int = 0) -> list[str]:
+        raise NotImplementedError
+
+
+@dataclass
+class JobOrchestratorMatrixExecution:
+    name: str
+    runs_on: str
+    strategy: JobStrategy
+    steps: list[StepToStringLines] = field(default_factory=list)
 
 
 # the step base class

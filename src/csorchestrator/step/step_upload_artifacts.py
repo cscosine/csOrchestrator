@@ -1,22 +1,32 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from csorchestrator.ci.github.github_workflow_config import (
-    JobOrchestratorMatrixExecution,
-    StepGitHubUploadArtifacts,
+from csorchestrator.ci.github.github_workflow_steps_transations import StepGitHubUploadArtifacts
+from csorchestrator.ci.github.guthub_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.core.report import Report
+from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
+from csorchestrator.orchestrator.step_base import (
+    JobOrchestratorMatrixExecution,
+    StepBase,
+    StepValidatorBase,
+    StepValidatorNoOp,
+)
+
+
+def create_artifact_prefix_from_orchestrator_name_version(o: Orchestrator) -> str:
+    return f"{o.name}-{o.version}-"
 
 
 @dataclass
 class StepUploadArtifacts(StepBase):
     base_install_dir: Path
+    artifact_prefix: str
 
     def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
         return execute_step_upload_artifacts(self, context, reporter_sink)
@@ -41,7 +51,7 @@ def step_upload_artifacts_to_githubwf(
 
     install_subdir = create_context_os_architecture_compiler_generator_string_github_matrix()
 
-    artifact_name = f"{wf_job.orchestrator_desc.name}-{wf_job.orchestrator_desc.version}-{install_subdir}"
+    artifact_name = f"{step.artifact_prefix}{install_subdir}"
 
     wf_job.steps.append(
         StepGitHubUploadArtifacts(

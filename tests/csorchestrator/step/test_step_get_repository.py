@@ -3,10 +3,9 @@ from pathlib import Path
 
 import pytest
 
+from csorchestrator.cli.execution import create_os_and_path
 from csorchestrator.context.context_compiler_generator import Compiler, ContextCompilerGenerator, GeneratorWithType
 from csorchestrator.context.context_local_execution import ContextLocalExecution
-from csorchestrator.orchestrator.execution import create_os_and_path
-from csorchestrator.orchestrator.orchestrator import create_orchestrator_factory
 from csorchestrator.orchestrator.step_base import StepExtra
 from csorchestrator.reporters.reporter_sink_dummy import ReporterSinkDummy
 from csorchestrator.step.step_get_repository import (
@@ -157,7 +156,6 @@ def test_execute_step_get_repository_success(
     if depth_one:
         step.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
-    orchestrator = create_orchestrator_factory("test", "0.0.0", "exec-job")
     os_path_opt = create_os_and_path(str(tmp_path))
     assert os_path_opt.result is not None
 
@@ -167,7 +165,6 @@ def test_execute_step_get_repository_success(
         active_compiler_generator=ContextCompilerGenerator(
             Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
         ),
-        orchestrator_desc=orchestrator.extract_minimal_description(),
         matrix_execution_id="1",
     )
 
@@ -226,7 +223,6 @@ def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: Repo
     if depth_one:
         step.add_extra(StepGetRepositoryExtraDepthOne(on_local_checkout=True, on_github_action_checkout=True))
 
-    orchestrator = create_orchestrator_factory("test", "0.0.0", "exec-job")
     os_path_opt = create_os_and_path(str(tmp_path))
     assert os_path_opt.result is not None
 
@@ -236,7 +232,6 @@ def test_execute_step_get_repository_update_fails(tmp_path: Path, repo_url: Repo
         active_compiler_generator=ContextCompilerGenerator(
             Compiler.GCC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT, GeneratorWithType.MSVC_17_2022
         ),
-        orchestrator_desc=orchestrator.extract_minimal_description(),
         matrix_execution_id="1",
     )
 

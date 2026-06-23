@@ -2,11 +2,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TypeAlias
 
-from csorchestrator.ci.github.github_workflow_config import (
-    JobOrchestratorMatrixExecution,
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
-    StepRunCommand,
-)
+from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.ci.github.guthub_workflow_matrix_constants import MatrixOsArchCompilerGeneratorGithubConstants
 from csorchestrator.context.context_compiler_generator import GeneratorType
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
@@ -15,7 +12,12 @@ from csorchestrator.context.context_os_architecture_compiler_generator import Co
 from csorchestrator.core.expected import Expected
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
+from csorchestrator.orchestrator.step_base import (
+    JobOrchestratorMatrixExecution,
+    StepBase,
+    StepValidatorBase,
+    StepValidatorNoOp,
+)
 from csorchestrator.step.step_custom_command import execute_command
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,
@@ -120,7 +122,7 @@ def step_cmake_workflow_to_githubwf(
     run_str_list = ["|", "set -e"]
     first_cycle = False
     for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:
-        generator_type_matrix_embraced = MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_TYPE_EMBRACED
+        generator_type_matrix_embraced = MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED
         if_elif_str = "if" if not first_cycle else "elif"
         run_str_list += [
             if_elif_str + ' [[ "' + generator_type_matrix_embraced + '" == ' + '"' + generator_type.value + '" ]]; then'
@@ -141,13 +143,13 @@ def step_cmake_workflow_to_githubwf(
 
         for config in selected_configs:
             wf_name = workflow_name_from_components(
-                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME_EMBRACED,
-                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION_EMBRACED,
-                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_EMBRACED,
-                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
-                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_EMBRACED,
-                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_VERSION_EMBRACED,
-                MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_VERSION_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_EMBRACED,
                 config.value,
             )
             run_str_list += ["  cmake --workflow " + wf_name]
@@ -157,7 +159,7 @@ def step_cmake_workflow_to_githubwf(
     run_str_list += ["else"]
     run_str_list += [
         '  echo "Unknown generator_type: '
-        f'{MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_TYPE_EMBRACED}"'
+        f'{MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED}"'
     ]
     run_str_list += ["  exit 1"]
     run_str_list += ["fi"]

@@ -5,10 +5,9 @@ from pathlib import Path
 from string import Template
 from typing import Callable, TextIO
 
-from csorchestrator.ci.github.github_workflow_config import (
-    JobOrchestratorMatrixExecution,
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
-    StepRunCommand,
+from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.ci.github.guthub_workflow_matrix_constants import (
+    MatrixOsArchCompilerGeneratorGithubConstants,
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.context.context_compiler_generator import (
@@ -25,7 +24,12 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
 )
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase, StepValidatorNoOp
+from csorchestrator.orchestrator.step_base import (
+    JobOrchestratorMatrixExecution,
+    StepBase,
+    StepValidatorBase,
+    StepValidatorNoOp,
+)
 from csorchestrator.step.step_utils import StepExecuteOnlyOn
 
 
@@ -186,22 +190,22 @@ def evaluate_cmd_variable_subst_local(cmd: list[str], context: ContextLocalExecu
 
 def evaluate_cmd_variable_subst_github_wf(cmd: list[str]) -> list[str]:
     subst: dict[str, str] = {
-        "CS_MATRIX_EXEC_ID": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_EXECUTION_ID_EMBRACED,
         "CS_DIR_FROM_MATRIX": create_context_os_architecture_compiler_generator_string_github_matrix(),
-        "CS_OS": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME_EMBRACED,
-        "CS_OS_VERSION": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION_EMBRACED,
-        "CS_ARCHITECTURE": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_EMBRACED,
-        "CS_ARCHITECTURE_VARIANT": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
-        "CS_COMPILER_FAMILY": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_EMBRACED,
-        "CS_COMPILER_VERSION": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_COMPILER_VERSION_EMBRACED,
-        "CS_GENERATOR": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_EMBRACED,
-        "CS_GENERATOR_TYPE": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_TYPE_EMBRACED,
+        "CS_MATRIX_EXEC_ID": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_EXECUTION_ID_EMBRACED,
+        "CS_OS": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME_EMBRACED,
+        "CS_OS_VERSION": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION_EMBRACED,
+        "CS_ARCHITECTURE": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_EMBRACED,
+        "CS_ARCHITECTURE_VARIANT": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
+        "CS_COMPILER_FAMILY": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_EMBRACED,
+        "CS_COMPILER_VERSION": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_VERSION_EMBRACED,
+        "CS_GENERATOR": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_EMBRACED,
+        "CS_GENERATOR_TYPE": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED,
         "CS_GENERATOR_TYPE_SINGLECONFIG": GeneratorType.SINGLE_CONFIG.value,
         "CS_GENERATOR_TYPE_MULTICONFIG": GeneratorType.MULTI_CONFIG.value,
-        "CS_GENERATOR_CMAKE": MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_GENERATOR_CMAKE_EMBRACED,
-        "CS_C_COMPILER": MatrixOsArchCompilerGeneratorRunnerEntryInclude.C_COMPILER_EMBRACED,
-        "CS_CPP_COMPILER": MatrixOsArchCompilerGeneratorRunnerEntryInclude.CPP_COMPILER_EMBRACED,
-        "CS_TOOLSET": MatrixOsArchCompilerGeneratorRunnerEntryInclude.TOOLSET_EMBRACED,
+        "CS_GENERATOR_CMAKE": MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_CMAKE_EMBRACED,
+        "CS_C_COMPILER": MatrixOsArchCompilerGeneratorGithubConstants.C_COMPILER_EMBRACED,
+        "CS_CPP_COMPILER": MatrixOsArchCompilerGeneratorGithubConstants.CPP_COMPILER_EMBRACED,
+        "CS_TOOLSET": MatrixOsArchCompilerGeneratorGithubConstants.TOOLSET_EMBRACED,
     }
     subst_cmd = []
     for c in cmd:
@@ -237,9 +241,9 @@ def get_if_str(step: StepBase) -> str | None:
         if execute_only_on_extra is not None:
             os_str = execute_only_on_extra.os.value.lower()
             if execute_only_on_extra.version_starts_with is not None:
-                if_str = f"${{{{ {MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME} == '{os_str}' && startsWith({MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_VERSION}, '{execute_only_on_extra.version_starts_with}') }}}}"  # noqa: E501
+                if_str = f"${{{{ {MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME} == '{os_str}' && startsWith({MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION}, '{execute_only_on_extra.version_starts_with}') }}}}"  # noqa: E501
             else:
-                if_str = f"${{{{ {MatrixOsArchCompilerGeneratorRunnerEntryInclude.MATRIX_OS_NAME} == '{os_str}' }}}}"
+                if_str = f"${{{{ {MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME} == '{os_str}' }}}}"
             return if_str
     return None
 

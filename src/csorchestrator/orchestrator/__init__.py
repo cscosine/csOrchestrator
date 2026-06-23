@@ -5,7 +5,6 @@ from csorchestrator.orchestrator.orchestrator_executor import execute_orchestrat
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.orchestrator.step_base import StepBase
-from csorchestrator.orchestrator.validated_orchestrator import create_validated_orchestrator
 
 __all__ = [
     "Orchestrator",
@@ -13,5 +12,4 @@ __all__ = [
     "OrchestratorVisitorBase",
     "Phase",
     "StepBase",
-    "create_validated_orchestrator",
 ]

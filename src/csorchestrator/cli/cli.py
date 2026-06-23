@@ -10,13 +10,13 @@ from typing import Callable, Literal, Optional, Sequence, cast
 
 import click
 
-from csorchestrator.core.expected import Expected
-from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
-from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.execution import (
+from csorchestrator.cli.execution import (
     validate_and_execute_orchestrator,
     validate_and_generate_github_workflow,
 )
+from csorchestrator.core.expected import Expected
+from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
+from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.reporters.orchestrator_executor_reporter_composite import OrchestratorExecutorReporterComposite
