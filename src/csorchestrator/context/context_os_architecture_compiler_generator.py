@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from typing import TypeVar
 
 from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
@@ -13,42 +12,11 @@ class ContextOsArchitectureCompilerGenerator:
     context_compiler_generator: ContextCompilerGenerator
 
 
-# base class for extra information that can be provided to matrix execution
-class MatrixExecutionExtra:
-    pass
-
-
-MatrixExecutionExtraT = TypeVar("MatrixExecutionExtraT", bound="MatrixExecutionExtra")
-
-
 @dataclass
 class ExecutionMatrixOsArchCompilerGenerator:
     name: str
     os_architecture_compiler_generator_list: list[ContextOsArchitectureCompilerGenerator] = field(default_factory=list)
     fail_fast = False
-    _extras: dict[type, MatrixExecutionExtra] = field(
-        default_factory=dict,
-        kw_only=True,
-    )
-
-    def add_extra(
-        self,
-        extra: MatrixExecutionExtra,
-    ) -> "ExecutionMatrixOsArchCompilerGenerator":
-        key = type(extra)
-        self._extras[key] = extra
-        return self
-
-    def get_extra(self, t: type[MatrixExecutionExtraT]) -> MatrixExecutionExtraT | None:
-        extra = self._extras.get(t)
-        return extra if isinstance(extra, t) else None
-
-    def remove_extra(
-        self,
-        key: type[MatrixExecutionExtraT],
-    ) -> "ExecutionMatrixOsArchCompilerGenerator":
-        self._extras.pop(key, None)  # no exception if not exists
-        return self
 
     def to_list_string_description(self) -> list[str]:
         ret: list[str] = []
