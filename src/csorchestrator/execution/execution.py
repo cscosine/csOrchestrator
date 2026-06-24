@@ -97,16 +97,17 @@ def create_os_and_path(base_folder_path: str) -> OptionalOsArchitectureAndPathWi
 
     pr = ensure_directory_exists_or_create_and_is_usable(base_folder_path)
 
-    report.append_report(pr.report)
+    if pr.error is not None:
+        report.append_error(pr.error)
 
     osaExpected = detect_context_os_architecture()
 
     if osaExpected.error is not None:
         report.append_error(osaExpected.error)
 
-    if pr.result is not None and osaExpected.value is not None:
+    if pr.value is not None and osaExpected.value is not None:
         return OptionalOsArchitectureAndPathWithReport.createResultAndReport(
-            OsArchitectureAndPath(os_architecture=osaExpected.value, path=pr.result),
+            OsArchitectureAndPath(os_architecture=osaExpected.value, path=pr.value),
             report,
         )
     else:
@@ -356,12 +357,15 @@ def validate_and_generate_github_workflow(
         output_path = script_folder_path / Path(f".github/workflows/{wf.name}.yml")
 
     dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(output_path.parent.resolve()))
-    res.report_pre_execution.append_report(dir_creation_res.report)
 
-    if dir_creation_res.result is None:
+    if dir_creation_res.error is not None:
+        res.report_pre_execution.append_error(dir_creation_res.error)
         reporter.report_pre_execution_report(res.report_pre_execution)
         reporter.finalize_execution()
         return res
+
+    assert dir_creation_res.value
+    output_path = dir_creation_res.value
 
     # end pre execution
     reporter.report_pre_execution_report(res.report_pre_execution)

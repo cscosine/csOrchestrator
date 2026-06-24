@@ -10,8 +10,8 @@ from csorchestrator.utils.file_system.directory import ensure_directory_exists_o
 
 def test_empty_path_invalid() -> None:
     cr = ensure_directory_exists_or_create_and_is_usable("")
-    assert not cr.has_result()
-    assert cr.report.has_errors()
+    assert not cr.value
+    assert cr.error
 
 
 def test_creates_directory(tmp_path: Path) -> None:
@@ -19,9 +19,9 @@ def test_creates_directory(tmp_path: Path) -> None:
 
     cr = ensure_directory_exists_or_create_and_is_usable(str(target))
 
-    assert cr.has_result()
-    assert not cr.report.has_errors()
-    assert cr.result == target.resolve()
+    assert cr.value
+    assert not cr.error
+    assert cr.value == target.resolve()
     assert target.exists()
     assert target.is_dir()
 
@@ -32,9 +32,9 @@ def test_local_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
 
     cr = ensure_directory_exists_or_create_and_is_usable("./")
 
-    assert cr.has_result()
-    assert not cr.report.has_errors()
-    assert cr.result == tmp_path.resolve()
+    assert cr.value
+    assert not cr.error
+    assert cr.value == tmp_path.resolve()
 
 
 def test_relative_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -43,9 +43,9 @@ def test_relative_path(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
 
     cr = ensure_directory_exists_or_create_and_is_usable("relative_dir")
 
-    assert cr.has_result()
-    assert not cr.report.has_errors()
-    assert cr.result == (tmp_path / "relative_dir").resolve()
+    assert cr.value
+    assert not cr.error
+    assert cr.value == (tmp_path / "relative_dir").resolve()
 
 
 def test_expand_user_and_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -53,9 +53,9 @@ def test_expand_user_and_env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) ->
 
     cr = ensure_directory_exists_or_create_and_is_usable("$TEST_DIR/env_dir")
 
-    assert cr.has_result()
-    assert not cr.report.has_errors()
-    assert cr.result == (tmp_path / "env_dir").resolve()
+    assert cr.value
+    assert not cr.error
+    assert cr.value == (tmp_path / "env_dir").resolve()
 
 
 def test_existing_directory(tmp_path: Path) -> None:
@@ -65,13 +65,13 @@ def test_existing_directory(tmp_path: Path) -> None:
     cr1 = ensure_directory_exists_or_create_and_is_usable(str(target))
     cr2 = ensure_directory_exists_or_create_and_is_usable(str(target))
 
-    assert cr1.has_result()
-    assert not cr1.report.has_errors()
+    assert cr1.value
+    assert not cr1.error
 
-    assert cr2.has_result()
-    assert not cr2.report.has_errors()
+    assert cr2.value
+    assert not cr2.error
 
-    assert cr1.result == cr2.result
+    assert cr1.value == cr2.value
 
 
 def test_path_is_file_dir_creation_fails(tmp_path: Path) -> None:
@@ -79,9 +79,9 @@ def test_path_is_file_dir_creation_fails(tmp_path: Path) -> None:
     file_path.write_text("data")
 
     cr = ensure_directory_exists_or_create_and_is_usable(str(file_path))
-    assert not cr.has_result()
-    assert cr.report.has_errors()
-    assert "Failed to create directory" in str(cr.report.errors[0])
+    assert not cr.value
+    assert cr.error
+    assert "Failed to create directory" in cr.error
 
 
 def test_path_is_file_dir_creation_patched(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
@@ -95,18 +95,18 @@ def test_path_is_file_dir_creation_patched(monkeypatch: pytest.MonkeyPatch, tmp_
     monkeypatch.setattr(Path, "mkdir", fake_mkdir)
 
     cr = ensure_directory_exists_or_create_and_is_usable(str(file_path))
-    assert not cr.has_result()
-    assert cr.report.has_errors()
-    assert "not a directory" in str(cr.report.errors[0])
+    assert not cr.value
+    assert cr.error
+    assert "not a directory" in cr.error
 
 
 def test_directory_is_writable(tmp_path: Path) -> None:
     cr = ensure_directory_exists_or_create_and_is_usable(str(tmp_path / "writable"))
-    assert cr.has_result()
-    assert not cr.report.has_errors()
+    assert cr.value
+    assert not cr.error
 
-    assert cr.result is not None
-    result_path = cr.result
+    assert cr.value is not None
+    result_path = cr.value
 
     test_file = result_path / "test.txt"
     test_file.write_text("hello")
@@ -125,8 +125,8 @@ def test_permission_error(tmp_path: Path) -> None:
     target.chmod(stat.S_IREAD)
 
     cr = ensure_directory_exists_or_create_and_is_usable(str(target))
-    assert not cr.has_result()
-    assert cr.report.has_errors()
+    assert not cr.value
+    assert cr.error
 
     # Restore permissions so pytest can clean up
     target.chmod(stat.S_IWUSR | stat.S_IREAD)
@@ -140,5 +140,5 @@ def test_resolve_failure(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(Path, "resolve", fake_resolve)
 
     cr = ensure_directory_exists_or_create_and_is_usable("some/path")
-    assert not cr.has_result()
-    assert cr.report.has_errors()
+    assert not cr.value
+    assert cr.error

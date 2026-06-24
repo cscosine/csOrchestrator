@@ -4,33 +4,32 @@ import tempfile
 from pathlib import Path
 from typing import TypeAlias
 
-from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
-from csorchestrator.core.report import Report
+from csorchestrator.core.expected import Expected
 
-OptionalPathWithReport: TypeAlias = OptionalResultWithReport[Path]
+ExpectedPathOrError: TypeAlias = Expected[Path, str]
 
 
-def ensure_directory_exists_or_create_and_is_usable(path: str) -> OptionalPathWithReport:
+def ensure_directory_exists_or_create_and_is_usable(path: str) -> ExpectedPathOrError:
     if not path.strip():
-        return OptionalPathWithReport.createReport(
-            Report().append_error("create_local_context need a non empty base path string")
+        return Expected[Path, str].make_error(
+            "ensure_directory_exists_or_create_and_is_usable: input parameter empty directory to create"
         )
 
     try:
         # Expand ~ and environment variables, then resolve
         p = Path(os.path.expandvars(os.path.expanduser(path))).resolve()
     except Exception as e:
-        return OptionalPathWithReport.createReport(Report().append_error(f"Invalid path '{path}': {e}"))
+        return Expected[Path, str].make_error(f"Invalid path '{path}': {e}")
 
     try:
         # Create directory if it does not exist
         p.mkdir(parents=True, exist_ok=True)
     except Exception as e:
-        return OptionalPathWithReport.createReport(Report().append_error(f"Failed to create directory '{p}': {e}"))
+        return Expected[Path, str].make_error(f"Failed to create directory '{p}': {e}")
 
     # Ensure it's actually a directory
     if not p.is_dir():
-        return OptionalPathWithReport.createReport(Report().append_error(f"Path exists but is not a directory: '{p}'"))
+        return Expected[Path, str].make_error(f"Path exists but is not a directory: '{p}'")
 
     # Check readability & writability by attempting real operations
     try:
@@ -45,8 +44,6 @@ def ensure_directory_exists_or_create_and_is_usable(path: str) -> OptionalPathWi
         test_subdir.rmdir()
 
     except Exception as e:
-        return OptionalPathWithReport.createReport(
-            Report().append_error(f"Directory '{p}' is not writable or accessible: {e}")
-        )
+        return Expected[Path, str].make_error(f"Directory '{p}' is not writable or accessible: {e}")
 
-    return OptionalPathWithReport.createResultAndReport(p, Report())
+    return Expected[Path, str].make_value(p)
