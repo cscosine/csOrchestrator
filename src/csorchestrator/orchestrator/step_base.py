@@ -13,7 +13,7 @@ class StepExtra:
     pass
 
 
-T = TypeVar("T", bound="StepExtra")
+StepExtraT = TypeVar("StepExtraT", bound="StepExtra")
 
 
 @dataclass
@@ -57,13 +57,13 @@ class StepBase(ABC):
         self._extras[key] = extra
         return self
 
-    def get_extra(self, t: type[T]) -> T | None:
+    def get_extra(self, t: type[StepExtraT]) -> StepExtraT | None:
         extra = self._extras.get(t)
         return extra if isinstance(extra, t) else None
 
     def remove_extra(
         self,
-        key: type[T],
+        key: type[StepExtraT],
     ) -> "StepBase":
         self._extras.pop(key, None)  # no exception if not exists
         return self

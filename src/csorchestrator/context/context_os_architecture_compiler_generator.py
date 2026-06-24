@@ -18,7 +18,7 @@ class MatrixExecutionExtra:
     pass
 
 
-T = TypeVar("T", bound="MatrixExecutionExtra")
+MatrixExecutionExtraT = TypeVar("MatrixExecutionExtraT", bound="MatrixExecutionExtra")
 
 
 @dataclass
@@ -39,13 +39,13 @@ class ExecutionMatrixOsArchCompilerGenerator:
         self._extras[key] = extra
         return self
 
-    def get_extra(self, t: type[T]) -> T | None:
+    def get_extra(self, t: type[MatrixExecutionExtraT]) -> MatrixExecutionExtraT | None:
         extra = self._extras.get(t)
         return extra if isinstance(extra, t) else None
 
     def remove_extra(
         self,
-        key: type[T],
+        key: type[MatrixExecutionExtraT],
     ) -> "ExecutionMatrixOsArchCompilerGenerator":
         self._extras.pop(key, None)  # no exception if not exists
         return self

@@ -13,7 +13,7 @@ class ContextLocalExecutionExtra:
     pass
 
 
-T = TypeVar("T", bound="ContextLocalExecutionExtra")
+ContextLocalExecutionExtraT = TypeVar("ContextLocalExecutionExtraT", bound="ContextLocalExecutionExtra")
 
 
 # create it with create_local_context to ensure is a valid path pointint to an existing (eventually created) folder
@@ -49,12 +49,12 @@ class ContextLocalExecution:
 
     def remove_extra(
         self,
-        key: type[T],
+        key: type[ContextLocalExecutionExtraT],
     ) -> "ContextLocalExecution":
         self.extras.pop(key, None)  # no exception if not exists
         return self
 
-    def get_extra(self, t: type[T]) -> T | None:
+    def get_extra(self, t: type[ContextLocalExecutionExtraT]) -> ContextLocalExecutionExtraT | None:
         extra = self.extras.get(t)
         return extra if isinstance(extra, t) else None
 
@@ -68,11 +68,11 @@ class ContextLocalExecution:
 
     def remove_matrix_extra(
         self,
-        key: type[T],
+        key: type[ContextLocalExecutionExtraT],
     ) -> "ContextLocalExecution":
         self.matrix_extras.pop(key, None)  # no exception if not exists
         return self
 
-    def get_matrix_extra(self, t: type[T]) -> T | None:
+    def get_matrix_extra(self, t: type[ContextLocalExecutionExtraT]) -> ContextLocalExecutionExtraT | None:
         extra = self.matrix_extras.get(t)
         return extra if isinstance(extra, t) else None
