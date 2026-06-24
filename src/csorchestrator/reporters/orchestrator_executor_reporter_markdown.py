@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator_executor import flatten_orchestrator_executor_visit_reports
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
@@ -87,6 +86,17 @@ class OrchestratorExecutorReporterMarkdown(OrchestratorExecutorReporterBase):
         self.sink.lines.append("## Pre-Execution Report\n")
         repo_to_reporter_sink(report, self.sink)
 
+    def report_validation_report(self, report: OrchestratorExecutorVisitReports) -> None:
+        self.sink.lines.append("## Validation Report\n")
+
+        for phase_report in report:
+            self.sink.increase_indentation()
+            for step_report in phase_report:
+                self.sink.increase_indentation()
+                repo_to_reporter_sink(step_report, self.sink)
+                self.sink.decrease_indentation()
+            self.sink.decrease_indentation()
+
     # ---------------- EXECUTION REPORT ----------------
 
     def report_start_execution(self, exec_desc: str) -> None:
@@ -98,8 +108,13 @@ class OrchestratorExecutorReporterMarkdown(OrchestratorExecutorReporterBase):
     def report_execution_report(self, reportVisit: OrchestratorExecutorVisitReports) -> None:
         self.sink.lines.append("## Execution Report\n")
 
-        report = flatten_orchestrator_executor_visit_reports(reportVisit)
-        repo_to_reporter_sink(report, self.sink)
+        for phase_report in reportVisit:
+            self.sink.increase_indentation()
+            for step_report in phase_report:
+                self.sink.increase_indentation()
+                repo_to_reporter_sink(step_report, self.sink)
+                self.sink.decrease_indentation()
+            self.sink.decrease_indentation()
 
     # ---------------- SAVE ----------------
 

@@ -9,7 +9,7 @@ from csorchestrator.execution.factory import create_orchestrator_factory_all_sup
 from csorchestrator.execution.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
-    flatten_orchestrator_executor_visit_reports,
+    executor_visit_reports_has_any_error,
 )
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
@@ -40,8 +40,8 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
 
     orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
 
-    assert orchestratorValidatedOpt.result is not None
-    orchestrator = orchestratorValidatedOpt.result
+    assert orchestratorValidatedOpt.orchestrator is not None
+    orchestrator = orchestratorValidatedOpt.orchestrator
     assert orchestrator is not None
 
     os_path_opt = create_os_and_path(str(tmp_path))
@@ -60,11 +60,9 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
 
     # execute the orchestrator visitor, which will execute the step to clone the repo
     report = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
-    flatten_report = flatten_orchestrator_executor_visit_reports(report)
-    assert not flatten_report.has_errors()
+    assert not executor_visit_reports_has_any_error(report)
 
     # execute the orchestrator visitor a second time, which will execute the step to update the repo,
     # which should succeed without errors
     report = execute_orchestrator(orchestrator, ovb, OrchestratorExecutorReporterDummy())
-    flatten_report = flatten_orchestrator_executor_visit_reports(report)
-    assert not flatten_report.has_errors()
+    assert not executor_visit_reports_has_any_error(report)

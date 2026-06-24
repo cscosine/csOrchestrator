@@ -10,10 +10,8 @@ from csorchestrator.execution.validated_orchestrator import (
 )
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
-    flatten_orchestrator_executor_visit_reports,
 )
 from csorchestrator.orchestrator.orchestrator_visitor_base import (
-    OrchestratorExecutorVisitReports,
     OrchestratorVisitorBase,
 )
 from csorchestrator.orchestrator.phase import Phase
@@ -94,9 +92,8 @@ def test_orchestrator_executor_invalid_visitor() -> None:
 
     ovr = create_validated_orchestrator(o)
 
-    assert ovr.has_result()
-    orchestrator = ovr.result
-    assert orchestrator is not None
+    assert ovr.orchestrator is not None
+    orchestrator = ovr.orchestrator
 
     with pytest.raises(NotImplementedError) as exc_info:
         execute_orchestrator(orchestrator, OrchestratorVisitorDummy(), OrchestratorExecutorReporterDummy())
@@ -145,9 +142,8 @@ def test_orchestrator_executor_valid_visitor() -> None:
 
     ovr = create_validated_orchestrator(o)
 
-    assert ovr.has_result()
-    orchestrator = ovr.result
-    assert orchestrator is not None
+    assert ovr.orchestrator is not None
+    orchestrator = ovr.orchestrator
 
     ovb = OrchestratorVisitorConcretePerType()
 
@@ -204,9 +200,8 @@ def test_orchestrator_executor_base_only_visitor() -> None:
 
     ovr = create_validated_orchestrator(o)
 
-    assert ovr.has_result()
-    orchestrator = ovr.result
-    assert orchestrator is not None
+    assert ovr.orchestrator is not None
+    orchestrator = ovr.orchestrator
 
     ovb = OrchestratorVisitorConcreteBaseOnly()
 
@@ -262,9 +257,8 @@ def test_orchestrator_executor_base_only_visitor_use_visit_step_base() -> None:
 
     ovr = create_validated_orchestrator(o)
 
-    assert ovr.has_result()
-    orchestrator = ovr.result
-    assert orchestrator is not None
+    assert ovr.orchestrator is not None
+    orchestrator = ovr.orchestrator
 
     ovb = OrchestratorVisitorConcreteUseVisitBase()
 
@@ -331,9 +325,8 @@ def test_orchestrator_executor_base_fail_step() -> None:
 
     ovr = create_validated_orchestrator(o)
 
-    assert ovr.has_result()
-    orchestrator = ovr.result
-    assert orchestrator is not None
+    assert ovr.orchestrator is not None
+    orchestrator = ovr.orchestrator
 
     # complete case
     ovb = OrchestratorVisitorFailStep(-1)
@@ -438,17 +431,3 @@ def test_orchestrator_executor_base_fail_step() -> None:
     assert len(visit_reports[1]) == 2
     assert not visit_reports[1][0].has_errors()
     assert visit_reports[1][1].has_errors()
-
-
-def test_flatten_orchestrator_executor_visit_reports() -> None:
-
-    oevr: OrchestratorExecutorVisitReports = [
-        [Report().append_warning("W"), Report().append_error("E")],
-        [Report().append_error("E"), Report().append_info("I"), Report().append_warning("W")],
-    ]
-
-    rf = flatten_orchestrator_executor_visit_reports(oevr)
-
-    assert rf.errors == ("E", "E")
-    assert rf.warnings == ("W", "W")
-    assert rf.infos == ("I",)

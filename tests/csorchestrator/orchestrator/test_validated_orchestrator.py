@@ -39,12 +39,11 @@ def test_orchestrator_valid() -> None:
     o.add_phase(Phase("p1").add_step(StepEchoMessage("s1", "", "")).add_step(StepEchoMessage("s2", "", ""))).add_phase(
         Phase("p2").add_step(StepEchoMessage("s1", "", "")).add_step(StepEchoMessage("s2", "", ""))
     )
+
     vr = create_validated_orchestrator(o)
-    assert vr.has_result()
-    assert vr.result == o
-    assert len(vr.report.errors) == 0
-    assert len(vr.report.warnings) == 0
-    assert len(vr.report.infos) == 0
+    assert vr.orchestrator is not None
+    assert vr.orchestrator == o
+    assert not vr.has_any_error()
 
 
 def test_orchestrator_invalid_repeated_phase_names() -> None:
@@ -54,10 +53,12 @@ def test_orchestrator_invalid_repeated_phase_names() -> None:
         Phase("p").add_step(StepEchoMessage("s1", "", ""))
     )
     vr = create_validated_orchestrator(o)
-    assert not vr.has_result()
-    assert len(vr.report.errors) == 1
-    assert len(vr.report.warnings) == 0
-    assert len(vr.report.infos) == 0
+    assert vr.orchestrator is None
+    assert vr.has_any_error()
+
+    assert len(vr.main_report.errors) == 1
+    assert len(vr.main_report.warnings) == 0
+    assert len(vr.main_report.infos) == 0
 
 
 def test_orchestrator_invalid_repeated_step_names() -> None:
@@ -66,10 +67,12 @@ def test_orchestrator_invalid_repeated_step_names() -> None:
 
     o.add_phase(Phase("p").add_step(StepEchoMessage("s", "", "")).add_step(StepEchoMessage("s", "", "")))
     vr = create_validated_orchestrator(o)
-    assert not vr.has_result()
-    assert len(vr.report.errors) == 1
-    assert len(vr.report.warnings) == 0
-    assert len(vr.report.infos) == 0
+    assert vr.orchestrator is None
+    assert vr.has_any_error()
+
+    assert len(vr.main_report.errors) == 1
+    assert len(vr.main_report.warnings) == 0
+    assert len(vr.main_report.infos) == 0
 
 
 def test_orchestrator_invalid_repeated_phase_and_step_names() -> None:
@@ -80,10 +83,12 @@ def test_orchestrator_invalid_repeated_phase_and_step_names() -> None:
         Phase("p").add_step(StepEchoMessage("s", "", "")).add_step(StepEchoMessage("s", "", ""))
     )
     vr = create_validated_orchestrator(o)
-    assert not vr.has_result()
-    assert len(vr.report.errors) == 3
-    assert len(vr.report.warnings) == 0
-    assert len(vr.report.infos) == 0
+    assert vr.orchestrator is None
+    assert vr.has_any_error()
+
+    assert len(vr.main_report.errors) == 3
+    assert len(vr.main_report.warnings) == 0
+    assert len(vr.main_report.infos) == 0
 
 
 def test_orchestrator_invalid_step_get_repository() -> None:
@@ -103,11 +108,15 @@ def test_orchestrator_invalid_step_get_repository() -> None:
     )
     o.add_phase(Phase("p").add_step(s))
     vr = create_validated_orchestrator(o)
-    assert not vr.has_result()
-    assert len(vr.report.errors) == 1
-    assert "Invalid target_directory" in vr.report.errors[0]
-    assert len(vr.report.warnings) == 0
-    assert len(vr.report.infos) == 0
+    assert vr.orchestrator is None
+    assert vr.has_any_error()
+
+    assert len(vr.main_report.errors) == 0
+    assert len(vr.main_report.warnings) == 0
+    assert len(vr.main_report.infos) == 0
+    assert len(vr.validation_reports) == 1  # 1 phase
+    assert len(vr.validation_reports[0]) == 1  # 1 step
+    assert "Invalid target_directory" in vr.validation_reports[0][0].errors[0]
 
 
 def test_orchestrator_invalid_step_duplicate_target_directory() -> None:
@@ -140,6 +149,12 @@ def test_orchestrator_invalid_step_duplicate_target_directory() -> None:
 
     vr = create_validated_orchestrator(o)
 
-    assert not vr.has_result()
-    assert len(vr.report.errors) == 1
-    assert "already used by another step" in vr.report.errors[0]
+    assert vr.orchestrator is None
+    assert vr.has_any_error()
+
+    assert len(vr.main_report.errors) == 0
+    assert len(vr.main_report.warnings) == 0
+    assert len(vr.main_report.infos) == 0
+    assert len(vr.validation_reports) == 1  # 1 phase
+    assert len(vr.validation_reports[0]) == 2  # 2 steps
+    assert "already used by another step" in vr.validation_reports[0][1].errors[0]

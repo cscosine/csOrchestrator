@@ -56,6 +56,10 @@ class OrchestratorExecutorReporterComposite(OrchestratorExecutorReporterBase):
         for r in self.reporters:
             r.report_pre_execution_report(report)
 
+    def report_validation_report(self, report: OrchestratorExecutorVisitReports) -> None:
+        for r in self.reporters:
+            r.report_validation_report(report)
+
     def report_execution_report(self, report: OrchestratorExecutorVisitReports) -> None:
         for r in self.reporters:
             r.report_execution_report(report)

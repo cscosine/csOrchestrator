@@ -1,28 +1,36 @@
 from collections import Counter
-from typing import TypeAlias
+from dataclasses import dataclass, field
 
-from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.orchestrator import Orchestrator
 from csorchestrator.orchestrator.orchestrator_executor import (
     execute_orchestrator,
-    flatten_orchestrator_executor_visit_reports,
+    executor_visit_reports_has_any_error,
 )
+from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.visitors.orchestrator_visitor_validator import OrchestratorVisitorValidator
 
-OptionalValidatedOrchestratorWithReport: TypeAlias = OptionalResultWithReport[Orchestrator]
+
+@dataclass
+class OrchestratorValidationResultAndReport:
+    main_report: Report = field(default_factory=Report)
+    validation_reports: OrchestratorExecutorVisitReports = field(default_factory=OrchestratorExecutorVisitReports)
+    orchestrator: Orchestrator | None = None
+
+    def has_any_error(self) -> bool:
+        return self.main_report.has_errors() or executor_visit_reports_has_any_error(self.validation_reports)
 
 
-def create_validated_orchestrator(o: Orchestrator) -> OptionalValidatedOrchestratorWithReport:
-    report = Report()
+def create_validated_orchestrator(o: Orchestrator) -> OrchestratorValidationResultAndReport:
+    validation_report = OrchestratorValidationResultAndReport()
 
     # check phases name are unique
     phase_names = [p.name for p in o.phases]
     counter_phase_names = Counter(phase_names)
     for name, c in counter_phase_names.items():
         if c > 1:
-            report.append_error(f"phase named {name} has {c} occurrences")
+            validation_report.main_report.append_error(f"phase named {name} has {c} occurrences")
 
     # check step names are unique in each phase
     for p in o.phases:
@@ -30,19 +38,19 @@ def create_validated_orchestrator(o: Orchestrator) -> OptionalValidatedOrchestra
         counter_step_names = Counter(step_names)
         for name, c in counter_step_names.items():
             if c > 1:
-                report.append_error(f"in phase {p.name}, step named {name} has {c} occurrences")
-
-    # if so far is validated, use the orchestrator visitor validator to validate the steps, and append the reports
-    if len(report.errors) == 0:
-        visit_report = execute_orchestrator(
-            o, OrchestratorVisitorValidator(), reporter=OrchestratorExecutorReporterDummy()
-        )
-        report.append_report(flatten_orchestrator_executor_visit_reports(visit_report))
+                validation_report.main_report.append_error(f"in phase {p.name}, step named {name} has {c} occurrences")
 
     # if there are no execution matrix in the list, return error
     if len(o.execution_matrix.os_architecture_compiler_generator_list) == 0:
-        report.append_error("execution matrix list is empty")
+        validation_report.main_report.append_error("execution matrix list is empty")
 
-    if len(report.errors) > 0:
-        return OptionalValidatedOrchestratorWithReport.createReport(report)
-    return OptionalValidatedOrchestratorWithReport.createResultAndReport(o, report)
+    # if so far is validated, use the orchestrator visitor validator to validate the steps, and append the reports
+    if len(validation_report.main_report.errors) == 0:
+        validation_report.validation_reports = execute_orchestrator(
+            o, OrchestratorVisitorValidator(), reporter=OrchestratorExecutorReporterDummy()
+        )
+
+    if not validation_report.has_any_error():
+        validation_report.orchestrator = o
+
+    return validation_report

@@ -62,6 +62,11 @@ class OrchestratorExecutorReporterBase(ABC):
         ...
 
     @abstractmethod
+    def report_validation_report(self, report: OrchestratorExecutorVisitReports) -> None:
+        """Called in the pre-execution phase, with the report of the orchestrator validation"""
+        ...
+
+    @abstractmethod
     def report_execution_report(self, report: OrchestratorExecutorVisitReports) -> None:
         """Called after the execution phase, with the report of the execution phase"""
         ...

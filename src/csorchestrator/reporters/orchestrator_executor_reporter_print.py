@@ -1,7 +1,6 @@
 from dataclasses import dataclass, field
 
 from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator_executor import flatten_orchestrator_executor_visit_reports
 from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
@@ -81,6 +80,17 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
         repo_to_reporter_sink(report, self.reporter_sink)
         self.reporter_sink.decrease_indentation()
 
+    def report_validation_report(self, report: OrchestratorExecutorVisitReports) -> None:
+        self.reporter_sink.stdout("[Validation Report]")
+
+        for phase_report in report:
+            self.reporter_sink.increase_indentation()
+            for step_report in phase_report:
+                self.reporter_sink.increase_indentation()
+                repo_to_reporter_sink(step_report, self.reporter_sink)
+                self.reporter_sink.decrease_indentation()
+            self.reporter_sink.decrease_indentation()
+
     def report_skip_execution(self, exec_desc: str) -> None:
         self.reporter_sink.stdout(f"[Skip Execution {exec_desc}]")
 
@@ -92,7 +102,12 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
     def report_execution_report(self, reportVisit: OrchestratorExecutorVisitReports) -> None:
         self.reporter_sink.stdout("[Execution Report]")
         self.reporter_sink.increase_indentation()
-        report = flatten_orchestrator_executor_visit_reports(reportVisit)
-        repo_to_reporter_sink(report, self.reporter_sink)
+        for phase_report in reportVisit:
+            self.reporter_sink.increase_indentation()
+            for step_report in phase_report:
+                self.reporter_sink.increase_indentation()
+                repo_to_reporter_sink(step_report, self.reporter_sink)
+                self.reporter_sink.decrease_indentation()
+            self.reporter_sink.decrease_indentation()
         self.reporter_sink.decrease_indentation()
         self.reporter_sink.decrease_indentation()  # decrease the report_start_execution

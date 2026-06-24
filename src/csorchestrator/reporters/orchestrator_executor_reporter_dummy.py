@@ -42,6 +42,9 @@ class OrchestratorExecutorReporterDummy(OrchestratorExecutorReporterBase):
     def report_pre_execution_report(self, report: Report) -> None:
         pass
 
+    def report_validation_report(self, report: OrchestratorExecutorVisitReports) -> None:
+        pass
+
     def report_execution_report(self, report: OrchestratorExecutorVisitReports) -> None:
         pass
 

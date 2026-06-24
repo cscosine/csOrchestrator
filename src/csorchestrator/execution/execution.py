@@ -56,6 +56,8 @@ from csorchestrator.visitors.orchestrator_visitor_local_executor import Orchestr
 @dataclass
 class ExecutionResult:
     # report of the validation phase, which is executed before the execution phase
+    report_validation: OrchestratorExecutorVisitReports = field(default_factory=OrchestratorExecutorVisitReports)
+    # report of the pre execution, before validation
     report_pre_execution: Report = field(default_factory=Report)
     # description of the execution, which is extracted from the orchestrator
     # before the execution phase
@@ -122,16 +124,16 @@ def validate_and_execute_orchestrator(
     reporter.report_execution_description(er.execution_description)
 
     orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
-    er.report_pre_execution.append_report(orchestratorValidatedOpt.report)
+    er.report_pre_execution.append_report(orchestratorValidatedOpt.main_report)
+    er.report_validation = orchestratorValidatedOpt.validation_reports
+    reporter.report_validation_report(er.report_validation)
 
-    if orchestratorValidatedOpt.result is None:
+    if orchestratorValidatedOpt.orchestrator is None:
         reporter.report_pre_execution_report(er.report_pre_execution)
         reporter.finalize_execution()
         return er
 
-    reporter.report_pre_execution_report(er.report_pre_execution)
-
-    orchestrator = orchestratorValidatedOpt.result
+    orchestrator = orchestratorValidatedOpt.orchestrator
 
     # validated orchestrator, create context
 
@@ -142,6 +144,9 @@ def validate_and_execute_orchestrator(
         reporter.report_pre_execution_report(er.report_pre_execution)
         reporter.finalize_execution()
         return er
+
+    # finalized the pre execution
+    reporter.report_pre_execution_report(er.report_pre_execution)
 
     os_and_path = os_and_path_opt.result
 
@@ -319,14 +324,16 @@ def validate_and_generate_github_workflow(
     reporter.report_execution_description(res.execution_description)
 
     orchestratorValidatedOpt = create_validated_orchestrator(orchestrator)
-    res.report_pre_execution.append_report(orchestratorValidatedOpt.report)
+    res.report_pre_execution.append_report(orchestratorValidatedOpt.main_report)
+    res.report_validation = orchestratorValidatedOpt.validation_reports
+    reporter.report_validation_report(res.report_validation)
 
-    if orchestratorValidatedOpt.result is None:
+    if orchestratorValidatedOpt.orchestrator is None:
         reporter.report_pre_execution_report(res.report_pre_execution)
         reporter.finalize_execution()
         return res
 
-    orchestrator = orchestratorValidatedOpt.result
+    orchestrator = orchestratorValidatedOpt.orchestrator
 
     # validated orchestrator
 
@@ -350,6 +357,20 @@ def validate_and_generate_github_workflow(
         return res
 
     wf = create_github_wf(orchestrator.name, config=orchestrator.wf_config)
+
+    if output_path is None:
+        output_path = script_folder_path / Path(f".github/workflows/{wf.name}.yml")
+
+    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(output_path.parent.resolve()))
+    res.report_pre_execution.append_report(dir_creation_res.report)
+
+    if dir_creation_res.result is None:
+        reporter.report_pre_execution_report(res.report_pre_execution)
+        reporter.finalize_execution()
+        return res
+
+    # end pre execution
+    reporter.report_pre_execution_report(res.report_pre_execution)
 
     if orchestrator.wf_config.create_release_on_tag is not None:
         wf.on_job_create_release_on_tag(
@@ -376,17 +397,6 @@ def validate_and_generate_github_workflow(
     reporter.report_execution_report(report_execution)
 
     res.report_executions.append(report_execution)
-
-    if output_path is None:
-        output_path = script_folder_path / Path(f".github/workflows/{wf.name}.yml")
-
-    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(output_path.parent.resolve()))
-    res.report_pre_execution.append_report(dir_creation_res.report)
-
-    if dir_creation_res.result is None:
-        reporter.report_pre_execution_report(res.report_pre_execution)
-        reporter.finalize_execution()
-        return res
 
     output_path.write_text("\n".join(wf.to_string_lines()), encoding="utf-8")
     return res

@@ -722,16 +722,6 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor \u2192 test_flatten_orchestrator_executor_visit_reports",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/orchestrator/test_orchestrator_executor.py::test_flatten_orchestrator_executor_visit_reports"
-      ],
-      "justMyCode": false
-    },
-    {
       "name": "\ud83e\uddea tests/csorchestrator/orchestrator/test_orchestrator_executor \u2192 test_orchestrator_executor_base_fail_step",
       "type": "debugpy",
       "request": "launch",

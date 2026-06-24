@@ -15,14 +15,6 @@ def executor_visit_reports_has_any_error(oevr: OrchestratorExecutorVisitReports)
     return False
 
 
-def flatten_orchestrator_executor_visit_reports(oevr: OrchestratorExecutorVisitReports) -> Report:
-    rl: list[Report] = [report for phase_reports in oevr for report in phase_reports]
-    r = Report()
-    for report in rl:
-        r.append_report(report)
-    return r
-
-
 # return OrchestratorExecutorVisitReports, which is a List[List[Report]], i.e.,
 # - the reports of each step per each phase
 # - in other words, r[phase_index][step_index]
