@@ -32,6 +32,7 @@ dev = [
     "mypy>=1.0",
     "ruff>=0.4",
     "pre-commit>=4",
+    "import-linter>=2.0"
 ]
 
 # ===============================
@@ -136,3 +137,21 @@ source = [
 [tool.coverage.report]
 show_missing = true
 # fail_under = 70 # TODO keep fail disabled for now
+
+# ===============================
+# import linter
+# ===============================
+
+[tool.importlinter]
+root_package = "csorchestrator"
+
+[[tool.importlinter.contracts]]
+name = "architecture layers"
+type = "layers"
+
+layers = [
+    # TODO add layers
+    "csorchestrator.orchestrator",
+    "csorchestrator.context",
+    "csorchestrator.core",
+]

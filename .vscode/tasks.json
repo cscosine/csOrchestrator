@@ -83,6 +83,18 @@
       }
     },
     {
+      "label": "Pre-commit run import-linter (all files)",
+      "type": "shell",
+      "command": "pre-commit run import-linter --all-files",
+      "problemMatcher": [],
+      "detail": "#Pre-Commit # Run pre-commit hooks import-linter on all files",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
+    },
+    {
       "label": "Setup Project",
       "dependsOn": [
         "Create venv",

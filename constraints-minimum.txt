@@ -6,3 +6,4 @@ ruff==0.4
 pre-commit==4.0
 click==8.1
 colorama==0.4.6
+import-linter==2.0

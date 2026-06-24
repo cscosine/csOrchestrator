@@ -41,6 +41,16 @@ repos:
 
   - repo: local
     hooks:
+      - id: import-linter
+        name: Import Linter
+        entry: lint-imports
+        language: python
+        additional_dependencies:
+        - ".[dev]"
+        pass_filenames: false
+
+  - repo: local
+    hooks:
 
       - id: generate-vscode-launch
         name: Generate VS Code launch configs
