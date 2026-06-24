@@ -7,8 +7,7 @@ from git import Repo
 
 from csorchestrator.core.report import Report
 from csorchestrator.reporters.report_reporter import repo_to_reporter_sink
-from csorchestrator.step.step_get_repository import RepoUrlParts
-from csorchestrator.utils.git.resolve_url import select_https_or_ssh_url_resolve_token_name_on_env
+from csorchestrator.utils.git.resolve_url import RepoUrlParts, select_https_or_ssh_url_resolve_token_name_on_env
 
 # keep these values aligned with the ones in tests/csorchestrator/utils/git/repo_config.py
 TOKEN_NAME: str = "ACTIONS_ORG_ACCESS"

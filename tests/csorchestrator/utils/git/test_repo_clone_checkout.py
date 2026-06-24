@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.step.step_get_repository import RepoUrlParts
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
+from csorchestrator.utils.git.resolve_url import RepoUrlParts
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 logging.basicConfig(level=logging.INFO)

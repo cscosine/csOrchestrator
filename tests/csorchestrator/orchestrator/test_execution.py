@@ -8,10 +8,10 @@ from csorchestrator.orchestrator.orchestrator_minimal_description import PhaseNa
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import (
-    RepoUrlParts,
     StepGetRepositoryExtraDepthOne,
     StepGetRepositoryGitHub,
 )
+from csorchestrator.utils.git.resolve_url import RepoUrlParts
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 

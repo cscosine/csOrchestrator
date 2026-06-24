@@ -13,11 +13,8 @@ from csorchestrator.orchestrator.orchestrator_executor import (
 )
 from csorchestrator.orchestrator.phase import Phase
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
-from csorchestrator.step.step_get_repository import (
-    RepoUrlParts,
-    StepGetRepositoryExtraDepthOne,
-    StepGetRepositoryGitHub,
-)
+from csorchestrator.step.step_get_repository import StepGetRepositoryExtraDepthOne, StepGetRepositoryGitHub
+from csorchestrator.utils.git.resolve_url import RepoUrlParts
 from csorchestrator.visitors.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 

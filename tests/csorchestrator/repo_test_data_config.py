@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from csorchestrator.step.step_get_repository import RepoUrlParts
+from csorchestrator.utils.git.resolve_url import RepoUrlParts
 
 # note: the test repo can be regenerated with the tool in tools/regenerate_test_repo.py,
 # after which the sha of the initial_commit_sha variable must be updated in this file accordingly

@@ -12,19 +12,7 @@ from csorchestrator.orchestrator.step_base import JobOrchestratorMatrixExecution
 from csorchestrator.utils.file_system.path import is_clean_relative_path
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
-
-
-@dataclass(frozen=True)
-class RepoUrlParts:
-    repo_base_url: str
-    repo_org: str
-    repo_name: str
-
-    def repo_org_name_sub_url(self) -> str:
-        return self.repo_org + "/" + self.repo_name
-
-    def repo_url(self) -> str:
-        return self.repo_base_url + self.repo_org_name_sub_url()
+from csorchestrator.utils.git.resolve_url import RepoUrlParts
 
 
 @dataclass

@@ -1,7 +1,19 @@
 import os
+from dataclasses import dataclass
 from enum import StrEnum
 
-from csorchestrator.step.step_get_repository import RepoUrlParts
+
+@dataclass(frozen=True)
+class RepoUrlParts:
+    repo_base_url: str
+    repo_org: str
+    repo_name: str
+
+    def repo_org_name_sub_url(self) -> str:
+        return self.repo_org + "/" + self.repo_name
+
+    def repo_url(self) -> str:
+        return self.repo_base_url + self.repo_org_name_sub_url()
 
 
 # return the token value if the token name is found in env, otherwise return None

@@ -9,13 +9,13 @@ from csorchestrator.execution.execution import create_os_and_path
 from csorchestrator.orchestrator.step_base import StepExtra
 from csorchestrator.reporters.reporter_sink_dummy import ReporterSinkDummy
 from csorchestrator.step.step_get_repository import (
-    RepoUrlParts,
     StepGetRepositoryExtraAccessToken,
     StepGetRepositoryExtraDepthOne,
     StepGetRepositoryGitHub,
     execute_step_get_repository,
     validate_step_get_repository,
 )
+from csorchestrator.utils.git.resolve_url import RepoUrlParts
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 

@@ -2,8 +2,11 @@ import logging
 
 import pytest
 
-from csorchestrator.step.step_get_repository import RepoUrlParts
-from csorchestrator.utils.git.resolve_url import RepoUrlSelected, select_https_or_ssh_url_resolve_token_name_on_env
+from csorchestrator.utils.git.resolve_url import (
+    RepoUrlParts,
+    RepoUrlSelected,
+    select_https_or_ssh_url_resolve_token_name_on_env,
+)
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 logger = logging.getLogger(__name__)

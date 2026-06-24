@@ -1,7 +1,7 @@
 import os
 
-from csorchestrator.step.step_get_repository import RepoUrlParts
 from csorchestrator.utils.git.resolve_url import (
+    RepoUrlParts,
     RepoUrlSelected,
     get_token_from_env,
     select_https_or_ssh_url,

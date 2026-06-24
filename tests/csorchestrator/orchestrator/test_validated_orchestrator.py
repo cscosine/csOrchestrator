@@ -14,7 +14,8 @@ from csorchestrator.orchestrator.step_base import (
     StepValidatorBase,
     StepValidatorNoOp,
 )
-from csorchestrator.step.step_get_repository import RepoUrlParts, StepGetRepositoryGitHub
+from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub
+from csorchestrator.utils.git.resolve_url import RepoUrlParts
 
 
 @dataclass

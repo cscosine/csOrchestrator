@@ -6,9 +6,9 @@ import git
 import pytest
 from git import GitCommandError, Repo
 
-from csorchestrator.step.step_get_repository import RepoUrlParts
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
+from csorchestrator.utils.git.resolve_url import RepoUrlParts
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 logging.basicConfig(level=logging.INFO)
