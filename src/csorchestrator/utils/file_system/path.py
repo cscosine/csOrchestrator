@@ -2,15 +2,10 @@ from pathlib import Path
 
 
 def is_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> bool:
-    op = try_parse_clean_relative_path(path_str, avoid_leaving_base)
-    return op is not None
-
-
-def try_parse_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> Path | None:
     p = Path(path_str)
 
     if p.is_absolute():
-        return None
+        return False
 
     if avoid_leaving_base:
         try:
@@ -18,16 +13,9 @@ def try_parse_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> Pa
             base_resolved = base.resolve()
             resolved = (base_resolved / p).resolve()
         except Exception:
-            return None
+            return False
 
         if not resolved.is_relative_to(base_resolved):
-            return None
+            return False
 
-        return resolved
-    else:
-        return p.resolve()
-
-
-def resolve_path(path_str: str) -> Path:
-    p = Path(path_str)
-    return p.resolve()
+    return True

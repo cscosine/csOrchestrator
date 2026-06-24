@@ -1482,12 +1482,12 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path \u2192 test_resolve_exception_try_parse_clean_relative_path",
+      "name": "\ud83e\uddea tests/csorchestrator/utils/filesystem/test_path \u2192 test_resolve_exception_is_clean_relative_path",
       "type": "debugpy",
       "request": "launch",
       "module": "pytest",
       "args": [
-        "tests/csorchestrator/utils/filesystem/test_path.py::test_resolve_exception_try_parse_clean_relative_path"
+        "tests/csorchestrator/utils/filesystem/test_path.py::test_resolve_exception_is_clean_relative_path"
       ],
       "justMyCode": false
     },

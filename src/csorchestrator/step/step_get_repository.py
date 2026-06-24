@@ -9,7 +9,7 @@ from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.core.report import Report
 from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.orchestrator.step_base import JobOrchestratorMatrixExecution, StepBase, StepExtra, StepValidatorBase
-from csorchestrator.utils.file_system.path import is_clean_relative_path, resolve_path
+from csorchestrator.utils.file_system.path import is_clean_relative_path
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
 
@@ -45,7 +45,7 @@ class StepGetRepositoryGitHub(StepBase):
     # - Commit hash, e.g. "9f8e7d6c5b4a3210abcd1234ef56789012345678"
 
     def resolved_target_directory_path(self) -> Path:
-        return resolve_path(self.target_directory)
+        return Path(self.target_directory).resolve()
 
     def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
         return execute_step_get_repository(self, context, reporter_sink)
