@@ -100,7 +100,7 @@ def test_validate_and_sync_repo_clone_tag_commit_mismatch(
 
     r = validate_and_sync_repo(repo_url.repo_url(), cfg.initial_commit_sha, target_path=target_path)
     assert r.has_errors()
-    assert "RefKind.COMMIT mismatch" in r.errors[0]
+    assert "commit mismatch" in r.errors[0]
 
 
 @pytest.mark.slow
@@ -117,7 +117,7 @@ def test_validate_and_sync_repo_clone_commit_tag_mismatch(
 
     r = validate_and_sync_repo(repo_url.repo_url(), cfg.tag, target_path=target_path)
     assert r.has_errors()
-    assert "RefKind.TAG mismatch" in r.errors[0]
+    assert "tag mismatch" in r.errors[0]
 
 
 @pytest.mark.slow

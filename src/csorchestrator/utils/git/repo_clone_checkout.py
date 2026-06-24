@@ -1,4 +1,4 @@
-import enum
+from enum import StrEnum
 from pathlib import Path
 
 from git import GitCommandError, Repo
@@ -9,7 +9,7 @@ from csorchestrator.core.report import Report
 # -------------------------
 # ENUM
 # -------------------------
-class RefKind(enum.StrEnum):
+class RefKind(StrEnum):
     BRANCH = "branch"
     TAG = "tag"
     COMMIT = "commit"

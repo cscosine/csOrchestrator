@@ -1,5 +1,5 @@
-import enum
 import os
+from enum import StrEnum
 
 from csorchestrator.step.step_get_repository import RepoUrlParts
 
@@ -13,7 +13,7 @@ def get_token_from_env(token_name: str) -> str | None:
 # -------------------------
 # ENUM
 # -------------------------
-class RepoUrlSelected(enum.StrEnum):
+class RepoUrlSelected(StrEnum):
     HTTPS = "https"
     SSH = "ssh"
 
