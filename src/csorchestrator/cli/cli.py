@@ -3,10 +3,11 @@ from __future__ import annotations
 
 import importlib.util
 import sys
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from pathlib import Path
 from types import ModuleType
-from typing import Callable, Literal, Optional, Sequence, cast
+from typing import Literal, cast
 
 import click
 
@@ -50,7 +51,7 @@ def _build_sink(kind: str) -> ReporterSinkPrintBase | None:
 @dataclass
 class CLIConfig:
     sink: SinkType = "colorama"
-    markdown_path: Optional[Path] = None
+    markdown_path: Path | None = None
 
 
 @click.group(help="csOrchestrator command line interface")  # type: ignore[untyped-decorator]

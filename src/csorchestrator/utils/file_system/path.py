@@ -3,9 +3,7 @@ from pathlib import Path
 
 def is_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> bool:
     op = try_parse_clean_relative_path(path_str, avoid_leaving_base)
-    if op is not None:
-        return True
-    return False
+    return op is not None
 
 
 def try_parse_clean_relative_path(path_str: str, avoid_leaving_base: bool) -> Path | None:

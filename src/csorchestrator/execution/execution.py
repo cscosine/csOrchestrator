@@ -76,13 +76,10 @@ class ExecutionResult:
     ) -> bool:
         if self.report_pre_execution.has_errors():
             return False
-        if self.report_executions is None:
-            return False
 
         for exec in self.report_executions:
-            if exec is not None:
-                if executor_visit_reports_has_any_error(exec):
-                    return False
+            if exec is not None and executor_visit_reports_has_any_error(exec):
+                return False
         return True
 
 
@@ -225,21 +222,18 @@ def get_runner(entry: ContextOsArchitectureCompilerGenerator) -> Expected[str, s
         if os_version == UBUNTU_VERSIONS.UBUNTU_22_04.value:
             if arch == Architecture.X64:
                 return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_22_04)
-        elif os_version == UBUNTU_VERSIONS.UBUNTU_24_04.value:
-            if arch == Architecture.X64:
-                return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_24_04)
-    elif os == OS.WINDOWS:
-        if os_version == WINDOWS_VERSIONS.WIN10.value:
-            if arch == Architecture.X64:
-                if generator == Generator.MSVC_17_2022:
-                    return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2022)
-                elif generator == Generator.MSVC_18_2026:
-                    return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2025_VS2026)
-                elif generator == Generator.NINJA or generator == Generator.NINJA_MULTI:
-                    if compiler_version == ContextCompilerGenerator.COMPILER_VERSION_MSVC_2026_18:
-                        return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2025_VS2026)
-                    elif compiler_version == ContextCompilerGenerator.COMPILER_VERSION_MSVC_2022_17:
-                        return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2022)
+        elif os_version == UBUNTU_VERSIONS.UBUNTU_24_04.value and arch == Architecture.X64:
+            return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_24_04)
+    elif os == OS.WINDOWS and os_version == WINDOWS_VERSIONS.WIN10.value and arch == Architecture.X64:
+        if generator == Generator.MSVC_17_2022:
+            return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2022)
+        elif generator == Generator.MSVC_18_2026:
+            return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2025_VS2026)
+        elif generator == Generator.NINJA or generator == Generator.NINJA_MULTI:
+            if compiler_version == ContextCompilerGenerator.COMPILER_VERSION_MSVC_2026_18:
+                return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2025_VS2026)
+            elif compiler_version == ContextCompilerGenerator.COMPILER_VERSION_MSVC_2022_17:
+                return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2022)
 
     return Expected[str, str].make_error(
         f"unsupported config os: {os.value}, os_version: {os_version}, arch: {arch.value}, generator: {generator.value}"

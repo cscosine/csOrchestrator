@@ -1,9 +1,10 @@
 import subprocess
 import threading
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from string import Template
-from typing import Callable, TextIO
+from typing import TextIO
 
 from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
 from csorchestrator.ci.github.guthub_workflow_matrix_constants import (

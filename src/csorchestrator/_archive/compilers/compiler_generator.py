@@ -1,6 +1,6 @@
 import re
 import subprocess
-from typing import Callable
+from collections.abc import Callable
 
 from csorchestrator.context.context_compiler_generator import Compiler
 from csorchestrator.core.expected import Expected

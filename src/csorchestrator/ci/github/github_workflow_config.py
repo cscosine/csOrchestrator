@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Optional, Self
+from typing import Self
 
 from csorchestrator.ci.github.github_workflow_job_create_release import (
     JobReleaseCreationFromArifacts,
@@ -52,8 +52,8 @@ class GitHubWorkflow:
     def on_push(
         self,
         *,
-        branches: Optional[list[str]] = None,
-        tags: Optional[list[str]] = None,
+        branches: list[str] | None = None,
+        tags: list[str] | None = None,
     ) -> Self:
         self._on[TriggerType.PUSH] = PushTrigger(branches, tags)
         return self
@@ -63,7 +63,7 @@ class GitHubWorkflow:
     def on_pull_request(
         self,
         *,
-        branches: Optional[list[str]] = None,
+        branches: list[str] | None = None,
     ) -> Self:
         self._on[TriggerType.PULL_REQUEST] = PullRequestTrigger(branches)
         return self

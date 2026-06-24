@@ -12,6 +12,16 @@
       "justMyCode": false
     },
     {
+      "name": "\ud83d\udcc1 tests/csorchestrator/_archive/compilers tests",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers"
+      ],
+      "justMyCode": false
+    },
+    {
       "name": "\ud83d\udcc1 tests/csorchestrator/ci/github tests",
       "type": "debugpy",
       "request": "launch",
@@ -82,16 +92,6 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83d\udcc1 tests/csorchestrator/utils/compilers tests",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers"
-      ],
-      "justMyCode": false
-    },
-    {
       "name": "\ud83d\udcc1 tests/csorchestrator/utils/filesystem tests",
       "type": "debugpy",
       "request": "launch",
@@ -128,6 +128,186 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/visitors"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_detect_compiler_version_run_exception",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_detect_compiler_version_run_exception"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_detect_compiler_version_run_failure_returncode",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_detect_compiler_version_run_failure_returncode"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_invalid_apple_clang_output",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_invalid_apple_clang_output"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_invalid_clang_output",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_invalid_clang_output"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_invalid_gcc_output",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_invalid_gcc_output"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_invalid_msvc_output",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_invalid_msvc_output"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_linux_clang_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_linux_clang_real"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_linux_gcc_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_linux_gcc_real"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_macos_apple_clang_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_macos_apple_clang_real"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_mocked_apple_clang",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_mocked_apple_clang"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_mocked_clang",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_mocked_clang"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_mocked_gcc",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_mocked_gcc"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_mocked_msvc",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_mocked_msvc"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_mocked_msvc_142",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_mocked_msvc_142"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_mocked_msvc_fallback_version",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_mocked_msvc_fallback_version"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_unsupported_compiler",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_unsupported_compiler"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_windows_clang_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_windows_clang_real"
+      ],
+      "justMyCode": false
+    },
+    {
+      "name": "\ud83e\uddea tests/csorchestrator/_archive/compilers/test_compiler_generator \u2192 test_windows_msvc_real",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "pytest",
+      "args": [
+        "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_windows_msvc_real"
       ],
       "justMyCode": false
     },
@@ -1158,186 +1338,6 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/step/test_step_get_repository.py::test_validate_step_get_repository"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_detect_compiler_version_run_exception",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_detect_compiler_version_run_exception"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_detect_compiler_version_run_failure_returncode",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_detect_compiler_version_run_failure_returncode"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_invalid_apple_clang_output",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_invalid_apple_clang_output"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_invalid_clang_output",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_invalid_clang_output"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_invalid_gcc_output",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_invalid_gcc_output"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_invalid_msvc_output",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_invalid_msvc_output"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_linux_clang_real",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_linux_clang_real"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_linux_gcc_real",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_linux_gcc_real"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_macos_apple_clang_real",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_macos_apple_clang_real"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_mocked_apple_clang",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_mocked_apple_clang"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_mocked_clang",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_mocked_clang"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_mocked_gcc",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_mocked_gcc"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_mocked_msvc",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_mocked_msvc"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_mocked_msvc_142",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_mocked_msvc_142"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_mocked_msvc_fallback_version",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_mocked_msvc_fallback_version"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_unsupported_compiler",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_unsupported_compiler"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_windows_clang_real",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_windows_clang_real"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/utils/compilers/test_compiler_generator \u2192 test_windows_msvc_real",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/utils/compilers/test_compiler_generator.py::test_windows_msvc_real"
       ],
       "justMyCode": false
     },

@@ -3,12 +3,12 @@ from unittest.mock import Mock, patch
 
 import pytest
 
-from csorchestrator.context.context_compiler_generator import Compiler
-from csorchestrator.context.context_os_architecture import OS, OS_PLATFORM_MACOS
-from csorchestrator.utils.compilers.compiler_generator import (
+from csorchestrator._archive.compilers.compiler_generator import (
     detect_compiler_version,
     detect_compiler_version_run,
 )
+from csorchestrator.context.context_compiler_generator import Compiler
+from csorchestrator.context.context_os_architecture import OS, OS_PLATFORM_MACOS
 
 # =========================================================
 # WINDOWS TESTS

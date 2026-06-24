@@ -220,9 +220,7 @@ def is_config_selected_multi_config_generator(current_config: BuildConfig, reque
         or requested_config == BuildConfig.DEBUG_RELEASE
         or requested_config == BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID
     ):
-        if requested_config == current_config:
-            return True
-        return False
+        return requested_config == current_config
     else:
         return False
 
@@ -233,20 +231,18 @@ def is_config_selected_single_config_generator(current_config: BuildConfig, requ
         or requested_config == BuildConfig.RELEASE
         or requested_config == BuildConfig.RELWITHDEBINFO
         or requested_config == BuildConfig.PARANOID
-    ):
-        if current_config == requested_config:
-            return True
+    ) and current_config == requested_config:
+        return True
     elif requested_config == BuildConfig.DEBUG_RELEASE:
         if current_config == BuildConfig.DEBUG or current_config == BuildConfig.RELEASE:
             return True
-    elif requested_config == BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID:
-        if (
-            current_config == BuildConfig.DEBUG
-            or current_config == BuildConfig.RELEASE
-            or current_config == BuildConfig.RELWITHDEBINFO
-            or current_config == BuildConfig.PARANOID
-        ):
-            return True
+    elif requested_config == BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID and (
+        current_config == BuildConfig.DEBUG
+        or current_config == BuildConfig.RELEASE
+        or current_config == BuildConfig.RELWITHDEBINFO
+        or current_config == BuildConfig.PARANOID
+    ):
+        return True
     return False
 
 

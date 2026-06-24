@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import List, Optional, TypeAlias
+from typing import TypeAlias
 
 from csorchestrator.orchestrator.workflow_config import Cron
 from csorchestrator.utils.common.strings import string_indent
@@ -29,8 +29,8 @@ class Trigger:
 
 @dataclass(frozen=True, slots=True)
 class PushTrigger(Trigger):
-    branches: Optional[List[str]] = None
-    tags: Optional[List[str]] = None
+    branches: list[str] | None = None
+    tags: list[str] | None = None
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         lines = [f"{string_indent(indent)}push:"]
@@ -55,7 +55,7 @@ class PushTrigger(Trigger):
 
 @dataclass(frozen=True, slots=True)
 class PullRequestTrigger(Trigger):
-    branches: Optional[List[str]] = None
+    branches: list[str] | None = None
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         lines = [f"{string_indent(indent)}pull_request:"]
