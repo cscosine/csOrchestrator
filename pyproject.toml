@@ -51,7 +51,16 @@ target-version = "py311"
 # F  -> Pyflakes (logical errors / unused imports)
 # I  -> Import sorting
 # B  -> Bugbear (common bug patterns)
-select = ["E", "F", "I", "B"]
+# UP -> modern Python suggestions
+# SIM -> catches simplifications
+select = [
+    "E",
+    "F",
+    "I",
+    "B",
+    "UP",
+    "SIM"
+]
 
 [tool.ruff.format]
 # Force double quotes in formatted code.
@@ -100,3 +109,30 @@ markers = [
   "git: requires git access to a remote repo",
   "requires: test requires external tool or dependency (e.g. `requires(\"clang++\")` )",
 ]
+
+testpaths = [
+    "tests"
+]
+
+pythonpath = [
+    "src"
+]
+
+addopts = [
+    "-ra",
+    "--strict-markers"
+]
+
+# ===============================
+# coverage
+# ===============================
+
+[tool.coverage.run]
+branch = true
+source = [
+    "csorchestrator"
+]
+
+[tool.coverage.report]
+show_missing = true
+# fail_under = 70 # TODO keep fail disabled for now
