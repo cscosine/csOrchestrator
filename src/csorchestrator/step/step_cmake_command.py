@@ -9,15 +9,15 @@ from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
-from csorchestrator.core.expected import Expected
-from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import (
+from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.domain.orchestrator.step_base import (
     JobOrchestratorMatrixExecution,
     StepBase,
     StepValidatorBase,
     StepValidatorNoOp,
 )
+from csorchestrator.foundation.core.expected import Expected
+from csorchestrator.foundation.core.report import Report
 from csorchestrator.step.step_custom_command import execute_command
 from csorchestrator.utils.presets.supported_variants import (
     BuildConfig,

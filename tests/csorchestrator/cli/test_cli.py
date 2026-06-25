@@ -13,9 +13,9 @@ def test_run_command_loads_project_script(tmp_path: Path, monkeypatch: pytest.Mo
         textwrap.dedent(
             """
             from typing import TypeAlias
-            from csorchestrator.core.report import Report
+            from csorchestrator.foundation.core.report import Report
             from csorchestrator.execution.factory import OptionalOrchestratorWithReport
-            from csorchestrator.orchestrator.orchestrator import Orchestrator
+            from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 
             def create_orchestrator() -> OptionalOrchestratorWithReport:
                 return OptionalOrchestratorWithReport.createResultAndReport(

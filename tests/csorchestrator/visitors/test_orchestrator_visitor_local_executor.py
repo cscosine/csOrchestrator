@@ -4,14 +4,14 @@ import pytest
 
 from csorchestrator.context.context_compiler_generator import Compiler, ContextCompilerGenerator, GeneratorWithType
 from csorchestrator.context.context_local_execution import ContextLocalExecution
-from csorchestrator.execution.execution import create_os_and_path
-from csorchestrator.execution.factory import create_orchestrator_factory_all_supported_cases
-from csorchestrator.execution.validated_orchestrator import create_validated_orchestrator
-from csorchestrator.orchestrator.orchestrator_executor import (
+from csorchestrator.domain.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     executor_visit_reports_has_any_error,
 )
-from csorchestrator.orchestrator.phase import Phase
+from csorchestrator.domain.orchestrator.phase import Phase
+from csorchestrator.execution.execution import create_os_and_path
+from csorchestrator.execution.factory import create_orchestrator_factory_all_supported_cases
+from csorchestrator.execution.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.step.step_get_repository import StepGetRepositoryExtraDepthOne, StepGetRepositoryGitHub
 from csorchestrator.utils.git.resolve_url import RepoUrlParts

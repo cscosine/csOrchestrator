@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 
 
 @dataclass

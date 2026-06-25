@@ -1,5 +1,5 @@
-from csorchestrator.core.report import Report, ReportMessageType
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.foundation.core.report import Report, ReportMessageType
 from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
 
 

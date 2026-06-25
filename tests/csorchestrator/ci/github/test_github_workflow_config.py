@@ -13,13 +13,13 @@ from csorchestrator.context.context_os_architecture import (
     UBUNTU_VERSIONS,
     Architecture,
 )
-from csorchestrator.execution.execution import GITHUB_RUNNER_UBUNTU_22_04, create_github_wf
-from csorchestrator.orchestrator.workflow_config import (
+from csorchestrator.domain.orchestrator.workflow_config import (
     Cron,
     DayOfWeek,
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     WorkflowConfig,
 )
+from csorchestrator.execution.execution import GITHUB_RUNNER_UBUNTU_22_04, create_github_wf
 
 EXPECTED_LINES_HEADER = [
     "name: test-wf-name",

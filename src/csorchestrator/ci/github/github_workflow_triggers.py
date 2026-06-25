@@ -2,8 +2,8 @@ from dataclasses import dataclass
 from enum import StrEnum
 from typing import TypeAlias
 
-from csorchestrator.orchestrator.workflow_config import Cron
-from csorchestrator.utils.common.strings import string_indent
+from csorchestrator.domain.orchestrator.workflow_config import Cron
+from csorchestrator.foundation.core.strings_utils import string_indent
 
 # =========================================================
 # Trigger keys

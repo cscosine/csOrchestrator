@@ -4,12 +4,12 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
     ExecutionMatrixOsArchCompilerGenerator,
 )
-from csorchestrator.orchestrator.orchestrator_minimal_description import (
+from csorchestrator.domain.orchestrator.orchestrator_minimal_description import (
     OrchestratorExecutorMinimalDescription,
     PhaseNameWithStepNames,
 )
-from csorchestrator.orchestrator.phase import Phase
-from csorchestrator.orchestrator.workflow_config import WorkflowConfig
+from csorchestrator.domain.orchestrator.phase import Phase
+from csorchestrator.domain.orchestrator.workflow_config import WorkflowConfig
 
 
 @dataclass

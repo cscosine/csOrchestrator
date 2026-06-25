@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
-from csorchestrator.core.expected import Expected
+from csorchestrator.foundation.core.expected import Expected
 
 
 class OS(Enum):

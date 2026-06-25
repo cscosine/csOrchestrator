@@ -3,7 +3,7 @@ import subprocess
 from collections.abc import Callable
 
 from csorchestrator.context.context_compiler_generator import Compiler
-from csorchestrator.core.expected import Expected
+from csorchestrator.foundation.core.expected import Expected
 
 
 def detect_compiler_version_run(cmd: list[str]) -> str | None:

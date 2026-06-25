@@ -23,14 +23,14 @@ from csorchestrator.context.context_local_execution import (
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
 )
-from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import (
+from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.domain.orchestrator.step_base import (
     JobOrchestratorMatrixExecution,
     StepBase,
     StepValidatorBase,
     StepValidatorNoOp,
 )
+from csorchestrator.foundation.core.report import Report
 from csorchestrator.step.step_utils import StepExecuteOnlyOn
 
 

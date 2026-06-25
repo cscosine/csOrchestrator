@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
-from csorchestrator.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
-from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
-from csorchestrator.orchestrator.phase import Phase
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.domain.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
+from csorchestrator.domain.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
+from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
+from csorchestrator.domain.orchestrator.phase import Phase
+from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.domain.orchestrator.step_base import StepBase
+from csorchestrator.foundation.core.report import Report
 from csorchestrator.reporters.report_reporter import repo_to_reporter_sink
 from csorchestrator.reporters.reporter_sink_markdown_file import ReporterSinkMarkdown
 

@@ -6,10 +6,15 @@ from csorchestrator.ci.github.github_workflow_steps_transations import (
     StepCheckoutRepositoryWith,
 )
 from csorchestrator.context.context_local_execution import ContextLocalExecution
-from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import JobOrchestratorMatrixExecution, StepBase, StepExtra, StepValidatorBase
-from csorchestrator.utils.file_system.path import is_clean_relative_path
+from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.domain.orchestrator.step_base import (
+    JobOrchestratorMatrixExecution,
+    StepBase,
+    StepExtra,
+    StepValidatorBase,
+)
+from csorchestrator.foundation.core.report import Report
+from csorchestrator.foundation.file_system.path import is_clean_relative_path
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
 from csorchestrator.utils.git.resolve_url import RepoUrlParts

@@ -33,20 +33,23 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
     create_context_os_architecture_string,
 )
-from csorchestrator.core.expected import Expected
-from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
-from csorchestrator.core.report import Report
-from csorchestrator.execution.validated_orchestrator import create_validated_orchestrator
-from csorchestrator.orchestrator.orchestrator import Orchestrator
-from csorchestrator.orchestrator.orchestrator_executor import (
+from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
+from csorchestrator.domain.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     executor_visit_reports_has_any_error,
 )
-from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
-from csorchestrator.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
-from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
-from csorchestrator.orchestrator.workflow_config import MatrixOsArchCompilerGeneratorRunnerEntryInclude, WorkflowConfig
-from csorchestrator.utils.file_system.directory import ensure_directory_exists_or_create_and_is_usable
+from csorchestrator.domain.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
+from csorchestrator.domain.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
+from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
+from csorchestrator.domain.orchestrator.workflow_config import (
+    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    WorkflowConfig,
+)
+from csorchestrator.execution.validated_orchestrator import create_validated_orchestrator
+from csorchestrator.foundation.core.expected import Expected
+from csorchestrator.foundation.core.optional_result_with_report import OptionalResultWithReport
+from csorchestrator.foundation.core.report import Report
+from csorchestrator.foundation.file_system.directory import ensure_directory_exists_or_create_and_is_usable
 from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import (
     OrchestratorVisitorGitHubWorkflowPreparation,
 )

@@ -1,6 +1,6 @@
-from csorchestrator.orchestrator.step_base import JobOrchestratorMatrixExecution, JobStrategy
-from csorchestrator.orchestrator.workflow_config import MatrixOsArchCompilerGeneratorRunnerEntryInclude
-from csorchestrator.utils.common.strings import string_indent
+from csorchestrator.domain.orchestrator.step_base import JobOrchestratorMatrixExecution, JobStrategy
+from csorchestrator.domain.orchestrator.workflow_config import MatrixOsArchCompilerGeneratorRunnerEntryInclude
+from csorchestrator.foundation.core.strings_utils import string_indent
 
 
 def job_strategy_to_string_lines(jobStrategy: JobStrategy, indent: int = 0) -> list[str]:

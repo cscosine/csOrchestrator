@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 import pytest
 
-from csorchestrator.core.expected import Expected
 from csorchestrator.execution.execution import create_os_and_path
+from csorchestrator.foundation.core.expected import Expected
 
 
 def test_create_context_empty_path_invalid() -> None:

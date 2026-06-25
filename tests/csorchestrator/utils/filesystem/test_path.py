@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from csorchestrator.context.context_os_architecture import OS
-from csorchestrator.utils.file_system.path import is_clean_relative_path
+from csorchestrator.foundation.file_system.path import is_clean_relative_path
 
 
 # run on WINDOWS

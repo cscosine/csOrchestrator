@@ -3,7 +3,7 @@ from pathlib import Path
 
 from git import GitCommandError, Repo
 
-from csorchestrator.core.report import Report
+from csorchestrator.foundation.core.report import Report
 
 
 # -------------------------

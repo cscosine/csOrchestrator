@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Generic, TypeVar
 
-from csorchestrator.core.report import Report
+from csorchestrator.foundation.core.report import Report
 
 T = TypeVar("T")
 

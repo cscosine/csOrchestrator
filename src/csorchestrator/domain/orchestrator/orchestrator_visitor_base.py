@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 
-from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.phase import Phase
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.domain.orchestrator.phase import Phase
+from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.domain.orchestrator.step_base import StepBase
+from csorchestrator.foundation.core.report import Report
 
 # external list per phase, internal per steps
 OrchestratorExecutorVisitReports = list[list[Report]]  # a list of reports of each step per each phase,

@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from csorchestrator.orchestrator.step_base import StepBase
+from csorchestrator.domain.orchestrator.step_base import StepBase
 
 
 # phase definition

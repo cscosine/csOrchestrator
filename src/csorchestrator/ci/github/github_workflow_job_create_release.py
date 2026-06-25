@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from csorchestrator.utils.common.strings import string_indent
+from csorchestrator.foundation.core.strings_utils import string_indent
 
 
 @dataclass

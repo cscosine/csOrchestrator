@@ -3,7 +3,7 @@ from tempfile import TemporaryDirectory
 
 from git import GitCommandError, InvalidGitRepositoryError, NoSuchPathError, Repo
 
-from csorchestrator.core.report import Report
+from csorchestrator.foundation.core.report import Report
 from csorchestrator.utils.git.repo_clone_checkout import RefKind, resolve_ref_type, try_git_clone_checkout
 
 

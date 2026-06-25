@@ -1,5 +1,5 @@
-from csorchestrator.core.optional_result_with_report import OptionalResultWithReport
-from csorchestrator.core.report import Report
+from csorchestrator.foundation.core.optional_result_with_report import OptionalResultWithReport
+from csorchestrator.foundation.core.report import Report
 
 
 def test_optional_result_with_report() -> None:

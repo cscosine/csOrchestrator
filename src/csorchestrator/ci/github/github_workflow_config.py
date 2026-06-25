@@ -15,11 +15,11 @@ from csorchestrator.ci.github.github_workflow_triggers import (
 )
 from csorchestrator.ci.github.guthub_workflow_matrix_constants import MatrixOsArchCompilerGeneratorGithubConstants
 from csorchestrator.ci.github.utils import job_orchestrator_matrix_execution_to_string_lines
-from csorchestrator.orchestrator.step_base import (
+from csorchestrator.domain.orchestrator.step_base import (
     JobOrchestratorMatrixExecution,
     JobStrategy,
 )
-from csorchestrator.orchestrator.workflow_config import Cron, MatrixOsArchCompilerGeneratorRunnerEntryInclude
+from csorchestrator.domain.orchestrator.workflow_config import Cron, MatrixOsArchCompilerGeneratorRunnerEntryInclude
 
 
 def create_job_from_matrix_list(

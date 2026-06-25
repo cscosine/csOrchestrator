@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 
 from csorchestrator.context.context_local_execution import ContextLocalExecution, ContextLocalExecutionExtra
 from csorchestrator.context.context_os_architecture import OS
-from csorchestrator.orchestrator.step_base import StepExtra
+from csorchestrator.domain.orchestrator.step_base import StepExtra
 
 
 @dataclass

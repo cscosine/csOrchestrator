@@ -1,4 +1,4 @@
-from csorchestrator.core.report import Report
+from csorchestrator.foundation.core.report import Report
 from csorchestrator.reporters.report_reporter import repo_to_reporter_sink
 from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
 

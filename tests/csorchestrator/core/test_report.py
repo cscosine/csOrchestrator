@@ -1,4 +1,4 @@
-from csorchestrator.core.report import Report, ReportMessageType
+from csorchestrator.foundation.core.report import Report, ReportMessageType
 
 
 def test_report_append_and_print(capfd):

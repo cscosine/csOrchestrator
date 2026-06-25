@@ -1,4 +1,4 @@
-from csorchestrator.core.expected import Expected
+from csorchestrator.foundation.core.expected import Expected
 
 
 def test_expected_ok() -> None:

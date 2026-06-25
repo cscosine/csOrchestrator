@@ -1,6 +1,6 @@
 import pytest
 
-from csorchestrator.core.report import Report
+from csorchestrator.foundation.core.report import Report
 from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
 from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
 

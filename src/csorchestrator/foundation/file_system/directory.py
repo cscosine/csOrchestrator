@@ -4,7 +4,7 @@ import tempfile
 from pathlib import Path
 from typing import TypeAlias
 
-from csorchestrator.core.expected import Expected
+from csorchestrator.foundation.core.expected import Expected
 
 ExpectedPathOrError: TypeAlias = Expected[Path, str]
 

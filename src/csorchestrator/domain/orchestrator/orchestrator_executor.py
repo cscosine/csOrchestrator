@@ -1,10 +1,10 @@
-from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator import Orchestrator
-from csorchestrator.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
-from csorchestrator.orchestrator.orchestrator_visitor_base import (
+from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
+from csorchestrator.domain.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
+from csorchestrator.domain.orchestrator.orchestrator_visitor_base import (
     OrchestratorExecutorVisitReports,
     OrchestratorVisitorBase,
 )
+from csorchestrator.foundation.core.report import Report
 
 
 def executor_visit_reports_has_any_error(oevr: OrchestratorExecutorVisitReports) -> bool:

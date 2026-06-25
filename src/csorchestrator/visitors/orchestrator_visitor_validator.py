@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 
-from csorchestrator.core.report import Report
-from csorchestrator.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
-from csorchestrator.orchestrator.phase import Phase
-from csorchestrator.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.orchestrator.step_base import StepBase, StepValidatorBase
+from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
+from csorchestrator.domain.orchestrator.phase import Phase
+from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
+from csorchestrator.domain.orchestrator.step_base import StepBase, StepValidatorBase
+from csorchestrator.foundation.core.report import Report
 
 
 @dataclass

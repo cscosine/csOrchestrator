@@ -9,7 +9,7 @@ from csorchestrator.context.context_os_architecture import (
     ContextOsArchitecture,
     detect_context_os_architecture,
 )
-from csorchestrator.core.expected import Expected
+from csorchestrator.foundation.core.expected import Expected
 
 # =========================================================
 # SUCCESS

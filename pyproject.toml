@@ -151,9 +151,10 @@ type = "layers"
 
 layers = [
     # TODO add layers
-    "orchestrator",
-    "context",
-    "core",
+    "application",
+    "frontend",
+    "domain",
+    "foundation",
 ]
 containers = [
     "csorchestrator"

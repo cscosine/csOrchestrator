@@ -1,9 +1,9 @@
 from dataclasses import dataclass, field
 
-from csorchestrator.orchestrator.step_base import (
+from csorchestrator.domain.orchestrator.step_base import (
     StepToStringLines,
 )
-from csorchestrator.utils.common.strings import string_indent
+from csorchestrator.foundation.core.strings_utils import string_indent
 
 # =========================================================
 # Steps models
