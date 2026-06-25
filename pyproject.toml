@@ -146,7 +146,7 @@ show_missing = true
 root_package = "csorchestrator"
 
 [[tool.importlinter.contracts]]
-name = "architecture layers"
+name = "high level layers"
 type = "layers"
 
 layers = [
@@ -159,3 +159,17 @@ layers = [
 containers = [
     "csorchestrator"
 ]
+# exhaustive = true #TODO add when complete
+
+[[tool.importlinter.contracts]]
+name = "foundation layers"
+type = "layers"
+
+layers = [
+    "file_system",
+    "core"
+]
+containers = [
+    "csorchestrator.foundation"
+]
+# exhaustive = true #TODO add when complete
