@@ -228,6 +228,13 @@
       ],
       "problemMatcher": [],
       "detail": "#Git # Push changes"
+    },
+    {
+      "label": "import-linter show graph",
+      "type": "shell",
+      "command": "import-linter explore csorchestrator",
+      "problemMatcher": [],
+      "detail": "#import-linter # Show Graph"
     }
   ]
 }
