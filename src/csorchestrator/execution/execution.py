@@ -29,7 +29,6 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
     ExecutionMatrixOsArchCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
-    create_context_os_architecture_string,
 )
 from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_executor import (
@@ -112,6 +111,17 @@ def create_os_and_path(base_folder_path: str) -> OptionalOsArchitectureAndPathWi
         return OptionalOsArchitectureAndPathWithReport.createReport(report)
 
 
+def _create_context_os_architecture_string(
+    os_architecture: ContextOsArchitecture,
+) -> str:
+    parts: list[str] = []
+    parts.append(os_architecture.os.value.lower())
+    parts.append(os_architecture.os_version.lower())
+    parts.append(os_architecture.architecture.value.lower())
+    parts.append(os_architecture.architecture_variant.lower())
+    return "-".join(parts)
+
+
 def validate_and_execute_orchestrator(
     orchestrator: Orchestrator, target_folder_path: str, reporter: OrchestratorExecutorReporterBase
 ) -> ExecutionResult:
@@ -161,7 +171,7 @@ def validate_and_execute_orchestrator(
             reporter.report_skip_execution(
                 "skip orchestrator execution on not compatible matrix config: "
                 f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
-                f", current os and architecture:  {create_context_os_architecture_string(os_and_path.os_architecture)}"
+                f", current os and architecture:  {_create_context_os_architecture_string(os_and_path.os_architecture)}"
             )
             er.report_executions.append(None)
             continue
