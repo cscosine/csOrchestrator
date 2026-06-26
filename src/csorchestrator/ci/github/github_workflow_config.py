@@ -5,6 +5,7 @@ from csorchestrator.ci.github.github_workflow_job_create_release import (
     JobReleaseCreationFromArifacts,
     job_release_on_tag_to_string_lines,
 )
+from csorchestrator.ci.github.github_workflow_matrix_constants import MatrixOsArchCompilerGeneratorGithubConstants
 from csorchestrator.ci.github.github_workflow_triggers import (
     PullRequestTrigger,
     PushTrigger,
@@ -13,7 +14,6 @@ from csorchestrator.ci.github.github_workflow_triggers import (
     TriggerUnion,
     WorkflowDispatchTrigger,
 )
-from csorchestrator.ci.github.guthub_workflow_matrix_constants import MatrixOsArchCompilerGeneratorGithubConstants
 from csorchestrator.domain.orchestrator.workflow_config import Cron
 from csorchestrator.foundation.core.strings_utils import string_indent
 

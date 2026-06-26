@@ -7,11 +7,11 @@ from string import Template
 from typing import TextIO
 
 from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
-from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
-from csorchestrator.ci.github.guthub_workflow_matrix_constants import (
+from csorchestrator.ci.github.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
+from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
 from csorchestrator.context.context_compiler_generator import (
     GeneratorType,
     get_c_cpp_compiler,
