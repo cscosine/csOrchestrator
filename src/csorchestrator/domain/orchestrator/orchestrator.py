@@ -9,6 +9,7 @@ from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.workflow_config import WorkflowConfig
 
 
+# TODO support capabilities here to be more generic?
 @dataclass
 class MatrixExecutionBase(ABC):
     name: str

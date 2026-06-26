@@ -1,10 +1,18 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 
 from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.domain.orchestrator.step_base import StepBase, StepCapability, StepValidatorBase
+from csorchestrator.domain.orchestrator.step_base import StepBase, StepCapability
 from csorchestrator.foundation.core.report import Report
+
+
+@dataclass
+class StepValidatorBase(ABC):
+    @abstractmethod
+    def validate(self, step: StepBase) -> Report:
+        raise NotImplementedError
 
 
 @dataclass

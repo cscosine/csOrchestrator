@@ -1,8 +1,6 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 from dataclasses import dataclass, field
 from typing import TypeVar
-
-from csorchestrator.foundation.core.report import Report
 
 
 # base class for extra information that can be provided
@@ -74,10 +72,3 @@ class StepBase(ABC):
     ) -> "StepBase":
         self._capabilities.pop(key, None)  # no exception if not exists
         return self
-
-
-@dataclass
-class StepValidatorBase(ABC):
-    @abstractmethod
-    def validate(self, step: StepBase) -> Report:
-        raise NotImplementedError
