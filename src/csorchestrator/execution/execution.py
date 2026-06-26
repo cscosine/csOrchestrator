@@ -361,9 +361,9 @@ def validate_and_generate_github_workflow(
     wf = create_github_wf(orchestrator.name, config=orchestrator.wf_config)
 
     if output_path is None:
-        output_path = script_folder_path / Path(f".github/workflows/{wf.name}.yml")
+        output_path = script_folder_path / Path(".github") / Path("workflows")
 
-    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(output_path.parent.resolve()))
+    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(output_path.resolve()))
 
     if dir_creation_res.error is not None:
         res.report_pre_execution.append_error(dir_creation_res.error)
@@ -372,7 +372,7 @@ def validate_and_generate_github_workflow(
         return res
 
     assert dir_creation_res.value
-    output_path = dir_creation_res.value
+    output_path = dir_creation_res.value / Path(f"{wf.name}.yml")
 
     # end pre execution
     reporter.report_pre_execution_report(res.report_pre_execution)
