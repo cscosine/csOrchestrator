@@ -91,6 +91,8 @@ class StepInstallAptPackages(StepBashScriptCommand):
     packages: list[str]
 
     def __post_init__(self) -> None:
+        super().__post_init__()  # call parent
+
         script = [
             "set -euo pipefail # enable strict mode",
             "",
