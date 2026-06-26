@@ -6,7 +6,6 @@ from csorchestrator.ci.github.github_workflow_config import (
 from csorchestrator.context.context_compiler_generator import (
     ContextCompilerGenerator,
     Generator,
-    get_cmake_generator_name,
 )
 from csorchestrator.context.context_os_architecture import (
     ARCHITECTURE_VARIANT_GENERIC,
@@ -100,7 +99,7 @@ def test_workflow_with_triggers_and_one_job():
                         build_generator="ninja",
                         build_generator_type="single",
                         runner=GITHUB_RUNNER_UBUNTU_22_04,
-                        generator_cmake=get_cmake_generator_name(Generator.NINJA) or "",
+                        generator_cmake=Generator.NINJA.get_cmake_generator_name() or "",
                     )
                 ],
             ),
@@ -137,7 +136,7 @@ def test_workflow_with_creation_helper():
                     build_generator="ninja",
                     build_generator_type="single",
                     runner=GITHUB_RUNNER_UBUNTU_22_04,
-                    generator_cmake=get_cmake_generator_name(Generator.NINJA) or "",
+                    generator_cmake=Generator.NINJA.get_cmake_generator_name() or "",
                 )
             ],
         )

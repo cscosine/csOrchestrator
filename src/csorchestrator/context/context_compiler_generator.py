@@ -10,16 +10,20 @@ class Compiler(Enum):
     GCC = "gcc"
     APPLE_CLANG = "appleclang"
 
+    def get_c_cpp_compiler(self) -> tuple[str | None, str | None]:
+        if self == Compiler.GCC:
+            return ("gcc", "g++")
+        elif self == Compiler.CLANG:
+            return ("clang", "clang++")
+        if self == Compiler.APPLE_CLANG:
+            return ("clang", "clang++")
+        else:
+            return (None, None)
 
-def get_c_cpp_compiler(compiler: Compiler) -> tuple[str | None, str | None]:
-    if compiler == Compiler.GCC:
-        return ("gcc", "g++")
-    elif compiler == Compiler.CLANG:
-        return ("clang", "clang++")
-    if compiler == Compiler.APPLE_CLANG:
-        return ("clang", "clang++")
-    else:
-        return (None, None)
+    def get_cmake_toolset(self) -> str | None:
+        if self == Compiler.MSVC_CLANG:
+            return "ClangCL"
+        return None
 
 
 class Generator(Enum):
@@ -28,24 +32,17 @@ class Generator(Enum):
     MSVC_17_2022 = "msvc2022"
     MSVC_18_2026 = "msvc2026"
 
-
-def get_cmake_toolset(compiler: Compiler) -> str | None:
-    if compiler == Compiler.MSVC_CLANG:
-        return "ClangCL"
-    return None
-
-
-def get_cmake_generator_name(generator: Generator) -> str | None:
-    if generator == Generator.NINJA:
-        return "Ninja"
-    elif generator == Generator.NINJA_MULTI:
-        return "Ninja Multi-Config"
-    elif generator == Generator.MSVC_17_2022:
-        return "Visual Studio 17 2022"
-    elif generator == Generator.MSVC_18_2026:
-        return "Visual Studio 18 2026"
-    else:
-        return None
+    def get_cmake_generator_name(self) -> str | None:
+        if self == Generator.NINJA:
+            return "Ninja"
+        elif self == Generator.NINJA_MULTI:
+            return "Ninja Multi-Config"
+        elif self == Generator.MSVC_17_2022:
+            return "Visual Studio 17 2022"
+        elif self == Generator.MSVC_18_2026:
+            return "Visual Studio 18 2026"
+        else:
+            return None
 
 
 class GeneratorType(Enum):

@@ -11,9 +11,6 @@ from csorchestrator.ci.github.github_workflow_job_create_release import JobRelea
 from csorchestrator.context.context_compiler_generator import (
     ContextCompilerGenerator,
     Generator,
-    get_c_cpp_compiler,
-    get_cmake_generator_name,
-    get_cmake_toolset,
 )
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
@@ -262,7 +259,7 @@ def orchestrator_matrix_to_github_wf_matrix(
         assert runner_or_err.value is not None
         runner = runner_or_err.value
 
-        generator_cmake = get_cmake_generator_name(entry.context_compiler_generator.build_generator.generator)
+        generator_cmake = entry.context_compiler_generator.build_generator.generator.get_cmake_generator_name()
         if generator_cmake is None:
             errors.append(
                 f"generator {entry.context_compiler_generator.build_generator.generator.value.lower()} does not have a "
@@ -270,8 +267,8 @@ def orchestrator_matrix_to_github_wf_matrix(
             )
             continue
 
-        c_cpp_compiler = get_c_cpp_compiler(entry.context_compiler_generator.compiler_family)
-        toolset = get_cmake_toolset(entry.context_compiler_generator.compiler_family)
+        c_cpp_compiler = entry.context_compiler_generator.compiler_family.get_c_cpp_compiler()
+        toolset = entry.context_compiler_generator.compiler_family.get_cmake_toolset()
 
         res.append(
             MatrixOsArchCompilerGeneratorRunnerEntryInclude(

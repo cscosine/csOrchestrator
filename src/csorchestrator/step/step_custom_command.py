@@ -12,12 +12,7 @@ from csorchestrator.ci.github.github_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
-from csorchestrator.context.context_compiler_generator import (
-    GeneratorType,
-    get_c_cpp_compiler,
-    get_cmake_generator_name,
-    get_cmake_toolset,
-)
+from csorchestrator.context.context_compiler_generator import GeneratorType
 from csorchestrator.context.context_local_execution import (
     ContextLocalExecution,
 )
@@ -164,6 +159,7 @@ def execute_command(
     stdout_thread.start()
     stderr_thread.start()
 
+    return_code = None
     try:
         return_code = process.wait()
     except Exception as e:
@@ -174,7 +170,7 @@ def execute_command(
     stdout_thread.join()
     stderr_thread.join()
 
-    if return_code != 0:
+    if return_code is not None:
         errors += [f"Command failed with exit code {return_code}"]
         # do not return immediately, do at cycle end
 
@@ -182,8 +178,8 @@ def execute_command(
 
 
 def evaluate_cmd_variable_subst_local(cmd: list[str], context: ContextLocalExecution) -> list[str]:
-    c_cpp_compiler = get_c_cpp_compiler(context.active_compiler_generator.compiler_family)
-    toolset = get_cmake_toolset(context.active_compiler_generator.compiler_family)
+    c_cpp_compiler = context.active_compiler_generator.compiler_family.get_c_cpp_compiler()
+    toolset = context.active_compiler_generator.compiler_family.get_cmake_toolset()
 
     subst: dict[str, str] = {
         "CS_DIR_FROM_MATRIX": create_context_os_architecture_compiler_generator_string(
@@ -201,7 +197,7 @@ def evaluate_cmd_variable_subst_local(cmd: list[str], context: ContextLocalExecu
         "CS_GENERATOR_TYPE": context.active_compiler_generator.build_generator.generator_type.value.lower(),
         "CS_GENERATOR_TYPE_SINGLECONFIG": GeneratorType.SINGLE_CONFIG.value,
         "CS_GENERATOR_TYPE_MULTICONFIG": GeneratorType.MULTI_CONFIG.value,
-        "CS_GENERATOR_CMAKE": get_cmake_generator_name(context.active_compiler_generator.build_generator.generator)
+        "CS_GENERATOR_CMAKE": context.active_compiler_generator.build_generator.generator.get_cmake_generator_name()
         or "",
         "CS_C_COMPILER": c_cpp_compiler[0] or "",
         "CS_CPP_COMPILER": c_cpp_compiler[1] or "",
