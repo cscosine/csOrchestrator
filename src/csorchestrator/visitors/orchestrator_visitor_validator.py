@@ -38,7 +38,7 @@ class OrchestratorVisitorValidator(OrchestratorVisitorBase):
         if validator is None:
             capability = step.get_capability(StepCapabilityValidation)
             if capability is None:
-                return Report().append_info(f"skip step {step.name} because it does not support local execution")
+                return Report().append_info(f"skip step {step.name} because it does not need validation")
 
             validator = type(capability).createValidator()
             if validator is None:
