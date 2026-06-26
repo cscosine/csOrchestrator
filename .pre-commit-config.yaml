@@ -49,9 +49,6 @@ repos:
         - ".[dev]"
         pass_filenames: false
 
-  - repo: local
-    hooks:
-
       - id: generate-vscode-launch
         name: Generate VS Code launch configs
         entry: python
