@@ -1,6 +1,6 @@
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.reporters.report_reporter import repo_to_reporter_sink
-from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
+from csorchestrator.frontend.reporters.report_reporter import repo_to_reporter_sink
+from csorchestrator.frontend.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
 
 
 def test_report_reporter():

@@ -1,6 +1,6 @@
 import os
 
-from csorchestrator.utils.git.resolve_url import (
+from csorchestrator.foundation.git.resolve_url import (
     RepoUrlParts,
     RepoUrlSelected,
     get_token_from_env,

@@ -2,6 +2,7 @@ from dataclasses import dataclass
 
 import pytest
 
+from csorchestrator.application.factory.factory import create_orchestrator_factory_all_supported_cases
 from csorchestrator.domain.orchestrator.orchestrator_executor import (
     execute_orchestrator,
 )
@@ -13,12 +14,11 @@ from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBa
 from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
 )
-from csorchestrator.execution.factory import create_orchestrator_factory_all_supported_cases
-from csorchestrator.execution.validated_orchestrator import (
+from csorchestrator.foundation.core.report import Report
+from csorchestrator.frontend.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
+from csorchestrator.frontend.validation.validated_orchestrator import (
     create_validated_orchestrator,
 )
-from csorchestrator.foundation.core.report import Report
-from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 
 
 @dataclass

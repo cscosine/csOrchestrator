@@ -1,14 +1,16 @@
 from dataclasses import dataclass
 
-from csorchestrator.domain.context.context_local_execution import ContextLocalExecution
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
 )
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.frontend.github.github_workflow_config import JobOrchestratorMatrixExecution
-from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import StepCapabilityGithubWorkflow
-from csorchestrator.visitors.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+from csorchestrator.frontend.github_workflow_translation.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
+    StepCapabilityGithubWorkflow,
+)
+from csorchestrator.frontend.local_execution.context_local_execution import ContextLocalExecution
+from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
 
 
 @dataclass

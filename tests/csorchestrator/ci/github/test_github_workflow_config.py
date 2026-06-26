@@ -13,11 +13,14 @@ from csorchestrator.domain.orchestrator.workflow_config import (
     DayOfWeek,
     WorkflowConfig,
 )
-from csorchestrator.execution.execution import GITHUB_RUNNER_UBUNTU_22_04, create_github_wf
-from csorchestrator.frontend.github.github_workflow_config import (
+from csorchestrator.frontend.github_workflow_translation.github_workflow_config import (
     GitHubWorkflow,
     MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     create_job_from_matrix_list,
+)
+from csorchestrator.frontend.github_workflow_translation.validate_and_generate_github_workflow import (
+    GITHUB_RUNNER_UBUNTU_22_04,
+    create_github_wf,
 )
 
 EXPECTED_LINES_HEADER = [

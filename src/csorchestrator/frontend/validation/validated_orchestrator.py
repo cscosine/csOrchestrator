@@ -10,9 +10,9 @@ from csorchestrator.domain.orchestrator.orchestrator_executor import (
     executor_visit_reports_has_any_error,
 )
 from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
-from csorchestrator.execution.orchestrator_visitor_validator import OrchestratorVisitorValidator
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
+from csorchestrator.frontend.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
+from csorchestrator.frontend.validation.orchestrator_visitor_validator import OrchestratorVisitorValidator
 
 
 @dataclass

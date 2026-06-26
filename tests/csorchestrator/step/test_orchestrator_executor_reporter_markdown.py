@@ -3,9 +3,11 @@ from pathlib import Path
 
 from csorchestrator.domain.orchestrator.orchestrator import MatrixExecutionBase, Orchestrator
 from csorchestrator.domain.orchestrator.step_base import StepBase
-from csorchestrator.execution.execution import validate_and_execute_orchestrator
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.reporters.orchestrator_executor_reporter_markdown import OrchestratorExecutorReporterMarkdown
+from csorchestrator.frontend.local_execution.validate_and_execute import validate_and_execute_orchestrator
+from csorchestrator.frontend.reporters.orchestrator_executor_reporter_markdown import (
+    OrchestratorExecutorReporterMarkdown,
+)
 
 
 @dataclass

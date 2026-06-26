@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from csorchestrator.application.cli.cli import main as csorchestrator_main
-from csorchestrator.execution.execution import ExecutionResult
+from csorchestrator.domain.execution.execution import ExecutionResult
 
 
 def test_run_command_loads_project_script(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -14,7 +14,7 @@ def test_run_command_loads_project_script(tmp_path: Path, monkeypatch: pytest.Mo
             """
             from typing import TypeAlias
             from csorchestrator.foundation.core.report import Report
-            from csorchestrator.execution.factory import OptionalOrchestratorWithReport
+            from csorchestrator.application.factory.factory import OptionalOrchestratorWithReport
             from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 
             def create_orchestrator() -> OptionalOrchestratorWithReport:

@@ -3,8 +3,8 @@ from unittest.mock import patch
 
 import pytest
 
-from csorchestrator.reporters.reporter_sink_colorama_print import ReporterSinkColoramaPrint
-from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
+from csorchestrator.frontend.reporters.reporter_sink_colorama_print import ReporterSinkColoramaPrint
+from csorchestrator.frontend.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
 
 
 @pytest.mark.parametrize("sink_class", [ReporterSinkColoredPrint, ReporterSinkColoramaPrint])

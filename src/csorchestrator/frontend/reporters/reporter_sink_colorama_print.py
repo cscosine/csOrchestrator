@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 from colorama import Fore, Style, init
 
-from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrintBase
+from csorchestrator.frontend.reporters.reporter_sink_print import ReporterSinkPrintBase
 
 init()  # enables ANSI on WINDOWS cmd
 

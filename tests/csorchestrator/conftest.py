@@ -2,7 +2,7 @@ import logging
 
 import pytest
 
-from csorchestrator.utils.git.resolve_url import (
+from csorchestrator.foundation.git.resolve_url import (
     RepoUrlParts,
     RepoUrlSelected,
     select_https_or_ssh_url_resolve_token_name_on_env,

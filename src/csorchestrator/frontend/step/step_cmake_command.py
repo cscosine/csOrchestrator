@@ -3,9 +3,6 @@ from pathlib import Path
 from typing import TypeAlias
 
 from csorchestrator.domain.context.context_compiler_generator import GeneratorType
-from csorchestrator.domain.context.context_local_execution import (
-    ContextLocalExecution,
-)
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
 )
@@ -15,11 +12,7 @@ from csorchestrator.domain.orchestrator.step_base import (
 )
 from csorchestrator.foundation.core.expected import Expected
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.frontend.github.github_workflow_config import JobOrchestratorMatrixExecution
-from csorchestrator.frontend.github.github_workflow_matrix_constants import MatrixOsArchCompilerGeneratorGithubConstants
-from csorchestrator.frontend.github.github_workflow_steps_transations import StepRunCommand
-from csorchestrator.frontend.step.step_custom_command import execute_command
-from csorchestrator.utils.presets.supported_variants import (
+from csorchestrator.frontend.cscmake_presets.supported_variants import (
     BuildConfig,
     ContextOsArchitectureCompilerGeneratorConfig,
     get_all_supported_workflow_descriptions,
@@ -28,8 +21,19 @@ from csorchestrator.utils.presets.supported_variants import (
     workflow_name_from_components,
     workflow_name_from_description,
 )
-from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import StepCapabilityGithubWorkflow
-from csorchestrator.visitors.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+from csorchestrator.frontend.github_workflow_translation.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
+    MatrixOsArchCompilerGeneratorGithubConstants,
+)
+from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
+    StepCapabilityGithubWorkflow,
+)
+from csorchestrator.frontend.local_execution.context_local_execution import (
+    ContextLocalExecution,
+)
+from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+from csorchestrator.frontend.step.step_custom_command import execute_command
 
 
 @dataclass

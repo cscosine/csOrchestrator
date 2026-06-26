@@ -1,15 +1,15 @@
 from dataclasses import dataclass
 
+from csorchestrator.application.factory.factory import create_orchestrator_factory_all_supported_cases
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
 )
-from csorchestrator.execution.factory import create_orchestrator_factory_all_supported_cases
-from csorchestrator.execution.validated_orchestrator import (
+from csorchestrator.foundation.git.resolve_url import RepoUrlParts
+from csorchestrator.frontend.step.step_get_repository import StepGetRepositoryGitHub
+from csorchestrator.frontend.validation.validated_orchestrator import (
     create_validated_orchestrator,
 )
-from csorchestrator.frontend.step.step_get_repository import StepGetRepositoryGitHub
-from csorchestrator.utils.git.resolve_url import RepoUrlParts
 
 
 @dataclass

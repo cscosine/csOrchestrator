@@ -15,7 +15,7 @@ from csorchestrator.domain.context.context_os_architecture import (
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
 )
-from csorchestrator.utils.presets.supported_variants import (
+from csorchestrator.frontend.cscmake_presets.supported_variants import (
     BuildConfig,
     get_all_supported_workflow_descriptions,
     get_supported_os_version_list,

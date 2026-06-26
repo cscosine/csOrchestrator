@@ -1,16 +1,16 @@
 from dataclasses import dataclass
 
-from csorchestrator.domain.context.context_local_execution import ContextLocalExecution
-from csorchestrator.domain.context.step_utils import (
-    StepExecuteOnlyOn,
-    StepExecuteOnlyOncePerMatrix,
-    StepSkipExecutionOnLocal,
-)
 from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import StepBase, StepCapability
 from csorchestrator.foundation.core.report import Report
+from csorchestrator.frontend.local_execution.context_local_execution import ContextLocalExecution
+from csorchestrator.frontend.local_execution.step_utils import (
+    StepExecuteOnlyOn,
+    StepExecuteOnlyOncePerMatrix,
+    StepSkipExecutionOnLocal,
+)
 
 
 @dataclass

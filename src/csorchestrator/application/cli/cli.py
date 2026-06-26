@@ -13,19 +13,23 @@ import click
 
 from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
-from csorchestrator.execution.execution import (
-    validate_and_execute_orchestrator,
-    validate_and_generate_github_workflow,
-)
 from csorchestrator.foundation.core.expected import Expected
 from csorchestrator.foundation.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.reporters.orchestrator_executor_reporter_composite import OrchestratorExecutorReporterComposite
-from csorchestrator.reporters.orchestrator_executor_reporter_markdown import OrchestratorExecutorReporterMarkdown
-from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
-from csorchestrator.reporters.reporter_sink_colorama_print import ReporterSinkColoramaPrint
-from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
-from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint, ReporterSinkPrintBase
+from csorchestrator.frontend.github_workflow_translation.validate_and_generate_github_workflow import (
+    validate_and_generate_github_workflow,
+)
+from csorchestrator.frontend.local_execution.validate_and_execute import validate_and_execute_orchestrator
+from csorchestrator.frontend.reporters.orchestrator_executor_reporter_composite import (
+    OrchestratorExecutorReporterComposite,
+)
+from csorchestrator.frontend.reporters.orchestrator_executor_reporter_markdown import (
+    OrchestratorExecutorReporterMarkdown,
+)
+from csorchestrator.frontend.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
+from csorchestrator.frontend.reporters.reporter_sink_colorama_print import ReporterSinkColoramaPrint
+from csorchestrator.frontend.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
+from csorchestrator.frontend.reporters.reporter_sink_print import ReporterSinkPrint, ReporterSinkPrintBase
 
 CreateOrchestratorFn = Callable[[], OptionalResultWithReport[Orchestrator]]
 

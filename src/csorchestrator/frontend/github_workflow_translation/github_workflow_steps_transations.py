@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
 from csorchestrator.foundation.core.strings_utils import string_indent
-from csorchestrator.frontend.github.github_workflow_config import StepToStringLines
+from csorchestrator.frontend.github_workflow_translation.github_workflow_config import StepToStringLines
 
 # =========================================================
 # Steps models

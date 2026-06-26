@@ -1,22 +1,27 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from csorchestrator.domain.context.context_local_execution import ContextLocalExecution
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import StepBase, StepExtra
-from csorchestrator.execution.orchestrator_visitor_validator import StepCapabilityValidation, StepValidatorBase
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.foundation.file_system.path import is_clean_relative_path
-from csorchestrator.frontend.github.github_workflow_config import JobOrchestratorMatrixExecution
-from csorchestrator.frontend.github.github_workflow_steps_transations import (
+from csorchestrator.foundation.git.repo_clone_checkout import try_git_clone_checkout
+from csorchestrator.foundation.git.repo_validate_and_sync import validate_and_sync_repo
+from csorchestrator.foundation.git.resolve_url import RepoUrlParts
+from csorchestrator.frontend.github_workflow_translation.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import (
     StepCheckoutRepository,
     StepCheckoutRepositoryWith,
 )
-from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
-from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
-from csorchestrator.utils.git.resolve_url import RepoUrlParts
-from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import StepCapabilityGithubWorkflow
-from csorchestrator.visitors.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
+    StepCapabilityGithubWorkflow,
+)
+from csorchestrator.frontend.local_execution.context_local_execution import ContextLocalExecution
+from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+from csorchestrator.frontend.validation.orchestrator_visitor_validator import (
+    StepCapabilityValidation,
+    StepValidatorBase,
+)
 
 
 @dataclass

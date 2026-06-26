@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrintBase
+from csorchestrator.frontend.reporters.reporter_sink_print import ReporterSinkPrintBase
 
 
 class Ansi:

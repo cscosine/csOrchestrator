@@ -3,8 +3,8 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
-from csorchestrator.utils.git.resolve_url import RepoUrlParts
+from csorchestrator.foundation.git.repo_clone_checkout import try_git_clone_checkout
+from csorchestrator.foundation.git.resolve_url import RepoUrlParts
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 logging.basicConfig(level=logging.INFO)
@@ -211,7 +211,7 @@ def test_try_git_clone_checkout_unknown_ref_type(
     assert not target_path.is_dir()
 
     # monkeypatch the resolve_ref_type to return an unknown type
-    from csorchestrator.utils.git import repo_clone_checkout as mod
+    from csorchestrator.foundation.git import repo_clone_checkout as mod
 
     def mock_resolve_ref_type(repo, ref):
         return "unknown_ref_type"

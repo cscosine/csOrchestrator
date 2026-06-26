@@ -7,12 +7,16 @@ from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
 )
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.frontend.github.github_workflow_config import JobOrchestratorMatrixExecution
-from csorchestrator.frontend.github.github_workflow_matrix_constants import (
+from csorchestrator.frontend.github_workflow_translation.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
-from csorchestrator.frontend.github.github_workflow_steps_transations import StepGitHubUploadArtifacts
-from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import StepCapabilityGithubWorkflow
+from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import (
+    StepGitHubUploadArtifacts,
+)
+from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
+    StepCapabilityGithubWorkflow,
+)
 
 
 @dataclass

@@ -5,7 +5,7 @@ from csorchestrator.domain.context.context_os_architecture_compiler_generator im
 )
 from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 from csorchestrator.foundation.core.optional_result_with_report import OptionalResultWithReport
-from csorchestrator.utils.presets.supported_variants import get_supported_context_os_architecture_list
+from csorchestrator.frontend.cscmake_presets.supported_variants import get_supported_context_os_architecture_list
 
 
 def create_orchestrator_factory_all_supported_cases(

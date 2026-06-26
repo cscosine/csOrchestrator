@@ -9,8 +9,8 @@ from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
-from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
+from csorchestrator.frontend.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
+from csorchestrator.frontend.reporters.reporter_sink_print import ReporterSinkPrint
 
 
 @dataclass

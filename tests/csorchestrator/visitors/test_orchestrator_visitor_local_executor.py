@@ -2,24 +2,24 @@ from pathlib import Path
 
 import pytest
 
+from csorchestrator.application.factory.factory import create_orchestrator_factory_all_supported_cases
 from csorchestrator.domain.context.context_compiler_generator import (
     Compiler,
     ContextCompilerGenerator,
     GeneratorWithType,
 )
-from csorchestrator.domain.context.context_local_execution import ContextLocalExecution
 from csorchestrator.domain.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     executor_visit_reports_has_any_error,
 )
 from csorchestrator.domain.orchestrator.phase import Phase
-from csorchestrator.execution.execution import create_os_and_path
-from csorchestrator.execution.factory import create_orchestrator_factory_all_supported_cases
-from csorchestrator.execution.validated_orchestrator import create_validated_orchestrator
+from csorchestrator.foundation.git.resolve_url import RepoUrlParts
+from csorchestrator.frontend.local_execution.context_local_execution import ContextLocalExecution
+from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
+from csorchestrator.frontend.local_execution.validate_and_execute import create_os_and_path
+from csorchestrator.frontend.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.frontend.step.step_get_repository import StepGetRepositoryExtraDepthOne, StepGetRepositoryGitHub
-from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
-from csorchestrator.utils.git.resolve_url import RepoUrlParts
-from csorchestrator.visitors.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
+from csorchestrator.frontend.validation.validated_orchestrator import create_validated_orchestrator
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 

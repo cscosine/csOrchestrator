@@ -2,16 +2,17 @@ from pathlib import Path
 
 import pytest
 
+from csorchestrator.application.factory.factory import create_orchestrator_factory_all_supported_cases
+from csorchestrator.domain.execution.execution import ExecutionResult
 from csorchestrator.domain.orchestrator.orchestrator_minimal_description import PhaseNameWithStepNames
 from csorchestrator.domain.orchestrator.phase import Phase
-from csorchestrator.execution.execution import ExecutionResult, validate_and_execute_orchestrator
-from csorchestrator.execution.factory import create_orchestrator_factory_all_supported_cases
+from csorchestrator.foundation.git.resolve_url import RepoUrlParts
+from csorchestrator.frontend.local_execution.validate_and_execute import validate_and_execute_orchestrator
+from csorchestrator.frontend.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.frontend.step.step_get_repository import (
     StepGetRepositoryExtraDepthOne,
     StepGetRepositoryGitHub,
 )
-from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
-from csorchestrator.utils.git.resolve_url import RepoUrlParts
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 

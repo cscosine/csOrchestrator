@@ -22,7 +22,7 @@ dependencies = [
 where = ["src"]
 
 [project.scripts]
-csorchestrator = "csorchestrator.cli.cli:main"
+csorchestrator = "csorchestrator.application.cli.cli:main"
 
 [project.optional-dependencies]
 # development tools (tests, linting, type checking)
@@ -150,7 +150,6 @@ name = "high level layers"
 type = "layers"
 
 layers = [
-    # TODO add layers
     "application",
     "frontend",
     "domain",
@@ -159,33 +158,34 @@ layers = [
 containers = [
     "csorchestrator"
 ]
-# exhaustive = true #TODO add when complete
+exhaustive = true
 
 [[tool.importlinter.contracts]]
 name = "foundation layers"
 type = "layers"
 
 layers = [
-    "file_system",
+    "file_system | git",
     "core"
 ]
 containers = [
     "csorchestrator.foundation"
 ]
-# exhaustive = true #TODO add when complete
+exhaustive = true
 
 [[tool.importlinter.contracts]]
 name = "domain layers"
 type = "layers"
 
 layers = [
+    "execution",
     "context",
     "orchestrator"
 ]
 containers = [
     "csorchestrator.domain"
 ]
-# exhaustive = true #TODO add when complete
+exhaustive = true
 
 [[tool.importlinter.contracts]]
 name = "frontend layers"
@@ -193,21 +193,23 @@ type = "layers"
 
 layers = [
     "step",
-    "github"
+    "github_workflow_translation : local_execution",
+    "validation",
+    "reporters | cscmake_presets"
 ]
 containers = [
     "csorchestrator.frontend"
 ]
-# exhaustive = true #TODO add when complete
+exhaustive = true
 
 [[tool.importlinter.contracts]]
 name = "application layers"
 type = "layers"
 
 layers = [
-    "cli"
+    "cli | factory"
 ]
 containers = [
     "csorchestrator.application"
 ]
-# exhaustive = true #TODO add when complete
+exhaustive = true

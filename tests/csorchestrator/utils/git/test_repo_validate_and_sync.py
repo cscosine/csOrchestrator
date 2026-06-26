@@ -6,9 +6,9 @@ import git
 import pytest
 from git import GitCommandError, Repo
 
-from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
-from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
-from csorchestrator.utils.git.resolve_url import RepoUrlParts
+from csorchestrator.foundation.git.repo_clone_checkout import try_git_clone_checkout
+from csorchestrator.foundation.git.repo_validate_and_sync import validate_and_sync_repo
+from csorchestrator.foundation.git.resolve_url import RepoUrlParts
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 
 logging.basicConfig(level=logging.INFO)
@@ -329,7 +329,7 @@ def test_validate_and_sync_repo_unknown_ref_type(
 
     _clone_test_repo(target_path=target_path, repo_url=repo_url, repo_ref=cfg.main_branch, depth_one=depth_one)
 
-    from csorchestrator.utils.git import repo_validate_and_sync as mod
+    from csorchestrator.foundation.git import repo_validate_and_sync as mod
 
     def mock_resolve_ref_type(repo, ref):
         return "unknown_ref_type"
