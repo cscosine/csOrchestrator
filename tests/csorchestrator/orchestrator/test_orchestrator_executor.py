@@ -2,7 +2,6 @@ from dataclasses import dataclass
 
 import pytest
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.domain.orchestrator.orchestrator_executor import (
     execute_orchestrator,
 )
@@ -12,10 +11,7 @@ from csorchestrator.domain.orchestrator.orchestrator_visitor_base import (
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import (
-    JobOrchestratorMatrixExecution,
     StepBase,
-    StepValidatorBase,
-    StepValidatorNoOp,
 )
 from csorchestrator.execution.factory import create_orchestrator_factory_all_supported_cases
 from csorchestrator.execution.validated_orchestrator import (
@@ -27,16 +23,6 @@ from csorchestrator.reporters.orchestrator_executor_reporter_dummy import Orches
 
 @dataclass
 class StepCustom1(StepBase):
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
-
     def visit(self, ov: "OrchestratorVisitorConcretePerType") -> Report:
         ov.visited_steps_1 += 1
         return Report()
@@ -44,16 +30,6 @@ class StepCustom1(StepBase):
 
 @dataclass
 class StepCustom2(StepBase):
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
-
     def visit(self, ov: "OrchestratorVisitorConcretePerType") -> Report:
         ov.visited_steps_2 += 1
         return Report()

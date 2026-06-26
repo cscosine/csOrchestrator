@@ -2,18 +2,12 @@ from dataclasses import dataclass
 
 import pytest
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.domain.orchestrator.orchestrator import MatrixExecutionBase, Orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_executor import execute_orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.domain.orchestrator.step_base import (
-    JobOrchestratorMatrixExecution,
-    StepBase,
-    StepValidatorBase,
-    StepValidatorNoOp,
-)
-from csorchestrator.execution.factory import create_orchestrator_factory
+from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.reporters.orchestrator_executor_reporter_print import OrchestratorExecutorReporterPrint
 from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
@@ -23,16 +17,6 @@ from csorchestrator.reporters.reporter_sink_print import ReporterSinkPrint
 class MockStep(StepBase):
     name: str
     should_fail: bool = False
-
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
 
 
 class MockVisitor(OrchestratorVisitorBase):
@@ -107,7 +91,7 @@ def test_reporter_sink_print_indentation(capsys: pytest.CaptureFixture[str]) -> 
 
 def test_orchestrator_executor_reporter_print_success_flow(capsys: pytest.CaptureFixture[str]) -> None:
     """End-to-end test of the printing reporter via execute_orchestrator on success."""
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
     phase = Phase(name="Setup")
     phase.add_step(MockStep(name="StepA", description=""))
     orchestrator.add_phase(phase)
@@ -133,7 +117,7 @@ def test_orchestrator_executor_reporter_print_success_flow(capsys: pytest.Captur
 
 def test_orchestrator_executor_reporter_print_failure_flow(capsys: pytest.CaptureFixture[str]) -> None:
     """End-to-end test of the printing reporter via execute_orchestrator on failure."""
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
     phase = Phase(name="Execution")
     phase.add_step(MockStep(name="FailingStep", description="", should_fail=True))
     orchestrator.add_phase(phase)

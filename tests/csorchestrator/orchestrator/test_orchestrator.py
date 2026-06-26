@@ -1,35 +1,17 @@
 from dataclasses import dataclass
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.domain.orchestrator.orchestrator import MatrixExecutionBase, Orchestrator
 from csorchestrator.domain.orchestrator.phase import Phase
-from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.domain.orchestrator.step_base import (
-    JobOrchestratorMatrixExecution,
-    StepBase,
-    StepValidatorBase,
-    StepValidatorNoOp,
-)
-from csorchestrator.execution.factory import create_orchestrator_factory
-from csorchestrator.foundation.core.report import Report
+from csorchestrator.domain.orchestrator.step_base import StepBase
 
 
 @dataclass
 class StepEchoMessage(StepBase):
     message: str
 
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
-
 
 def test_orchestrator_add_phases() -> None:
-    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    o = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
 
     p = Phase("phase_1").add_step(StepEchoMessage(name="p1s1", description="p1 step s1", message="phase 1 step 2"))
     p.add_step(StepEchoMessage(name="p1s2", description="p1 step s2", message="phase 1 step 2"))
@@ -53,7 +35,7 @@ def test_orchestrator_add_phases() -> None:
 
 
 def test_orchestrator_executor_minimal_description() -> None:
-    o = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    o = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
 
     o.create_phase("p1").add_step(StepEchoMessage(name="p1s1", description="p1 step s1", message="")).add_step(
         StepEchoMessage(name="p1s2", description="p1 step s2", message="")

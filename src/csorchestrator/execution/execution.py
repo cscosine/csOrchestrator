@@ -4,6 +4,7 @@ from typing import TypeAlias
 
 from csorchestrator.ci.github.github_workflow_config import (
     GitHubWorkflow,
+    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
     create_job_from_matrix_list,
 )
 from csorchestrator.ci.github.github_workflow_job_create_release import JobReleaseCreationFromArifacts
@@ -41,10 +42,7 @@ from csorchestrator.domain.orchestrator.orchestrator_executor import (
 from csorchestrator.domain.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
 from csorchestrator.domain.orchestrator.orchestrator_minimal_description import OrchestratorExecutorMinimalDescription
 from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
-from csorchestrator.domain.orchestrator.workflow_config import (
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
-    WorkflowConfig,
-)
+from csorchestrator.domain.orchestrator.workflow_config import WorkflowConfig
 from csorchestrator.execution.validated_orchestrator import create_validated_orchestrator
 from csorchestrator.foundation.core.expected import Expected
 from csorchestrator.foundation.core.optional_result_with_report import OptionalResultWithReport
@@ -155,6 +153,9 @@ def validate_and_execute_orchestrator(
 
     matrix_extras: dict[type, ContextLocalExecutionExtra] = {}
     counter: int = 0
+
+    assert isinstance(matrix, ExecutionMatrixOsArchCompilerGenerator)  # ensured by the validator
+
     for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
         match = os_architecture_compiler_generator.context_os_architecture.can_be_executed_on(
             os_and_path.os_architecture
@@ -198,6 +199,7 @@ def validate_and_execute_orchestrator(
 
         er.report_executions.append(report_execution)
 
+        # keep the matrix_extras modified for the next context
         matrix_extras = context.matrix_extras
         counter += 1
 
@@ -336,6 +338,8 @@ def validate_and_generate_github_workflow(
     # validated orchestrator
 
     matrix = orchestrator.execution_matrix
+
+    assert isinstance(matrix, ExecutionMatrixOsArchCompilerGenerator)  # ensured by the validator
 
     wf_matrix_or_errors = orchestrator_matrix_to_github_wf_matrix(matrix)
     if wf_matrix_or_errors.error is not None:

@@ -1,8 +1,6 @@
 from dataclasses import dataclass, field
 
-from csorchestrator.domain.orchestrator.step_base import (
-    StepToStringLines,
-)
+from csorchestrator.ci.github.github_workflow_config import StepToStringLines
 from csorchestrator.foundation.core.strings_utils import string_indent
 
 # =========================================================

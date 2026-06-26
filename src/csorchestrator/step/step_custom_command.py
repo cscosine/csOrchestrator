@@ -6,6 +6,7 @@ from pathlib import Path
 from string import Template
 from typing import TextIO
 
+from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
 from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
 from csorchestrator.ci.github.guthub_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
@@ -23,15 +24,30 @@ from csorchestrator.context.context_local_execution import (
 from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
 )
+from csorchestrator.context.step_utils import StepExecuteOnlyOn
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import (
-    JobOrchestratorMatrixExecution,
     StepBase,
-    StepValidatorBase,
-    StepValidatorNoOp,
 )
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.step.step_utils import StepExecuteOnlyOn
+from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import StepCapabilityGithubWorkflow
+from csorchestrator.visitors.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+
+
+@dataclass
+class StepBashScriptCommandCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
+    step: "StepBashScriptCommand"
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_custom_command_to_githubwf(self.step, wf_job, reporter_sink)
+
+
+@dataclass
+class StepBashScriptCommandCapabilityLocalExecution(StepCapabilityLocalExecution):
+    step: "StepBashScriptCommand"
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_custom_command(self.step, context, reporter_sink)
 
 
 @dataclass(kw_only=True)
@@ -39,15 +55,25 @@ class StepBashScriptCommand(StepBase):
     cmd: list[str] = field(default_factory=list)
     dry_run: bool = False
 
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return execute_step_custom_command(self, context, reporter_sink)
+    def __post_init__(self) -> None:
+        self.add_capability(StepBashScriptCommandCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)
+        self.add_capability(StepBashScriptCommandCapabilityLocalExecution(self), StepCapabilityLocalExecution)
+
+
+@dataclass
+class StepWinPSCommandCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
+    step: "StepWinPSCommand"
 
     def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return step_custom_command_to_githubwf(self, wf_job, reporter_sink)
+        return step_win_ps_command_to_githubwf(self.step, wf_job, reporter_sink)
 
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
+
+@dataclass
+class StepWinPSCommandCapabilityLocalExecution(StepCapabilityLocalExecution):
+    step: "StepWinPSCommand"
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_win_ps_command(self.step, context, reporter_sink)
 
 
 @dataclass(kw_only=True)
@@ -55,15 +81,9 @@ class StepWinPSCommand(StepBase):
     cmd: list[str] = field(default_factory=list)
     dry_run: bool = False
 
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return execute_step_win_ps_command(self, context, reporter_sink)
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return step_win_ps_command_to_githubwf(self, wf_job, reporter_sink)
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
+    def __post_init__(self) -> None:
+        self.add_capability(StepWinPSCommandCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)
+        self.add_capability(StepWinPSCommandCapabilityLocalExecution(self), StepCapabilityLocalExecution)
 
 
 @dataclass(kw_only=True)

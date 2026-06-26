@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import TypeAlias
 
+from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
 from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
 from csorchestrator.ci.github.guthub_workflow_matrix_constants import MatrixOsArchCompilerGeneratorGithubConstants
 from csorchestrator.context.context_compiler_generator import GeneratorType
@@ -11,10 +12,7 @@ from csorchestrator.context.context_local_execution import (
 from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import (
-    JobOrchestratorMatrixExecution,
     StepBase,
-    StepValidatorBase,
-    StepValidatorNoOp,
 )
 from csorchestrator.foundation.core.expected import Expected
 from csorchestrator.foundation.core.report import Report
@@ -28,23 +26,34 @@ from csorchestrator.utils.presets.supported_variants import (
     workflow_name_from_components,
     workflow_name_from_description,
 )
+from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import StepCapabilityGithubWorkflow
+from csorchestrator.visitors.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+
+
+@dataclass
+class StepCMakeWorkflowCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
+    step: "StepCMakeWorkflow"
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_cmake_workflow_to_githubwf(self.step, wf_job, reporter_sink)
+
+
+@dataclass
+class StepCMakeWorkflowCapabilityLocalExecution(StepCapabilityLocalExecution):
+    step: "StepCMakeWorkflow"
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_cmake_workflow(self.step, context, reporter_sink)
 
 
 @dataclass
 class StepCMakeWorkflow(StepBase):
     source_dir: str
-
     config: BuildConfig
 
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return execute_step_cmake_workflow(self, context, reporter_sink)
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return step_cmake_workflow_to_githubwf(self, wf_job, reporter_sink)
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
+    def __post_init__(self) -> None:
+        self.add_capability(StepCMakeWorkflowCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)
+        self.add_capability(StepCMakeWorkflowCapabilityLocalExecution(self), StepCapabilityLocalExecution)
 
 
 ContextWorkflowsExpected: TypeAlias = Expected[

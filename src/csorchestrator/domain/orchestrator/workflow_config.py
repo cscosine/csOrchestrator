@@ -77,24 +77,3 @@ class WorkflowConfig:
     on_dispatch: bool | None = None
     on_schedule: Cron | None = None
     create_release_on_tag: ReleaseCreationOnTagConfig | None = None
-
-
-# =========================================================
-# Workflow builder
-# =========================================================
-@dataclass(frozen=True)
-class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
-    execution_id: str
-    os: str
-    os_version: str
-    architecture: str
-    architecture_variant: str
-    compiler: str
-    compiler_version: str
-    build_generator: str
-    build_generator_type: str
-    generator_cmake: str
-    runner: str
-    c_compiler: str | None = None
-    cpp_compiler: str | None = None
-    toolset: str | None = None

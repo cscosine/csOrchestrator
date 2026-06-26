@@ -3,18 +3,12 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.domain.orchestrator.orchestrator import MatrixExecutionBase, Orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_executor import execute_orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.domain.orchestrator.step_base import (
-    JobOrchestratorMatrixExecution,
-    StepBase,
-    StepValidatorBase,
-    StepValidatorNoOp,
-)
-from csorchestrator.execution.factory import create_orchestrator_factory
+from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.reporters.orchestrator_executor_reporter_composite import OrchestratorExecutorReporterComposite
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
@@ -26,15 +20,7 @@ from csorchestrator.reporters.reporter_sink_colored_print import ReporterSinkCol
 
 @dataclass
 class MockStep(StepBase):
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
+    pass
 
 
 @dataclass
@@ -94,7 +80,8 @@ def test_composite_reporter_prints_twice(capsys: pytest.CaptureFixture[str]) -> 
     duplicated output (one per reporter).
     """
     # 1. Setup Orchestrator
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
+
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -134,7 +121,7 @@ def test_composite_reporter_prints_twice(capsys: pytest.CaptureFixture[str]) -> 
 
 def test_composite_reporter_colored_colorama(capsys: pytest.CaptureFixture[str]) -> None:
     # 1. Setup Orchestrator
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -158,7 +145,7 @@ def test_composite_reporter_colored_colorama(capsys: pytest.CaptureFixture[str])
 
 def test_composite_reporter_markdown(tmp_path: Path) -> None:
     # 1. Setup Orchestrator
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -245,7 +232,7 @@ def test_composite_reporter_report_orchestrator_creation_report(
 
 def test_composite_reporter_step_with_errors(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Orchestrator
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -267,7 +254,7 @@ def test_composite_reporter_step_with_errors(tmp_path: Path, capsys: pytest.Capt
 
 def test_composite_reporter_report_execution_report(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Orchestrator
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)
@@ -303,7 +290,7 @@ def test_composite_reporter_report_execution_report(tmp_path: Path, capsys: pyte
 
 def test_composite_reporter_report_execution_description(tmp_path: Path, capsys: pytest.CaptureFixture[str]) -> None:
     # Setup Orchestrator
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
     phase = Phase(name="Build")
     phase.add_step(MockStep(name="Compile", description="Compile source code"))
     orchestrator.add_phase(phase)

@@ -13,7 +13,7 @@ class ContextLocalExecutionExtra:
     pass
 
 
-ContextLocalExecutionExtraT = TypeVar("ContextLocalExecutionExtraT", bound="ContextLocalExecutionExtra")
+ContextLocalExecutionExtraT = TypeVar("ContextLocalExecutionExtraT", bound=ContextLocalExecutionExtra)
 
 
 # create it with create_local_context to ensure is a valid path pointint to an existing (eventually created) folder

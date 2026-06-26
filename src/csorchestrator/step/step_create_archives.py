@@ -3,6 +3,7 @@ import tarfile
 from dataclasses import dataclass
 from pathlib import Path
 
+from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
 from csorchestrator.ci.github.github_workflow_steps_transations import StepRunCommand
 from csorchestrator.ci.github.guthub_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
@@ -14,13 +15,26 @@ from csorchestrator.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string,
 )
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.domain.orchestrator.step_base import (
-    JobOrchestratorMatrixExecution,
-    StepBase,
-    StepValidatorBase,
-    StepValidatorNoOp,
-)
+from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.foundation.core.report import Report
+from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import StepCapabilityGithubWorkflow
+from csorchestrator.visitors.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+
+
+@dataclass
+class StepCreateArchivesCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
+    step: "StepCreateArchives"
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_create_archives_to_githubwf(self.step, wf_job, reporter_sink)
+
+
+@dataclass
+class StepCreateArchivesCapabilityLocalExecution(StepCapabilityLocalExecution):
+    step: "StepCreateArchives"
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_create_archives(self.step, context, reporter_sink)
 
 
 @dataclass
@@ -29,15 +43,9 @@ class StepCreateArchives(StepBase):
     input_dict: str
     base_install_dir: Path
 
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return execute_step_create_archives(self, context, reporter_sink)
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return step_create_archives_to_githubwf(self, wf_job, reporter_sink)
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
+    def __post_init__(self) -> None:
+        self.add_capability(StepCreateArchivesCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)
+        self.add_capability(StepCreateArchivesCapabilityLocalExecution(self), StepCapabilityLocalExecution)
 
 
 def execute_step_create_archives(

@@ -234,7 +234,12 @@
       "type": "shell",
       "command": "import-linter explore csorchestrator",
       "problemMatcher": [],
-      "detail": "#import-linter # Show Graph"
+      "detail": "#import-linter # Show Graph",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": true
+      }
     }
   ]
 }

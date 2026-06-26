@@ -1,15 +1,20 @@
+from abc import ABC
 from dataclasses import dataclass, field
 
-from csorchestrator.context.context_os_architecture_compiler_generator import (
-    ContextOsArchitectureCompilerGenerator,
-    ExecutionMatrixOsArchCompilerGenerator,
-)
 from csorchestrator.domain.orchestrator.orchestrator_minimal_description import (
     OrchestratorExecutorMinimalDescription,
     PhaseNameWithStepNames,
 )
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.workflow_config import WorkflowConfig
+
+
+@dataclass
+class MatrixExecutionBase(ABC):
+    name: str
+
+    def to_list_string_description(self) -> list[str]:
+        return []
 
 
 @dataclass
@@ -24,7 +29,7 @@ class Orchestrator:
 
     name: str
     version: str
-    execution_matrix: ExecutionMatrixOsArchCompilerGenerator
+    execution_matrix: MatrixExecutionBase
     phases: list[Phase] = field(default_factory=list)
     wf_config: WorkflowConfig | None = None
 
@@ -36,10 +41,6 @@ class Orchestrator:
         phase = Phase(phase_name)
         self.phases.append(phase)
         return phase
-
-    def set_execution_matrix_list(self, matrix_list: list[ContextOsArchitectureCompilerGenerator]) -> "Orchestrator":
-        self.execution_matrix.os_architecture_compiler_generator_list = matrix_list
-        return self
 
     def extract_minimal_description(self) -> OrchestratorExecutorMinimalDescription:
         ret = OrchestratorExecutorMinimalDescription(name=self.name, version=self.version)

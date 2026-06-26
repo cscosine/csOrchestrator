@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 
 from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
 from csorchestrator.context.context_os_architecture import ContextOsArchitecture
+from csorchestrator.domain.orchestrator.orchestrator import MatrixExecutionBase
 
 CS_ORCHESTRATOR_SCHEMA_VERSION = "csv1"
 
@@ -13,8 +14,7 @@ class ContextOsArchitectureCompilerGenerator:
 
 
 @dataclass
-class ExecutionMatrixOsArchCompilerGenerator:
-    name: str
+class ExecutionMatrixOsArchCompilerGenerator(MatrixExecutionBase):
     os_architecture_compiler_generator_list: list[ContextOsArchitectureCompilerGenerator] = field(default_factory=list)
     fail_fast = False
 

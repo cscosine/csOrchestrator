@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
 from csorchestrator.ci.github.github_workflow_steps_transations import (
     StepCheckoutRepository,
     StepCheckoutRepositoryWith,
@@ -8,7 +9,6 @@ from csorchestrator.ci.github.github_workflow_steps_transations import (
 from csorchestrator.context.context_local_execution import ContextLocalExecution
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import (
-    JobOrchestratorMatrixExecution,
     StepBase,
     StepExtra,
     StepValidatorBase,
@@ -18,6 +18,32 @@ from csorchestrator.foundation.file_system.path import is_clean_relative_path
 from csorchestrator.utils.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.utils.git.repo_validate_and_sync import validate_and_sync_repo
 from csorchestrator.utils.git.resolve_url import RepoUrlParts
+from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import StepCapabilityGithubWorkflow
+from csorchestrator.visitors.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+from csorchestrator.visitors.orchestrator_visitor_validator import StepCapabilityValidation
+
+
+@dataclass
+class StepGetRepositoryGitHubCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
+    step: "StepGetRepositoryGitHub"
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_get_repository_to_githubwf(self.step, wf_job, reporter_sink)
+
+
+@dataclass
+class StepGetRepositoryGitHubCapabilityLocalExecution(StepCapabilityLocalExecution):
+    step: "StepGetRepositoryGitHub"
+
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return execute_step_get_repository(self.step, context, reporter_sink)
+
+
+@dataclass
+class StepGetRepositoryGitHubCapabilityValidation(StepCapabilityValidation):
+    @classmethod
+    def createValidator(cls) -> StepValidatorBase | None:
+        return StepGetRepositoryValidator()
 
 
 @dataclass
@@ -25,6 +51,11 @@ class StepGetRepositoryGitHub(StepBase):
     repo_url_parts: RepoUrlParts
     repo_ref: str
     target_directory: str
+
+    def __post_init__(self) -> None:
+        self.add_capability(StepGetRepositoryGitHubCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)
+        self.add_capability(StepGetRepositoryGitHubCapabilityLocalExecution(self), StepCapabilityLocalExecution)
+        self.add_capability(StepGetRepositoryGitHubCapabilityValidation(), StepCapabilityValidation)
 
     def repo_url(self) -> str:
         return self.repo_url_parts.repo_url()
@@ -39,16 +70,6 @@ class StepGetRepositoryGitHub(StepBase):
 
     def resolved_target_directory_path(self) -> Path:
         return Path(self.target_directory).resolve()
-
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return execute_step_get_repository(self, context, reporter_sink)
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return step_get_repository_to_githubwf(self, wf_job, reporter_sink)
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepGetRepositoryValidator()
 
 
 @dataclass

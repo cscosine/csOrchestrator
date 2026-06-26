@@ -1,16 +1,9 @@
 from dataclasses import dataclass
 from pathlib import Path
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution
-from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.domain.orchestrator.step_base import (
-    JobOrchestratorMatrixExecution,
-    StepBase,
-    StepValidatorBase,
-    StepValidatorNoOp,
-)
+from csorchestrator.domain.orchestrator.orchestrator import MatrixExecutionBase, Orchestrator
+from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.execution.execution import validate_and_execute_orchestrator
-from csorchestrator.execution.factory import create_orchestrator_factory
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.reporters.orchestrator_executor_reporter_markdown import OrchestratorExecutorReporterMarkdown
 
@@ -18,16 +11,6 @@ from csorchestrator.reporters.orchestrator_executor_reporter_markdown import Orc
 @dataclass
 class StepEchoMessage(StepBase):
     message: str
-
-    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
-        return Report()
-
-    @classmethod
-    def createValidator(cls) -> StepValidatorBase:
-        return StepValidatorNoOp()
 
 
 def test_markdown_reporter_produces_valid_file(tmp_path: Path) -> None:
@@ -41,7 +24,7 @@ def test_markdown_reporter_produces_valid_file(tmp_path: Path) -> None:
     reporter.report_orchestrator_creation_report(creation_report)
 
     # 2. Test Execution Description
-    orchestrator = create_orchestrator_factory("myName", "0.0.0", "exec-job")
+    orchestrator = Orchestrator("myName", "0.0.0", MatrixExecutionBase("exec-job"))
     phase = orchestrator.create_phase("Build")
     phase.add_step(StepEchoMessage(name="Compile", description="Compiling...", message="Compiling..."))
 

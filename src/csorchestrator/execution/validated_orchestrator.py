@@ -1,6 +1,7 @@
 from collections import Counter
 from dataclasses import dataclass, field
 
+from csorchestrator.context.context_os_architecture_compiler_generator import ExecutionMatrixOsArchCompilerGenerator
 from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_executor import (
     execute_orchestrator,
@@ -40,9 +41,14 @@ def create_validated_orchestrator(o: Orchestrator) -> OrchestratorValidationResu
             if c > 1:
                 validation_report.main_report.append_error(f"in phase {p.name}, step named {name} has {c} occurrences")
 
-    # if there are no execution matrix in the list, return error
-    if len(o.execution_matrix.os_architecture_compiler_generator_list) == 0:
-        validation_report.main_report.append_error("execution matrix list is empty")
+    if not isinstance(o.execution_matrix, ExecutionMatrixOsArchCompilerGenerator):
+        validation_report.main_report.append_error(
+            "execution_matrix needs to be a ExecutionMatrixOsArchCompilerGenerator"
+        )
+    else:
+        # if there are no execution matrix in the list, return error
+        if len(o.execution_matrix.os_architecture_compiler_generator_list) == 0:
+            validation_report.main_report.append_error("execution matrix list is empty")
 
     # if so far is validated, use the orchestrator visitor validator to validate the steps, and append the reports
     if len(validation_report.main_report.errors) == 0:

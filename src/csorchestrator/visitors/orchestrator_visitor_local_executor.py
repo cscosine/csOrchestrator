@@ -1,12 +1,22 @@
 from dataclasses import dataclass
 
 from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.context.step_utils import (
+    StepExecuteOnlyOn,
+    StepExecuteOnlyOncePerMatrix,
+    StepSkipExecutionOnLocal,
+)
 from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
-from csorchestrator.domain.orchestrator.step_base import StepBase
+from csorchestrator.domain.orchestrator.step_base import StepBase, StepCapability
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.step.step_utils import StepExecuteOnlyOn, StepExecuteOnlyOncePerMatrix, StepSkipExecutionOnLocal
+
+
+@dataclass
+class StepCapabilityLocalExecution(StepCapability):
+    def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return Report().append_error("StepCapabilityLocalExecution.execute_locally need to be imlemented in subclasses")
 
 
 @dataclass
@@ -31,7 +41,10 @@ class OrchestratorVisitorLocalExecutor(OrchestratorVisitorBase):
         if skip_reason is not None:
             return Report().append_info(f"skipping execution of step {step.name} since {skip_reason}")
 
-        return step.execute_locally(self.context, reporter_sink)
+        capability = step.get_capability(StepCapabilityLocalExecution)
+        if capability is None:
+            return Report().append_info(f"skip step {step.name} because it does not support local execution")
+        return capability.execute_locally(self.context, reporter_sink)
 
     def _should_execute_step(self, step: StepBase) -> None | str:  # None is non expected error
         if self._current_phase_name is None:
