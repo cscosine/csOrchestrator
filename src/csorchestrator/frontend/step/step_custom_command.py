@@ -172,7 +172,7 @@ def execute_command(
     stdout_thread.join()
     stderr_thread.join()
 
-    if return_code is not None:
+    if return_code is not None and return_code != 0:
         errors += [f"Command failed with exit code {return_code}"]
         # do not return immediately, do at cycle end
 
