@@ -1,16 +1,18 @@
 from collections import Counter
 from dataclasses import dataclass, field
 
-from csorchestrator.context.context_os_architecture_compiler_generator import ExecutionMatrixOsArchCompilerGenerator
+from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
+    ExecutionMatrixOsArchCompilerGenerator,
+)
 from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_executor import (
     execute_orchestrator,
     executor_visit_reports_has_any_error,
 )
 from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorExecutorVisitReports
+from csorchestrator.execution.orchestrator_visitor_validator import OrchestratorVisitorValidator
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
-from csorchestrator.visitors.orchestrator_visitor_validator import OrchestratorVisitorValidator
 
 
 @dataclass

@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 import pytest
 
-from csorchestrator.context.context_os_architecture import (
+from csorchestrator.domain.context.context_os_architecture import (
     ARCHITECTURE_VARIANT_ARM64_NANO,
     ARCHITECTURE_VARIANT_ARM64_ORIN,
     ARCHITECTURE_VARIANT_ARM64_XAVIER,
@@ -51,7 +51,7 @@ def test_detect_architecture_arm64_generic(machine):
     with (
         patch("platform.machine", return_value=machine),
         patch(
-            "csorchestrator.context.context_os_architecture.detect_arm64_variant",
+            "csorchestrator.domain.context.context_os_architecture.detect_arm64_variant",
             return_value=ARCHITECTURE_VARIANT_GENERIC,
         ),
     ):
@@ -72,7 +72,7 @@ def test_detect_architecture_arm64_generic(machine):
 def test_detect_architecture_arm64_variants(variant, expected):
     with (
         patch("platform.machine", return_value=MachineArchitecture.AARCH64.value),
-        patch("csorchestrator.context.context_os_architecture.detect_arm64_variant", return_value=variant),
+        patch("csorchestrator.domain.context.context_os_architecture.detect_arm64_variant", return_value=variant),
     ):
         result = detect_architecture()
 

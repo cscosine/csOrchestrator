@@ -1,13 +1,13 @@
 from dataclasses import dataclass, field
 
-from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
-from csorchestrator.ci.github.github_workflow_steps_transations import StepGitHubAction
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
 )
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.step.step_custom_command import get_if_str
+from csorchestrator.frontend.github.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.frontend.github.github_workflow_steps_transations import StepGitHubAction
+from csorchestrator.frontend.step.step_custom_command import get_if_str
 from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import StepCapabilityGithubWorkflow
 
 

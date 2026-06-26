@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from csorchestrator.context.context_os_architecture import (
+from csorchestrator.domain.context.context_os_architecture import (
     ARCHITECTURE_VARIANT_ARM64_NANO,
     ARCHITECTURE_VARIANT_ARM64_ORIN,
     ARCHITECTURE_VARIANT_ARM64_XAVIER,

@@ -1,4 +1,4 @@
-from csorchestrator.context.context_os_architecture_compiler_generator import (
+from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     create_context_os_architecture_compiler_generator_string_from_components,
 )
 

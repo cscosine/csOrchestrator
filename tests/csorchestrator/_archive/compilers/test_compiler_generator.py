@@ -7,8 +7,8 @@ from csorchestrator._archive.compilers.compiler_generator import (
     detect_compiler_version,
     detect_compiler_version_run,
 )
-from csorchestrator.context.context_compiler_generator import Compiler
-from csorchestrator.context.context_os_architecture import OS, OS_PLATFORM_MACOS
+from csorchestrator.domain.context.context_compiler_generator import Compiler
+from csorchestrator.domain.context.context_os_architecture import OS, OS_PLATFORM_MACOS
 
 # =========================================================
 # WINDOWS TESTS

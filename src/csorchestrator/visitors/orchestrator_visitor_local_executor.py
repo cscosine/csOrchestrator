@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution
-from csorchestrator.context.step_utils import (
+from csorchestrator.domain.context.context_local_execution import ContextLocalExecution
+from csorchestrator.domain.context.step_utils import (
     StepExecuteOnlyOn,
     StepExecuteOnlyOncePerMatrix,
     StepSkipExecutionOnLocal,

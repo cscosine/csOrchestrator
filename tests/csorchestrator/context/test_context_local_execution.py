@@ -15,7 +15,7 @@ def test_create_context_empty_path_invalid() -> None:
 
 def test_create_context_invalid_detect_context_os_architecture() -> None:
     with patch(
-        "csorchestrator.context.context_os_architecture.detect_context_os_architecture",
+        "csorchestrator.domain.context.context_os_architecture.detect_context_os_architecture",
         return_value=Expected.make_error("Unsupported OS"),
     ):
         cr = create_os_and_path("")

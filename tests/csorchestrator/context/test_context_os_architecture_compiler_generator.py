@@ -1,11 +1,11 @@
-from csorchestrator.context.context_compiler_generator import (
+from csorchestrator.domain.context.context_compiler_generator import (
     Compiler,
     ContextCompilerGenerator,
     Generator,
     GeneratorType,
     GeneratorWithType,
 )
-from csorchestrator.context.context_os_architecture import (
+from csorchestrator.domain.context.context_os_architecture import (
     ARCHITECTURE_VARIANT_ARM64_ORIN,
     ARCHITECTURE_VARIANT_GENERIC,
     OS,
@@ -14,7 +14,7 @@ from csorchestrator.context.context_os_architecture import (
     Architecture,
     ContextOsArchitecture,
 )
-from csorchestrator.context.context_os_architecture_compiler_generator import (
+from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     CS_ORCHESTRATOR_SCHEMA_VERSION,
     ContextOsArchitectureCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,

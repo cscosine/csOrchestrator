@@ -3,18 +3,22 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.context.context_compiler_generator import Compiler, ContextCompilerGenerator, GeneratorWithType
-from csorchestrator.context.context_local_execution import ContextLocalExecution
+from csorchestrator.domain.context.context_compiler_generator import (
+    Compiler,
+    ContextCompilerGenerator,
+    GeneratorWithType,
+)
+from csorchestrator.domain.context.context_local_execution import ContextLocalExecution
 from csorchestrator.domain.orchestrator.step_base import StepExtra
 from csorchestrator.execution.execution import create_os_and_path
-from csorchestrator.reporters.reporter_sink_dummy import ReporterSinkDummy
-from csorchestrator.step.step_get_repository import (
+from csorchestrator.frontend.step.step_get_repository import (
     StepGetRepositoryExtraAccessToken,
     StepGetRepositoryExtraDepthOne,
     StepGetRepositoryGitHub,
     execute_step_get_repository,
     validate_step_get_repository,
 )
+from csorchestrator.reporters.reporter_sink_dummy import ReporterSinkDummy
 from csorchestrator.utils.git.resolve_url import RepoUrlParts
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 

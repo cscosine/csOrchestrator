@@ -1,12 +1,14 @@
 from dataclasses import dataclass, field
 from typing import Self
 
-from csorchestrator.ci.github.github_workflow_job_create_release import (
+from csorchestrator.domain.orchestrator.workflow_config import Cron
+from csorchestrator.foundation.core.strings_utils import string_indent
+from csorchestrator.frontend.github.github_workflow_job_create_release import (
     JobReleaseCreationFromArifacts,
     job_release_on_tag_to_string_lines,
 )
-from csorchestrator.ci.github.github_workflow_matrix_constants import MatrixOsArchCompilerGeneratorGithubConstants
-from csorchestrator.ci.github.github_workflow_triggers import (
+from csorchestrator.frontend.github.github_workflow_matrix_constants import MatrixOsArchCompilerGeneratorGithubConstants
+from csorchestrator.frontend.github.github_workflow_triggers import (
     PullRequestTrigger,
     PushTrigger,
     ScheduleTrigger,
@@ -14,8 +16,6 @@ from csorchestrator.ci.github.github_workflow_triggers import (
     TriggerUnion,
     WorkflowDispatchTrigger,
 )
-from csorchestrator.domain.orchestrator.workflow_config import Cron
-from csorchestrator.foundation.core.strings_utils import string_indent
 
 
 # =========================================================

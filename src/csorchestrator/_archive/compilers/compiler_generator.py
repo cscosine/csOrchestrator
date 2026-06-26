@@ -2,7 +2,7 @@ import re
 import subprocess
 from collections.abc import Callable
 
-from csorchestrator.context.context_compiler_generator import Compiler
+from csorchestrator.domain.context.context_compiler_generator import Compiler
 from csorchestrator.foundation.core.expected import Expected
 
 

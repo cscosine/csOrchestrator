@@ -1,13 +1,8 @@
-from csorchestrator.ci.github.github_workflow_config import (
-    GitHubWorkflow,
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
-    create_job_from_matrix_list,
-)
-from csorchestrator.context.context_compiler_generator import (
+from csorchestrator.domain.context.context_compiler_generator import (
     ContextCompilerGenerator,
     Generator,
 )
-from csorchestrator.context.context_os_architecture import (
+from csorchestrator.domain.context.context_os_architecture import (
     ARCHITECTURE_VARIANT_GENERIC,
     OS,
     UBUNTU_VERSIONS,
@@ -19,6 +14,11 @@ from csorchestrator.domain.orchestrator.workflow_config import (
     WorkflowConfig,
 )
 from csorchestrator.execution.execution import GITHUB_RUNNER_UBUNTU_22_04, create_github_wf
+from csorchestrator.frontend.github.github_workflow_config import (
+    GitHubWorkflow,
+    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    create_job_from_matrix_list,
+)
 
 EXPECTED_LINES_HEADER = [
     "name: test-wf-name",

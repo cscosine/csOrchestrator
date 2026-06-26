@@ -173,3 +173,41 @@ containers = [
     "csorchestrator.foundation"
 ]
 # exhaustive = true #TODO add when complete
+
+[[tool.importlinter.contracts]]
+name = "domain layers"
+type = "layers"
+
+layers = [
+    "context",
+    "orchestrator"
+]
+containers = [
+    "csorchestrator.domain"
+]
+# exhaustive = true #TODO add when complete
+
+[[tool.importlinter.contracts]]
+name = "frontend layers"
+type = "layers"
+
+layers = [
+    "step",
+    "github"
+]
+containers = [
+    "csorchestrator.frontend"
+]
+# exhaustive = true #TODO add when complete
+
+[[tool.importlinter.contracts]]
+name = "application layers"
+type = "layers"
+
+layers = [
+    "cli"
+]
+containers = [
+    "csorchestrator.application"
+]
+# exhaustive = true #TODO add when complete

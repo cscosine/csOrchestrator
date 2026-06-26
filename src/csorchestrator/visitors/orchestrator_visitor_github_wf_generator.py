@@ -1,11 +1,11 @@
 from dataclasses import dataclass
 
-from csorchestrator.ci.github.github_workflow_config import JobOrchestratorMatrixExecution
 from csorchestrator.domain.orchestrator.orchestrator_visitor_base import OrchestratorVisitorBase
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import StepBase, StepCapability
 from csorchestrator.foundation.core.report import Report
+from csorchestrator.frontend.github.github_workflow_config import JobOrchestratorMatrixExecution
 
 
 @dataclass

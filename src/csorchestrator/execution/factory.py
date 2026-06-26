@@ -1,6 +1,8 @@
 from typing import TypeAlias
 
-from csorchestrator.context.context_os_architecture_compiler_generator import ExecutionMatrixOsArchCompilerGenerator
+from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
+    ExecutionMatrixOsArchCompilerGenerator,
+)
 from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 from csorchestrator.foundation.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.utils.presets.supported_variants import get_supported_context_os_architecture_list

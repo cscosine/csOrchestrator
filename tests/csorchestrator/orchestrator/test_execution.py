@@ -6,11 +6,11 @@ from csorchestrator.domain.orchestrator.orchestrator_minimal_description import 
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.execution.execution import ExecutionResult, validate_and_execute_orchestrator
 from csorchestrator.execution.factory import create_orchestrator_factory_all_supported_cases
-from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
-from csorchestrator.step.step_get_repository import (
+from csorchestrator.frontend.step.step_get_repository import (
     StepGetRepositoryExtraDepthOne,
     StepGetRepositoryGitHub,
 )
+from csorchestrator.reporters.orchestrator_executor_reporter_dummy import OrchestratorExecutorReporterDummy
 from csorchestrator.utils.git.resolve_url import RepoUrlParts
 from tests.csorchestrator.repo_test_data_config import RepoTestData
 

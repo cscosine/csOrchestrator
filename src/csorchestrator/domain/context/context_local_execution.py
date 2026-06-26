@@ -3,9 +3,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypeVar
 
-from csorchestrator.context.context_compiler_generator import ContextCompilerGenerator
-from csorchestrator.context.context_os_architecture import ContextOsArchitecture
-from csorchestrator.context.context_os_architecture_compiler_generator import ContextOsArchitectureCompilerGenerator
+from csorchestrator.domain.context.context_compiler_generator import ContextCompilerGenerator
+from csorchestrator.domain.context.context_os_architecture import ContextOsArchitecture
+from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
+    ContextOsArchitectureCompilerGenerator,
+)
 
 
 # base class for extra information that can be provided

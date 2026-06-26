@@ -2,21 +2,15 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TypeAlias
 
-from csorchestrator.ci.github.github_workflow_config import (
-    GitHubWorkflow,
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
-    create_job_from_matrix_list,
-)
-from csorchestrator.ci.github.github_workflow_job_create_release import JobReleaseCreationFromArifacts
-from csorchestrator.context.context_compiler_generator import (
+from csorchestrator.domain.context.context_compiler_generator import (
     ContextCompilerGenerator,
     Generator,
 )
-from csorchestrator.context.context_local_execution import (
+from csorchestrator.domain.context.context_local_execution import (
     ContextLocalExecution,
     ContextLocalExecutionExtra,
 )
-from csorchestrator.context.context_os_architecture import (
+from csorchestrator.domain.context.context_os_architecture import (
     OS,
     UBUNTU_STRING_PREFIX,
     UBUNTU_VERSIONS,
@@ -25,7 +19,7 @@ from csorchestrator.context.context_os_architecture import (
     ContextOsArchitecture,
     detect_context_os_architecture,
 )
-from csorchestrator.context.context_os_architecture_compiler_generator import (
+from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
     ExecutionMatrixOsArchCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
@@ -44,6 +38,12 @@ from csorchestrator.foundation.core.expected import Expected
 from csorchestrator.foundation.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.foundation.file_system.directory import ensure_directory_exists_or_create_and_is_usable
+from csorchestrator.frontend.github.github_workflow_config import (
+    GitHubWorkflow,
+    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    create_job_from_matrix_list,
+)
+from csorchestrator.frontend.github.github_workflow_job_create_release import JobReleaseCreationFromArifacts
 from csorchestrator.visitors.orchestrator_visitor_github_wf_generator import (
     OrchestratorVisitorGitHubWorkflowPreparation,
 )

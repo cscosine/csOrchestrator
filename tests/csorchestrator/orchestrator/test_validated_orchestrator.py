@@ -8,7 +8,7 @@ from csorchestrator.execution.factory import create_orchestrator_factory_all_sup
 from csorchestrator.execution.validated_orchestrator import (
     create_validated_orchestrator,
 )
-from csorchestrator.step.step_get_repository import StepGetRepositoryGitHub
+from csorchestrator.frontend.step.step_get_repository import StepGetRepositoryGitHub
 from csorchestrator.utils.git.resolve_url import RepoUrlParts
 
 

@@ -3,7 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from csorchestrator.context.context_os_architecture import (
+from csorchestrator.domain.context.context_os_architecture import (
     OS,
     OS_PLATFORM_MACOS,
     UBUNTU_STRING_PREFIX,

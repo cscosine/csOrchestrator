@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from csorchestrator.context.context_os_architecture import OS
+from csorchestrator.domain.context.context_os_architecture import OS
 from csorchestrator.foundation.file_system.directory import ensure_directory_exists_or_create_and_is_usable
 
 

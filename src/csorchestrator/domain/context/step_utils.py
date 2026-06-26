@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 
-from csorchestrator.context.context_local_execution import ContextLocalExecution, ContextLocalExecutionExtra
-from csorchestrator.context.context_os_architecture import OS
+from csorchestrator.domain.context.context_local_execution import ContextLocalExecution, ContextLocalExecutionExtra
+from csorchestrator.domain.context.context_os_architecture import OS
 from csorchestrator.domain.orchestrator.step_base import StepExtra
 
 

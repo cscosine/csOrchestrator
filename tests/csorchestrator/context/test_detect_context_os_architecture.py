@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from csorchestrator.context.context_os_architecture import (
+from csorchestrator.domain.context.context_os_architecture import (
     ARCHITECTURE_VARIANT_ARM64_ORIN,
     ARCHITECTURE_VARIANT_ARM64_XAVIER,
     OS,
@@ -19,7 +19,7 @@ from csorchestrator.foundation.core.expected import Expected
 def test_detect_context_os_architecture_success():
     with (
         patch(
-            "csorchestrator.context.context_os_architecture.detect_os",
+            "csorchestrator.domain.context.context_os_architecture.detect_os",
             return_value=Expected.make_value(
                 (
                     OS.LINUX,
@@ -28,7 +28,7 @@ def test_detect_context_os_architecture_success():
             ),
         ),
         patch(
-            "csorchestrator.context.context_os_architecture.detect_architecture",
+            "csorchestrator.domain.context.context_os_architecture.detect_architecture",
             return_value=Expected.make_value(
                 (
                     Architecture.ARM64,
@@ -56,7 +56,7 @@ def test_detect_context_os_architecture_success():
 
 def test_detect_context_os_architecture_os_error():
     with patch(
-        "csorchestrator.context.context_os_architecture.detect_os",
+        "csorchestrator.domain.context.context_os_architecture.detect_os",
         return_value=Expected.make_error("Unsupported OS"),
     ):
         result = detect_context_os_architecture()
@@ -73,7 +73,7 @@ def test_detect_context_os_architecture_os_error():
 def test_detect_context_os_architecture_architecture_error():
     with (
         patch(
-            "csorchestrator.context.context_os_architecture.detect_os",
+            "csorchestrator.domain.context.context_os_architecture.detect_os",
             return_value=Expected.make_value(
                 (
                     OS.LINUX,
@@ -82,7 +82,7 @@ def test_detect_context_os_architecture_architecture_error():
             ),
         ),
         patch(
-            "csorchestrator.context.context_os_architecture.detect_architecture",
+            "csorchestrator.domain.context.context_os_architecture.detect_architecture",
             return_value=Expected.make_error("Unsupported architecture"),
         ),
     ):

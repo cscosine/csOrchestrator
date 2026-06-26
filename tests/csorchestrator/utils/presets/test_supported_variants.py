@@ -1,10 +1,10 @@
-from csorchestrator.context.context_compiler_generator import (
+from csorchestrator.domain.context.context_compiler_generator import (
     Compiler,
     ContextCompilerGenerator,
     GeneratorType,
     GeneratorWithType,
 )
-from csorchestrator.context.context_os_architecture import (
+from csorchestrator.domain.context.context_os_architecture import (
     ARCHITECTURE_VARIANT_GENERIC,
     OS,
     UBUNTU_VERSIONS,
@@ -12,7 +12,7 @@ from csorchestrator.context.context_os_architecture import (
     Architecture,
     ContextOsArchitecture,
 )
-from csorchestrator.context.context_os_architecture_compiler_generator import (
+from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
 )
 from csorchestrator.utils.presets.supported_variants import (
