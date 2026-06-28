@@ -1,6 +1,9 @@
 from dataclasses import dataclass, field
 from typing import Self
 
+from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
+    ContextOsArchitectureCompilerGenerator,
+)
 from csorchestrator.domain.orchestrator.workflow_config import Cron
 from csorchestrator.foundation.core.strings_utils import string_indent
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_create_release import (
@@ -25,6 +28,8 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_trigger
 # =========================================================
 @dataclass(frozen=True)
 class MatrixOsArchCompilerGeneratorRunnerEntryInclude:
+    original_os_architecture_compiler_generator_list: ContextOsArchitectureCompilerGenerator
+
     execution_id: str
     os: str
     os_version: str

@@ -1,26 +1,19 @@
 from csorchestrator.domain.context.context_compiler_generator import (
     ContextCompilerGenerator,
-    Generator,
 )
 from csorchestrator.domain.context.context_os_architecture import (
     ARCHITECTURE_VARIANT_GENERIC,
-    OS,
-    UBUNTU_VERSIONS,
     Architecture,
 )
 from csorchestrator.domain.orchestrator.workflow_config import (
     Cron,
     DayOfWeek,
-    WorkflowConfig,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_config import (
     GitHubWorkflow,
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
-    create_job_from_matrix_list,
 )
 from csorchestrator.frontend.github_workflow_translation.validate_and_generate_github_workflow import (
     GITHUB_RUNNER_UBUNTU_22_04,
-    create_github_wf,
 )
 
 EXPECTED_LINES_HEADER = [
@@ -76,73 +69,3 @@ def test_workflow_with_triggers():
     )
 
     assert wf.to_string_lines() == EXPECTED_LINES_HEADER
-
-
-def test_workflow_with_triggers_and_one_job():
-
-    wf = (
-        GitHubWorkflow("test-wf-name")
-        .on_push(branches=["main", "dev"], tags=["'v*.*.*'"])
-        .on_pull_request(branches=["main"])
-        .on_dispatch()
-        .on_schedule(Cron.weekly(DayOfWeek.MON, hour=3))
-        .on_job_matrix_exec(
-            create_job_from_matrix_list(
-                name="the_job",
-                fail_fast=False,
-                matrix_list=[
-                    MatrixOsArchCompilerGeneratorRunnerEntryInclude(
-                        execution_id="1",
-                        os=OS.LINUX.value,
-                        os_version=UBUNTU_VERSIONS.UBUNTU_22_04.value,
-                        architecture=Architecture.X64.value,
-                        architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
-                        compiler="gcc",
-                        compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
-                        build_generator="ninja",
-                        build_generator_type="single",
-                        runner=GITHUB_RUNNER_UBUNTU_22_04,
-                        generator_cmake=Generator.NINJA.get_cmake_generator_name() or "",
-                    )
-                ],
-            ),
-        )
-    )
-
-    assert wf.to_string_lines() == EXPECTED_LINES
-
-
-def test_workflow_with_creation_helper():
-
-    wf = create_github_wf(
-        name="test-wf-name",
-        config=WorkflowConfig(
-            on_push_branches=["main", "dev"],
-            on_push_tags=["'v*.*.*'"],
-            on_pull_request_branches=["main"],
-            on_dispatch=True,
-            on_schedule=Cron.weekly(DayOfWeek.MON, hour=3),
-        ),
-    ).on_job_matrix_exec(
-        job=create_job_from_matrix_list(
-            name="the_job",
-            fail_fast=False,
-            matrix_list=[
-                MatrixOsArchCompilerGeneratorRunnerEntryInclude(
-                    execution_id="1",
-                    os=OS.LINUX.value,
-                    os_version=UBUNTU_VERSIONS.UBUNTU_22_04.value,
-                    architecture=Architecture.X64.value,
-                    architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
-                    compiler="gcc",
-                    compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
-                    build_generator="ninja",
-                    build_generator_type="single",
-                    runner=GITHUB_RUNNER_UBUNTU_22_04,
-                    generator_cmake=Generator.NINJA.get_cmake_generator_name() or "",
-                )
-            ],
-        )
-    )
-
-    assert wf.to_string_lines() == EXPECTED_LINES

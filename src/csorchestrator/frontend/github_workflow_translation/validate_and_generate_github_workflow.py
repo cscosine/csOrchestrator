@@ -101,6 +101,7 @@ def orchestrator_matrix_to_github_wf_matrix(
 
         res.append(
             MatrixOsArchCompilerGeneratorRunnerEntryInclude(
+                original_os_architecture_compiler_generator_list=entry,
                 execution_id=str(counter),
                 os=entry.context_os_architecture.os.value.lower(),
                 os_version=entry.context_os_architecture.os_version.lower(),
