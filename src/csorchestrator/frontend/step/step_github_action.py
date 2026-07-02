@@ -23,7 +23,6 @@ class StepAddGitHubActionCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
 
 @dataclass
 class StepAddGitHubAction(StepBase):
-    name: str
     uses: str
     with_list: list[str] = field(default_factory=list)
 
