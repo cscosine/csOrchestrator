@@ -24,6 +24,7 @@ class StepAddGitHubActionCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
 @dataclass
 class StepAddGitHubAction(StepBase):
     uses: str
+    id: str | None = None
     with_list: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
@@ -37,6 +38,7 @@ def step_add_github_action_to_githubwf(
         StepGitHubAction(
             name=step.name,
             uses=step.uses,
+            id=step.id,
             if_str=get_if_str(step),
             with_list=step.with_list,
         )

@@ -12,11 +12,14 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_config 
 class StepGitHubAction(StepToStringLines):
     name: str
     uses: str
+    id: str | None = None
     if_str: str | None = None
     with_list: list[str] = field(default_factory=list)
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
         lines = [f"{string_indent(indent)}- name: {self.name}"]
+        if self.id is not None:
+            lines += [f"{string_indent(indent)}  id: {self.id}"]
         lines += [f"{string_indent(indent)}  uses: {self.uses}"]
         if self.if_str is not None:
             lines += [f"{string_indent(indent)}  if: {self.if_str}"]
@@ -117,7 +120,11 @@ class StepRunCommand(StepToStringLines):
         if len(self.run) > 0:
             lines += [f"{string_indent(indent)}  run: {self.run[0]}"]
             for i in range(1, len(self.run)):
-                lines += [f"{string_indent(indent)}    {self.run[i]}"]
+                line = self.run[i]
+                if line == "":
+                    lines += [""]
+                else:
+                    lines += [f"{string_indent(indent)}    {line}"]
 
         if self.working_directory is not None:
             lines += [f"{string_indent(indent)}  working-directory: {self.working_directory}"]

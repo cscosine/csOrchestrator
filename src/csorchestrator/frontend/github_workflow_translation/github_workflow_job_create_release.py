@@ -34,6 +34,6 @@ def job_release_on_tag_to_string_lines(job: JobReleaseCreationFromArifacts, inde
     line_list += [f"{string_indent(indent + 6)}uses: softprops/action-gh-release@v3"]
     line_list += [f"{string_indent(indent + 6)}with:"]
     line_list += [f"{string_indent(indent + 8)}files: |"]
-    line_list += [f"{string_indent(indent + 10)}artifacts/**/*    "]
+    line_list += [f"{string_indent(indent + 10)}artifacts/**/*"]
     line_list += [""]
     return line_list
