@@ -9,6 +9,7 @@ from csorchestrator.domain.context.context_os_architecture_compiler_generator im
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
+    StepExtra,
 )
 from csorchestrator.foundation.core.expected import Expected
 from csorchestrator.foundation.core.report import Report
@@ -33,7 +34,7 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
-from csorchestrator.frontend.step.step_custom_command import execute_command
+from csorchestrator.frontend.step.step_custom_command import execute_command, get_if_str
 
 
 @dataclass
@@ -41,6 +42,8 @@ class StepCMakeWorkflowCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepCMakeWorkflow"
 
     def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        if self.step.get_extra(StepCMakeWorkflowGithubPowershell):
+            return step_cmake_workflow_to_githubwf_powershell(self.step, wf_job, reporter_sink)
         return step_cmake_workflow_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -60,6 +63,17 @@ class StepCMakeWorkflow(StepBase):
     def __post_init__(self) -> None:
         self.add_capability(StepCMakeWorkflowCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)
         self.add_capability(StepCMakeWorkflowCapabilityLocalExecution(self), StepCapabilityLocalExecution)
+
+
+@dataclass
+class StepCMakeWorkflowGithubPowershell(StepExtra):
+    @classmethod
+    def get_shell_type_or_none(cls, repo_step: StepCMakeWorkflow) -> str | None:
+        shell_type = None
+        shell_type_extra_opt = repo_step.get_extra(StepCMakeWorkflowGithubPowershell)
+        if shell_type_extra_opt is not None:
+            shell_type = "powershell"
+        return shell_type
 
 
 ContextWorkflowsExpected: TypeAlias = Expected[
@@ -127,6 +141,65 @@ def execute_step_cmake_workflow(
     return report
 
 
+def step_cmake_workflow_to_githubwf_powershell(
+    step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+) -> Report:
+    # create a step with a if inside base on single/multi config (
+    # - in single config need to launch N cmake workflow if I have to configure/build/test N
+    # - in multi config the command is one
+    run_str_list = ["|", f'$gen = "{MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED}"']
+    first_cycle = False
+    for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:
+        if_elif_str = "if" if not first_cycle else "elseif"
+        run_str_list += [if_elif_str + " ($gen -eq " + '"' + generator_type.value + '") {']
+        first_cycle = True
+        generator_supported_configs = get_supported_build_configs_for_generator_type(generator_type)
+        selected_configs = []
+        for supported_config in generator_supported_configs:
+            if is_config_selected_for_generator(
+                generator_type, current_config=supported_config, requested_config=step.config
+            ):
+                selected_configs += [supported_config]
+
+        if len(selected_configs) == 0:
+            return Report().append_error(
+                f"Requested config {step.config.value} is not supported for generator type {generator_type.value}"
+            )
+
+        for config in selected_configs:
+            wf_name = workflow_name_from_components(
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_VERSION_EMBRACED,
+                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_EMBRACED,
+                config.value,
+            )
+            run_str_list += ["  cmake --workflow " + wf_name]
+        run_str_list += ["}"]
+    if not first_cycle:
+        return Report().append_error("Defensive: no generators in for loop in step_cmake_workflow_to_githubwf?!?")
+
+    run_str_list += ["else {"]
+    run_str_list += ['   Write-Host "Unknown generator_type: $gen"']
+    run_str_list += ["  exit 1"]
+    run_str_list += ["}"]
+
+    wf_job.steps.append(
+        StepRunCommand(
+            name=f"cmake workflow on {step.name} for config(s) {step.config.value}",
+            shell_type="powershell",
+            run=run_str_list,
+            if_str=get_if_str(step),
+            working_directory=step.source_dir,
+        )
+    )
+
+    return Report()
+
+
 def step_cmake_workflow_to_githubwf(
     step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
@@ -184,6 +257,7 @@ def step_cmake_workflow_to_githubwf(
             name=f"cmake workflow on {step.name} for config(s) {step.config.value}",
             shell_type="bash",
             run=run_str_list,
+            if_str=get_if_str(step),
             working_directory=step.source_dir,
         )
     )
