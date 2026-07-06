@@ -39,6 +39,11 @@ class StepSkipExecutionOnLocal(StepExtra):
 
 
 @dataclass
+class StepGithubIfAlways(StepExtra):
+    pass
+
+
+@dataclass
 class StepExecuteOnlyOn(StepExtra):
     os: OS
     version_starts_with: str | None = None  # if None, any version is valid

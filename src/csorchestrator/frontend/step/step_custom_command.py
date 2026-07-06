@@ -28,7 +28,7 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
-from csorchestrator.frontend.local_execution.step_utils import StepExecuteOnlyOn
+from csorchestrator.frontend.local_execution.step_utils import StepExecuteOnlyOn, StepGithubIfAlways
 
 
 @dataclass
@@ -265,6 +265,11 @@ def get_if_str(step: StepBase) -> str | None:
                 if_str = f"${{{{ {MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME} == '{os_str}' && startsWith({MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION}, '{execute_only_on_extra.version_starts_with}') }}}}"  # noqa: E501
             else:
                 if_str = f"${{{{ {MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME} == '{os_str}' }}}}"
+            return if_str
+    elif step.get_extra(StepGithubIfAlways) is not None:
+        execute_alwayw = step.get_extra(StepGithubIfAlways)
+        if execute_alwayw is not None:
+            if_str = "always()"
             return if_str
     return None
 
