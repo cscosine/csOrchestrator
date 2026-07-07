@@ -74,28 +74,29 @@ def get_supported_build_configs_for_generator_type(
 
 
 def get_supported_generators_linux(
-    use_ninja: bool,
-    use_ninjamulti: bool,
-    arch: Architecture | None = None,
+    use_ninja: bool, use_ninjamulti: bool, arch: Architecture, generate_all_combinations: bool
 ) -> list[GeneratorWithType]:
     lst: list[GeneratorWithType] = []
-    if arch is None:
-        if use_ninja:
-            lst += [GeneratorWithType.NINJA]
-        if use_ninjamulti:
-            lst += [GeneratorWithType.NINJA_MULTI]
-    elif arch == Architecture.X64:  # on x64 arch, we can use multi-config generators,
-        #  but if use_ninja_multi is False, we can still use single-config generators
-        if use_ninjamulti:
-            lst += [GeneratorWithType.NINJA_MULTI]
-        elif use_ninja:
-            lst += [GeneratorWithType.NINJA]
-    elif arch == Architecture.ARM64:  # on arm64 arch, we can only use single-config generators,
-        # so we ignore use_ninjamulti, but we can still use single-config generators if use_ninja is True
-        if use_ninja:
-            lst += [GeneratorWithType.NINJA]
-        elif use_ninjamulti:
-            lst += [GeneratorWithType.NINJA_MULTI]
+    if arch == Architecture.X64:
+        if generate_all_combinations:
+            lst += [GeneratorWithType.NINJA, GeneratorWithType.NINJA_MULTI]
+        else:
+            # on x64 arch, we can use multi-config generators,
+            #  but if use_ninja_multi is False, we can still use single-config generators
+            if use_ninjamulti:
+                lst += [GeneratorWithType.NINJA_MULTI]
+            elif use_ninja:
+                lst += [GeneratorWithType.NINJA]
+    elif arch == Architecture.ARM64:
+        if generate_all_combinations:
+            lst += [GeneratorWithType.NINJA, GeneratorWithType.NINJA_MULTI]
+        else:
+            # on arm64 arch, we can only use single-config generators,
+            # so we ignore use_ninjamulti, but we can still use single-config generators if use_ninja is True
+            if use_ninja:
+                lst += [GeneratorWithType.NINJA]
+            elif use_ninjamulti:
+                lst += [GeneratorWithType.NINJA_MULTI]
     return lst
 
 
@@ -105,7 +106,12 @@ def get_supported_generators_windows(
     use_ninjamulti: bool = True,
 ) -> list[GeneratorWithType]:
     if use_ninja_for_windows:
-        return get_supported_generators_linux(use_ninja, use_ninjamulti)
+        lst: list[GeneratorWithType] = []
+        if use_ninja:
+            lst += [GeneratorWithType.NINJA]
+        if use_ninjamulti:
+            lst += [GeneratorWithType.NINJA_MULTI]
+        return lst
     else:
         return [
             GeneratorWithType.MSVC_17_2022,
@@ -136,6 +142,7 @@ def get_supported_context_os_architecture_list(
     use_ninja_for_windows: bool,
     use_ninja: bool,
     use_ninjamulti: bool,
+    generate_all_combinations: bool = False,
 ) -> list[ContextOsArchitectureCompilerGenerator]:
 
     retList: list[ContextOsArchitectureCompilerGenerator] = []
@@ -149,7 +156,12 @@ def get_supported_context_os_architecture_list(
                 architecture=arch,
                 architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
             )
-            generators = get_supported_generators_linux(use_ninja=use_ninja, use_ninjamulti=use_ninjamulti, arch=arch)
+            generators = get_supported_generators_linux(
+                use_ninja=use_ninja,
+                use_ninjamulti=use_ninjamulti,
+                arch=arch,
+                generate_all_combinations=generate_all_combinations,
+            )
             compilers = get_supported_compilers_linux()
 
             for compiler in compilers:
