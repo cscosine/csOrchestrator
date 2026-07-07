@@ -67,13 +67,20 @@ class StepCMakeWorkflow(StepBase):
 
 @dataclass
 class StepCMakeWorkflowGithubPowershell(StepExtra):
+    pass
+
+
+@dataclass
+class StepCMakeWorkflowGithubExtraCommandsPrefix(StepExtra):
+    cmd: list[str]
+
     @classmethod
-    def get_shell_type_or_none(cls, repo_step: StepCMakeWorkflow) -> str | None:
-        shell_type = None
-        shell_type_extra_opt = repo_step.get_extra(StepCMakeWorkflowGithubPowershell)
-        if shell_type_extra_opt is not None:
-            shell_type = "powershell"
-        return shell_type
+    def get_extra_cmd_prefix(cls, repo_step: StepCMakeWorkflow) -> list[str]:
+        extra_cmd_prefix = []
+        extra_cmd_prefix_opt = repo_step.get_extra(StepCMakeWorkflowGithubExtraCommandsPrefix)
+        if extra_cmd_prefix_opt is not None:
+            extra_cmd_prefix = extra_cmd_prefix_opt.cmd
+        return extra_cmd_prefix
 
 
 ContextWorkflowsExpected: TypeAlias = Expected[
@@ -147,7 +154,11 @@ def step_cmake_workflow_to_githubwf_powershell(
     # create a step with a if inside base on single/multi config (
     # - in single config need to launch N cmake workflow if I have to configure/build/test N
     # - in multi config the command is one
-    run_str_list = ["|", f'$gen = "{MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED}"']
+    run_str_list = [
+        "|",
+    ]
+    run_str_list += StepCMakeWorkflowGithubExtraCommandsPrefix.get_extra_cmd_prefix(step)
+    run_str_list += [f'$gen = "{MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED}"']
     first_cycle = False
     for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:
         if_elif_str = "if" if not first_cycle else "elseif"
@@ -208,6 +219,7 @@ def step_cmake_workflow_to_githubwf(
     # - in single config need to launch N cmake workflow if I have to configure/build/test N
     # - in multi config the command is one
     run_str_list = ["|", "set -e"]
+    run_str_list += StepCMakeWorkflowGithubExtraCommandsPrefix.get_extra_cmd_prefix(step)
     first_cycle = False
     for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:
         generator_type_matrix_embraced = MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED
