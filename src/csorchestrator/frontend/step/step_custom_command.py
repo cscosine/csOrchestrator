@@ -261,10 +261,19 @@ def get_if_str(step: StepBase) -> str | None:
         execute_only_on_extra = step.get_extra(StepExecuteOnlyOn)
         if execute_only_on_extra is not None:
             os_str = execute_only_on_extra.os.value.lower()
+            if_str = "${{" + f" {MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME} == '{os_str}'"
             if execute_only_on_extra.version_starts_with is not None:
-                if_str = f"${{{{ {MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME} == '{os_str}' && startsWith({MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION}, '{execute_only_on_extra.version_starts_with}') }}}}"  # noqa: E501
-            else:
-                if_str = f"${{{{ {MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME} == '{os_str}' }}}}"
+                if_str = (
+                    if_str + f" && startsWith({MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION}, "
+                    f"'{execute_only_on_extra.version_starts_with}')"
+                )
+            if execute_only_on_extra.arch is not None:
+                if_str = (
+                    if_str + f" && {MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE} == "
+                    f"'{execute_only_on_extra.arch.value.lower()}'"
+                )
+            if_str = if_str + " }}"
+
             return if_str
     elif step.get_extra(StepGithubIfAlways) is not None:
         execute_alwayw = step.get_extra(StepGithubIfAlways)

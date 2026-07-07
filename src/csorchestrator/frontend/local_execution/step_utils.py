@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 
-from csorchestrator.domain.context.context_os_architecture import OS
+from csorchestrator.domain.context.context_os_architecture import OS, Architecture
 from csorchestrator.domain.orchestrator.step_base import StepExtra
 from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
@@ -46,6 +46,7 @@ class StepGithubIfAlways(StepExtra):
 @dataclass
 class StepExecuteOnlyOn(StepExtra):
     os: OS
+    arch: Architecture | None = None  # if None, any architecture is valid
     version_starts_with: str | None = None  # if None, any version is valid
 
     # return none if the step should be executed,
@@ -57,4 +58,6 @@ class StepExecuteOnlyOn(StepExtra):
             self.version_starts_with
         ):
             return f"Step is marked to be executed only on {self.os.value} with version starting with {self.version_starts_with} but current version is {context.os_architecture.os_version}"  # noqa: E501
+        if self.arch is not None and context.os_architecture.architecture != self.arch:
+            return f"Step is marked to be executed only on {self.os.value} with architecture {self.arch.value} but current architecture is {context.os_architecture.architecture.value}"  # noqa: E501
         return None

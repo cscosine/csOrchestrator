@@ -7,6 +7,7 @@ class MatrixOsArchCompilerGeneratorGithubConstants:
     # not embraced
     MATRIX_OS_NAME: str = "matrix.os"
     MATRIX_OS_VERSION: str = "matrix.os_version"
+    MATRIX_ARCHITECTURE: str = "matrix.architecture"
 
     # embraced
     MATRIX_EXECUTION_ID_EMBRACED: str = "${{ matrix.execution_id }}"
