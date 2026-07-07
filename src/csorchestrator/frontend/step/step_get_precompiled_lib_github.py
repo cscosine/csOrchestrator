@@ -244,7 +244,7 @@ def step_get_precompiled_lib_to_githubwf(
                 f"repository: {step.org}/{step.project_name}",
                 f"tag: {step.project_tag}",
                 f"fileName: ${{{{ steps.{step_id}.outputs.{filename_variable} }}}}",
-                f"out-file-path: {libs_subdir}",
+                f"out-file-path: {libs_subdir.as_posix()}",
             ],
         )
     )
@@ -257,8 +257,8 @@ def step_get_precompiled_lib_to_githubwf(
             shell_type="bash",
             run=[
                 "|",
-                f"tar -xzf {tarfile_path} -C {libs_subdir}",
-                f"rm -f {tarfile_path}",
+                f"tar -xzf {tarfile_path.as_posix()} -C {libs_subdir.as_posix()}",
+                f"rm -f {tarfile_path.as_posix()}",
             ],
         )
     )
