@@ -76,12 +76,26 @@ def get_supported_build_configs_for_generator_type(
 def get_supported_generators_linux(
     use_ninja: bool,
     use_ninjamulti: bool,
+    arch: Architecture | None = None,
 ) -> list[GeneratorWithType]:
     lst: list[GeneratorWithType] = []
-    if use_ninja:
-        lst += [GeneratorWithType.NINJA]
-    if use_ninjamulti:
-        lst += [GeneratorWithType.NINJA_MULTI]
+    if arch is None:
+        if use_ninja:
+            lst += [GeneratorWithType.NINJA]
+        if use_ninjamulti:
+            lst += [GeneratorWithType.NINJA_MULTI]
+    elif arch == Architecture.X64:  # on x64 arch, we can use multi-config generators,
+        #  but if use_ninja_multi is False, we can still use single-config generators
+        if use_ninjamulti:
+            lst += [GeneratorWithType.NINJA_MULTI]
+        elif use_ninja:
+            lst += [GeneratorWithType.NINJA]
+    elif arch == Architecture.ARM64:  # on arm64 arch, we can only use single-config generators,
+        # so we ignore use_ninjamulti, but we can still use single-config generators if use_ninja is True
+        if use_ninja:
+            lst += [GeneratorWithType.NINJA]
+        elif use_ninjamulti:
+            lst += [GeneratorWithType.NINJA_MULTI]
     return lst
 
 
@@ -126,29 +140,30 @@ def get_supported_context_os_architecture_list(
 
     retList: list[ContextOsArchitectureCompilerGenerator] = []
 
-    ## LINUX
+    ## LINUX. use multi-config for x64 arch, use single config for arm64 arch
     for os_version in get_supported_os_version_list(OS.LINUX):
-        os_arch = ContextOsArchitecture(
-            os=OS.LINUX,
-            os_version=os_version,
-            architecture=Architecture.X64,
-            architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
-        )
-        generators = get_supported_generators_linux(use_ninja=use_ninja, use_ninjamulti=use_ninjamulti)
-        compilers = get_supported_compilers_linux()
+        for arch in [Architecture.X64, Architecture.ARM64]:
+            os_arch = ContextOsArchitecture(
+                os=OS.LINUX,
+                os_version=os_version,
+                architecture=arch,
+                architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
+            )
+            generators = get_supported_generators_linux(use_ninja=use_ninja, use_ninjamulti=use_ninjamulti, arch=arch)
+            compilers = get_supported_compilers_linux()
 
-        for compiler in compilers:
-            for generator in generators:
-                ccg = ContextCompilerGenerator(
-                    compiler_family=compiler,
-                    compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
-                    build_generator=generator,
-                )
-                retList.append(
-                    ContextOsArchitectureCompilerGenerator(
-                        context_os_architecture=os_arch, context_compiler_generator=ccg
+            for compiler in compilers:
+                for generator in generators:
+                    ccg = ContextCompilerGenerator(
+                        compiler_family=compiler,
+                        compiler_version=ContextCompilerGenerator.COMPILER_VERSION_DEFAULT,
+                        build_generator=generator,
                     )
-                )
+                    retList.append(
+                        ContextOsArchitectureCompilerGenerator(
+                            context_os_architecture=os_arch, context_compiler_generator=ccg
+                        )
+                    )
 
     ## WINDOWS
     for os_version in get_supported_os_version_list(OS.WINDOWS):

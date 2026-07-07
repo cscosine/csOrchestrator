@@ -38,7 +38,11 @@ OrchestratorMatrixToGitHubWFExpected: TypeAlias = Expected[
 ]  # str is the error messages
 
 GITHUB_RUNNER_UBUNTU_22_04 = UBUNTU_STRING_PREFIX + "-22.04"
+GITHUB_RUNNER_UBUNTU_22_04_ARM64 = GITHUB_RUNNER_UBUNTU_22_04 + "-arm"
+
 GITHUB_RUNNER_UBUNTU_24_04 = UBUNTU_STRING_PREFIX + "-24.04"
+GITHUB_RUNNER_UBUNTU_24_04_ARM64 = GITHUB_RUNNER_UBUNTU_24_04 + "-arm"
+
 GITHUB_RUNNER_WINDOWS_2022 = OS.WINDOWS.value + "-2022"
 GITHUB_RUNNER_WINDOWS_2025_VS2026 = OS.WINDOWS.value + "-2025-vs2026"
 
@@ -51,11 +55,14 @@ def get_runner(entry: ContextOsArchitectureCompilerGenerator) -> Expected[str, s
     compiler_version = entry.context_compiler_generator.compiler_version
 
     if os == OS.LINUX:
-        if os_version == UBUNTU_VERSIONS.UBUNTU_22_04.value:
-            if arch == Architecture.X64:
-                return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_22_04)
+        if os_version == UBUNTU_VERSIONS.UBUNTU_22_04.value and arch == Architecture.X64:
+            return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_22_04)
         elif os_version == UBUNTU_VERSIONS.UBUNTU_24_04.value and arch == Architecture.X64:
             return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_24_04)
+        elif os_version == UBUNTU_VERSIONS.UBUNTU_22_04.value and arch == Architecture.ARM64:
+            return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_22_04_ARM64)
+        elif os_version == UBUNTU_VERSIONS.UBUNTU_24_04.value and arch == Architecture.ARM64:
+            return Expected[str, str].make_value(GITHUB_RUNNER_UBUNTU_24_04_ARM64)
     elif os == OS.WINDOWS and os_version == WINDOWS_VERSIONS.WIN10.value and arch == Architecture.X64:
         if generator == Generator.MSVC_17_2022:
             return Expected[str, str].make_value(GITHUB_RUNNER_WINDOWS_2022)
