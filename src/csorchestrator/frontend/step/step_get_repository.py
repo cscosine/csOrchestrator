@@ -25,6 +25,20 @@ from csorchestrator.frontend.validation.orchestrator_visitor_validator import (
 
 
 @dataclass
+class StepGetRepositoryGitHubSelfCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
+    step: "StepGetRepositoryGitHubSelf"
+
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+        return step_get_repository_self_to_githubwf(self.step, wf_job, reporter_sink)
+
+
+@dataclass
+class StepGetRepositoryGitHubSelf(StepBase):
+    def __post_init__(self) -> None:
+        self.add_capability(StepGetRepositoryGitHubSelfCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)
+
+
+@dataclass
 class StepGetRepositoryGitHubCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepGetRepositoryGitHub"
 
@@ -120,6 +134,17 @@ def execute_step_get_repository(
         report.append_report(validate_and_sync_report)
 
     return report
+
+
+def step_get_repository_self_to_githubwf(
+    step: StepGetRepositoryGitHubSelf, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+) -> Report:
+    wf_job.steps.append(
+        StepCheckoutRepository(
+            name=step.name,
+        )
+    )
+    return Report()
 
 
 def step_get_repository_to_githubwf(
