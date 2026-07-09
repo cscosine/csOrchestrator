@@ -2,6 +2,7 @@ import os
 import re
 import tarfile
 from collections.abc import Callable
+from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from urllib import request
@@ -84,7 +85,7 @@ def execute_step_get_precompiled_lib(
     if step.mapping_function is None:
         release_name_part = libs_subdir
     else:
-        source_context = step.mapping_function(context.get_active_os_architecture_compiler_generator())
+        source_context = step.mapping_function(deepcopy(context.get_active_os_architecture_compiler_generator()))
         if source_context is None:
             report.append_error(f"mapping function returned None for input context {libs_subdir}")
             return report
@@ -200,7 +201,7 @@ def step_get_precompiled_lib_to_githubwf(
     else:
         filenames_dict_lines: list[str] = []
         for matrix_id, matrix in enumerate(wf_job.strategy._matrix_includes):
-            new_context = step.mapping_function(matrix.original_os_architecture_compiler_generator_list)
+            new_context = step.mapping_function(deepcopy(matrix.original_os_architecture_compiler_generator_list))
             if new_context is None:
                 return Report().append_error(f"error evaluating mapping function for {step.name} in github translation")
             filenames_dict_lines += [
