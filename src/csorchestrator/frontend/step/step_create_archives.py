@@ -60,9 +60,9 @@ def execute_step_create_archives(
     install_subdir = create_context_os_architecture_compiler_generator_string(
         context.get_active_os_architecture_compiler_generator()
     )
-    input_full_dir = Path(context.base_folder_path / step.base_install_dir / install_subdir).resolve()
+    input_base_dir = Path(context.base_folder_path / step.base_install_dir).resolve()
     input_full_path = Path(
-        context.base_folder_path / step.base_install_dir / Path(step.input_id + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
+        input_base_dir / Path(step.input_id + "-" + install_subdir + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
     ).resolve()
 
     packages = None
@@ -79,16 +79,16 @@ def execute_step_create_archives(
     for item in packages:
         name = item["name"]
         version = item["version"]
-        input_path = Path(input_full_dir / Path(name)).resolve()
+        input_path = Path(input_base_dir / Path(name)).resolve()
         output_path = Path(
-            input_full_dir / Path(str(install_subdir) + "-" + name + "-" + version + ".tar.gz")
+            input_base_dir / Path(str(install_subdir) + "-" + name + "-" + version + ".tar.gz")
         ).resolve()
 
         report.append_info(f"tar.gz {str(input_path)} to {str(output_path)} ")
         with tarfile.open(output_path, "w:gz") as tar:
             for path in input_path.rglob("*"):
                 resolved_path = path.resolve()
-                arcname = path.resolve().relative_to(input_full_dir)
+                arcname = path.resolve().relative_to(input_base_dir)
                 tar.add(resolved_path, arcname=arcname)
     return report
 
