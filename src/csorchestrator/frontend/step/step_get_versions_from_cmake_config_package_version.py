@@ -225,7 +225,7 @@ def execute_step_get_versions_from_cmake_config_package_version(
         context.base_folder_path
         / step.base_install_dir
         / install_subdir
-        / Path(step.id + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
+        / Path(step.id + "-" + install_subdir + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
     )
     with open(output_file, "w", encoding="utf-8") as f:
         f.write(f"{step.output_dict_name}={json.dumps(result_dict)}\n")
@@ -331,7 +331,7 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
         "output_file = (",
         f"    Path('{step.base_install_dir}')",
         f"    / Path('{install_subdir}')",
-        f"    / Path('{step.id}' + '{CS_ORCHESTRATOR_VERSION_FILE_EXTENSION}')",
+        f"    / Path('{step.id}-{install_subdir}{CS_ORCHESTRATOR_VERSION_FILE_EXTENSION}')",
     ]
     lines += [")", ""]
     lines += ['with open(output_file, "w", encoding="utf-8") as f:']
