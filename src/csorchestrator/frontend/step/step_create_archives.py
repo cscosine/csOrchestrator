@@ -22,6 +22,8 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
 
+CS_ORCHESTRATOR_VERSION_FILE_EXTENSION = ".csOrchestratorVersion"
+
 
 @dataclass
 class StepCreateArchivesCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
@@ -59,7 +61,7 @@ def execute_step_create_archives(
         context.get_active_os_architecture_compiler_generator()
     )
     input_full_dir = Path(context.base_folder_path / step.base_install_dir / install_subdir).resolve()
-    input_full_path = Path(input_full_dir / Path(step.input_id + ".ver")).resolve()
+    input_full_path = Path(input_full_dir / Path(step.input_id + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)).resolve()
 
     packages = None
     with open(input_full_path) as f:

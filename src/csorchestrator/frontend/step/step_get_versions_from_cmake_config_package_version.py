@@ -11,7 +11,6 @@ from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBa
 from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
 )
-from csorchestrator.foundation.core.expected import Expected
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.frontend.github_workflow_translation.github_workflow_config import JobOrchestratorMatrixExecution
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
@@ -25,6 +24,7 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+from csorchestrator.frontend.step.step_create_archives import CS_ORCHESTRATOR_VERSION_FILE_EXTENSION
 
 
 @dataclass(frozen=True)
@@ -76,7 +76,7 @@ class StepGetVersionsFromCMakeConfigPackageVersion(StepBase):
 
 # return a tuple bc we do not want dependencies from Expected in github wf
 def grep_package_version(filename: Path) -> tuple[str | None, str | None]:
-    path = Path(filename)
+    path = filename
 
     if not path.is_file():
         return (None, f"ERROR: file not found: {path}")
@@ -122,28 +122,75 @@ def find_cmake_config_version(search_path: Path, name: str) -> tuple[Path | None
     return (matches[0], None)
 
 
-def find_cmake_config_version_expected(search_path: Path, name: str) -> Expected[Path, str]:
-    v_or_err = find_cmake_config_version(search_path=search_path, name=name)
-    if v_or_err[0] is not None:
-        return Expected[Path, str].make_value(v_or_err[0])
-    elif v_or_err[1] is not None:
-        return Expected[Path, str].make_error(v_or_err[1])
-    else:
-        return Expected[Path, str].make_error(
-            "unexpected behavior of find_cmake_config_version in find_cmake_config_version_expected"
-        )
+@dataclass
+class VersionSearchOutput:
+    versions: list[CMakeConfigPackageVersion] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
 
 
-def grep_package_version_expected(filename: Path) -> Expected[str, str]:
-    v_or_err = grep_package_version(filename=filename)
-    if v_or_err[0] is not None:
-        return Expected[str, str].make_value(v_or_err[0])
-    elif v_or_err[1] is not None:
-        return Expected[str, str].make_error(v_or_err[1])
-    else:
-        return Expected[str, str].make_error(
-            "unexpected behavior of grep_package_version in grep_package_version_expected"
-        )
+def cmake_config_package_version_list_to_dict(src: list[CMakeConfigPackageVersion]) -> list[dict[str, str]]:
+    ret = []
+    for pv in src:
+        ret.append({"name": pv.name, "version": pv.version})
+    return ret
+
+
+def get_versions_helper(
+    repos_config_file_list: list[CMakeConfigPackageVersionGrep],  # pairs of repo and files reporting versions
+    repos_auto_search_list: list[str],  # repo name only
+    repos_version: list[CMakeConfigPackageVersion],  # pairs of repo and versions
+    base_install_dir: Path,
+    install_subdir: Path,
+    base_folder_path: Path | None,
+) -> VersionSearchOutput:
+    result = VersionSearchOutput()
+
+    # fixed versions
+    for repo_v in repos_version:
+        result.versions.append(CMakeConfigPackageVersion(name=repo_v.name, version=repo_v.version))
+
+    # repo with version with file hint
+    for repo in repos_config_file_list:
+        if base_folder_path is not None:
+            target_full_path = base_folder_path / base_install_dir / install_subdir / repo.version_file
+        else:
+            target_full_path = base_install_dir / install_subdir / repo.version_file
+
+        version_or_err = grep_package_version(target_full_path)
+
+        if version_or_err[1] is not None:
+            result.errors.append(version_or_err[1])
+
+        else:
+            assert version_or_err[0] is not None
+            version = version_or_err[0]
+            result.versions.append(CMakeConfigPackageVersion(name=repo.name, version=version))
+
+    # repo with version autosearch
+    for name in repos_auto_search_list:
+        if base_folder_path is not None:
+            search_path = base_folder_path / base_install_dir / install_subdir / name
+        else:
+            search_path = base_install_dir / install_subdir / name
+        path_or_err = find_cmake_config_version(search_path=search_path, name=name)
+        if path_or_err[1] is not None:
+            result.errors.append(path_or_err[1])
+
+        else:
+            assert path_or_err[0] is not None
+            path = path_or_err[0]
+
+            version_or_err = grep_package_version(path)
+
+            if version_or_err[1] is not None:
+                result.errors.append(version_or_err[1])
+
+            else:
+                assert version_or_err[0] is not None
+                version = version_or_err[0]
+                result.versions.append(CMakeConfigPackageVersion(name=name, version=version))
+
+    return result
 
 
 def execute_step_get_versions_from_cmake_config_package_version(
@@ -155,54 +202,33 @@ def execute_step_get_versions_from_cmake_config_package_version(
         context.get_active_os_architecture_compiler_generator()
     )
 
-    result = []
-    # fixed versions
-    for repo_v in step.repos_version:
-        report.append_info(f"version of {repo_v.name} is {repo_v.version}")
-        result.append({"name": repo_v.name, "version": repo_v.version})
+    result = get_versions_helper(
+        step.repos_config_file_list,
+        step.repos_auto_search_list,
+        step.repos_version,
+        step.base_install_dir,
+        Path(install_subdir),
+        context.base_folder_path,
+    )
 
-    # repo with version with file hint
-    for repo in step.repos_config_file_list:
-        target_full_path: Path = context.base_folder_path / step.base_install_dir / install_subdir / repo.version_file
-        version_or_err = grep_package_version_expected(target_full_path)
-
-        if version_or_err.error is not None:
-            report.append_error(version_or_err.error)
-
-        else:
-            assert version_or_err.value is not None
-            version = version_or_err.value
-            report.append_info(f"version of {repo.name} is {version}")
-            result.append({"name": repo.name, "version": version})
-
-    # repo with version autosearch
-    for name in step.repos_auto_search_list:
-        search_path: Path = context.base_folder_path / step.base_install_dir / install_subdir / name
-        path_or_err = find_cmake_config_version_expected(search_path=search_path, name=name)
-        if path_or_err.error is not None:
-            report.append_error(path_or_err.error)
-
-        else:
-            assert path_or_err.value is not None
-            path = path_or_err.value
-
-            version_or_err = grep_package_version_expected(path)
-
-            if version_or_err.error is not None:
-                report.append_error(version_or_err.error)
-
-            else:
-                assert version_or_err.value is not None
-                version = version_or_err.value
-                report.append_info(f"version of {name} is {version} found in {path}")
-                result.append({"name": name, "version": version})
-
-    if report.has_errors():
+    if len(result.errors) > 0:
+        for e in result.errors:
+            report.append_error(e)
         return report
 
-    output_file = context.base_folder_path / step.base_install_dir / install_subdir / Path(step.id + ".ver")
+    for p in result.versions:
+        report.append_info(f"repo: {p.name} version: {p.version}")
+
+    result_dict = cmake_config_package_version_list_to_dict(result.versions)
+
+    output_file = (
+        context.base_folder_path
+        / step.base_install_dir
+        / install_subdir
+        / Path(step.id + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
+    )
     with open(output_file, "w", encoding="utf-8") as f:
-        f.write(f"{step.output_dict_name}={json.dumps(result)}\n")
+        f.write(f"{step.output_dict_name}={json.dumps(result_dict)}\n")
 
     return report
 
@@ -218,70 +244,98 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
         "import json",
         "import sys",
         "import os",
+        "from dataclasses import dataclass, field",
         "",
     ]
-
+    class1 = inspect.getsource(CMakeConfigPackageVersionGrep).splitlines()
+    class2 = inspect.getsource(CMakeConfigPackageVersion).splitlines()
+    class3 = inspect.getsource(VersionSearchOutput).splitlines()
     body1 = inspect.getsource(grep_package_version).splitlines()
     body2 = inspect.getsource(find_cmake_config_version).splitlines()
+    body3 = inspect.getsource(get_versions_helper).splitlines()
+    body4 = inspect.getsource(cmake_config_package_version_list_to_dict).splitlines()
 
-    lines = header + body1 + [""] + body2 + [""]
+    lines = (
+        header
+        + class1
+        + [""]
+        + class2
+        + [""]
+        + class3
+        + [""]
+        + body1
+        + [""]
+        + body2
+        + [""]
+        + body3
+        + [""]
+        + body4
+        + [""]
+    )
 
     install_subdir = create_context_os_architecture_compiler_generator_string_github_matrix()
 
-    lines += ["files = {"]
-    for repo in step.repos_config_file_list:
-        target_full_path: Path = step.base_install_dir / install_subdir / repo.version_file
-        lines += ['    "' + repo.name + '": "' + str(target_full_path) + '",']
-    lines += ["}", ""]
+    if len(step.repos_config_file_list) == 0:
+        lines += ["repos_config_file_list : list[CMakeConfigPackageVersionGrep] = []", ""]
+    else:
+        lines += ["repos_config_file_list : list[CMakeConfigPackageVersionGrep] = ["]
+        for r1 in step.repos_config_file_list:
+            lines += [f"    CMakeConfigPackageVersionGrep('{r1.name}', Path('{r1.version_file}')),"]
+        lines += ["]", ""]
 
-    lines += ["result = []"]
+    if len(step.repos_auto_search_list) == 0:
+        lines += ["repos_auto_search_list : list[str] = []", ""]
+    else:
+        lines += ["repos_auto_search_list : list[str] = ["]
+        for r2 in step.repos_auto_search_list:
+            lines += [f"    '{r2}',"]
+        lines += ["]", ""]
+
+    if len(step.repos_version) == 0:
+        lines += ["repos_version: list[CMakeConfigPackageVersion] = []", ""]
+    else:
+        lines += ["repos_version: list[CMakeConfigPackageVersion] = ["]
+        for r3 in step.repos_version:
+            lines += [f"    CMakeConfigPackageVersion('{r3.name}', '{r3.version}'),"]
+        lines += ["]", ""]
+
+    lines += [
+        "result = get_versions_helper(",
+        "    repos_config_file_list,",
+        "    repos_auto_search_list,",
+        "    repos_version,",
+        f"    Path('{step.base_install_dir}'),",
+        f"    Path('{install_subdir}'),",
+        "    None",
+        ")",
+    ]
+
+    lines += [
+        "if len(result.errors) > 0:",
+        "    for e in result.errors:",
+        "        print(e)",
+        "    sys.exit('ERROR: getting package versions')",
+    ]
     lines += [""]
-
-    # fixed versions
-    for repo_v in step.repos_version:
-        lines += [f"result.append({{'name': '{repo_v.name}','version': '{repo_v.version}'}})"]
-
-    lines += [""]
-    lines += ["for name, filename in files.items():"]
-    lines += ["  v_or_err = grep_package_version(filename=filename)"]
-    lines += ["  if v_or_err[0] is not None:"]
-    lines += ["      version = v_or_err[0]"]
-    lines += ["      result.append({'name': name,'version': version})"]
-    lines += ["  elif v_or_err[1] is not None:"]
-    lines += ["      sys.exit(f'ERROR: processing {name} at {filename}: {v_or_err[1]}')"]
-    lines += ["  else:"]
-    lines += ["      sys.exit('ERROR: unexpected behavior of grep_package_version processing {name} at {filename}')"]
-    lines += [""]
-
-    lines += ["repos_auto_search_list = ["]
-    for name in step.repos_auto_search_list:
-        lines += ['    "' + name + '",']
-    lines += ["]", ""]
-
-    search_path_base = step.base_install_dir / install_subdir
-    lines += ["for name in repos_auto_search_list:"]
-    lines += [f"  search_path: Path = Path('{search_path_base.as_posix()}') / name"]
-    lines += ["  path_or_err = find_cmake_config_version(search_path=search_path, name=name)"]
-    lines += ["  if path_or_err[0] is not None:"]
-    lines += ["    path = path_or_err[0]"]
-    lines += ["    v_or_err = grep_package_version(filename=path)"]
-    lines += ["    if v_or_err[0] is not None:"]
-    lines += ["      version = v_or_err[0]"]
-    lines += ["      result.append({'name': name,'version': version})"]
-    lines += ["    elif v_or_err[1] is not None:"]
-    lines += ["      sys.exit(f'ERROR: processing {name} at {path}: {v_or_err[1]}')"]
-    lines += ["    else:"]
-    lines += ["      sys.exit('ERROR: unexpected behavior of grep_package_version processing {name} at {path}')"]
-    lines += ["  elif path_or_err[1] is not None:"]
-    lines += ["      sys.exit(f'ERROR: processing {name} : {path_or_err[1]}')"]
-    lines += ["  else:"]
-    lines += ["      sys.exit('ERROR: unexpected behavior of find_cmake_config_version processing {name}')"]
-    lines += [""]
+    lines += ["result_dict = cmake_config_package_version_list_to_dict(result.versions)"]
 
     lines += [""]
     lines += ['output_file = os.environ["GITHUB_OUTPUT"]']
     lines += ['with open(output_file, "w", encoding="utf-8") as f:']
-    lines += [f'    f.write(f"{step.output_dict_name}={{json.dumps(result)}}\\n")']
+    lines += [f'    f.write(f"{step.output_dict_name}={{json.dumps(result_dict)}}\\n")']
+    lines += [""]
+
+    lines += [""]
+
+    lines += [
+        "output_file = (",
+        f"    Path('{step.base_install_dir}')",
+        f"    / Path('{install_subdir}')",
+        f"    / Path('{step.id}' + '{CS_ORCHESTRATOR_VERSION_FILE_EXTENSION}')",
+    ]
+    lines += [")", ""]
+    lines += ['with open(output_file, "w", encoding="utf-8") as f:']
+    lines += [f'    f.write(f"{step.output_dict_name}={{json.dumps(result_dict)}}\\n")']
     lines += [""]
 
     # produce output
