@@ -77,7 +77,7 @@ class StepCheckoutRepository(StepToStringLines):
 class StepGitHubUploadArtifacts(StepToStringLines):
     name: str
     with_name: str
-    with_path: str
+    with_path: list[str]
     uses: str = "actions/upload-artifact@v7"
 
     def to_string_lines(self, indent: int = 0) -> list[str]:
@@ -85,8 +85,9 @@ class StepGitHubUploadArtifacts(StepToStringLines):
         lines += [f"{string_indent(indent)}  uses: {self.uses}"]
         lines += [f"{string_indent(indent)}  with:"]
         lines += [f"{string_indent(indent)}    name: {self.with_name}"]
-        lines += [f"{string_indent(indent)}    path: {self.with_path}"]
-
+        lines += [f"{string_indent(indent)}    path: |"]
+        for p in self.with_path:
+            lines += [f"{string_indent(indent)}      {p}"]
         return lines
 
 

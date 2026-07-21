@@ -17,6 +17,7 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_t
 from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
     StepCapabilityGithubWorkflow,
 )
+from csorchestrator.frontend.step.step_create_archives import CS_ORCHESTRATOR_VERSION_FILE_EXTENSION
 
 
 @dataclass
@@ -52,7 +53,10 @@ def step_upload_artifacts_to_githubwf(
         StepGitHubUploadArtifacts(
             name="Upload Artifacts",
             with_name=artifact_name,
-            with_path=(step.base_install_dir / install_subdir / "*.tar.gz").as_posix(),
+            with_path=[
+                (step.base_install_dir / install_subdir / "*.tar.gz").as_posix(),
+                (step.base_install_dir / install_subdir / ("*" + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)).as_posix(),
+            ],
         )
     )
 
