@@ -61,7 +61,9 @@ def execute_step_create_archives(
         context.get_active_os_architecture_compiler_generator()
     )
     input_full_dir = Path(context.base_folder_path / step.base_install_dir / install_subdir).resolve()
-    input_full_path = Path(input_full_dir / Path(step.input_id + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)).resolve()
+    input_full_path = Path(
+        context.base_folder_path / step.base_install_dir / Path(step.input_id + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
+    ).resolve()
 
     packages = None
     with open(input_full_path) as f:

@@ -55,7 +55,7 @@ def step_upload_artifacts_to_githubwf(
             with_name=artifact_name,
             with_path=[
                 (step.base_install_dir / install_subdir / "*.tar.gz").as_posix(),
-                (step.base_install_dir / install_subdir / ("*" + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)).as_posix(),
+                (step.base_install_dir / ("*" + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)).as_posix(),
             ],
         )
     )
