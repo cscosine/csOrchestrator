@@ -1,4 +1,4 @@
-import json
+import inspect
 import tarfile
 from dataclasses import dataclass
 from pathlib import Path
@@ -21,8 +21,11 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
-
-CS_ORCHESTRATOR_VERSION_FILE_EXTENSION = ".csOrchestratorVersion"
+from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
+    CMakeConfigPackageVersion,
+    create_version_file_name,
+    load_version_file,
+)
 
 
 @dataclass
@@ -43,13 +46,14 @@ class StepCreateArchivesCapabilityLocalExecution(StepCapabilityLocalExecution):
 
 @dataclass
 class StepCreateArchives(StepBase):
-    input_id: str
-    input_dict: str
     base_install_dir: Path
 
     def __post_init__(self) -> None:
         self.add_capability(StepCreateArchivesCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)
         self.add_capability(StepCreateArchivesCapabilityLocalExecution(self), StepCapabilityLocalExecution)
+
+
+# TODO: minimze code repetition between local execution and github wf
 
 
 def execute_step_create_archives(
@@ -61,27 +65,14 @@ def execute_step_create_archives(
         context.get_active_os_architecture_compiler_generator()
     )
     input_base_dir = Path(context.base_folder_path / step.base_install_dir).resolve()
-    input_full_path = Path(
-        input_base_dir / Path(step.input_id + "-" + install_subdir + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
-    ).resolve()
+    input_full_path = Path(input_base_dir / Path(create_version_file_name(install_subdir))).resolve()
 
-    packages = None
-    with open(input_full_path) as f:
-        line = f.read().strip()
-        key, value = line.split("=", 1)
-        if key != step.input_dict:
-            report.append_error(f"unexpected key {key} in {str(input_full_path)}, expected {step.input_dict}")
-            return report
-        packages = json.loads(value)
-
-    assert packages is not None
+    packages = load_version_file(input_full_path)
 
     for item in packages:
-        name = item["name"]
-        version = item["version"]
-        input_path = Path(input_base_dir / install_subdir / Path(name)).resolve()
+        input_path = Path(input_base_dir / install_subdir / Path(item.name)).resolve()
         output_path = Path(
-            input_base_dir / Path(str(install_subdir) + "-" + name + "-" + version + ".tar.gz")
+            input_base_dir / Path(str(install_subdir) + "-" + item.name + "-" + item.version + ".tar.gz")
         ).resolve()
 
         report.append_info(f"tar.gz {str(input_path)} to {str(output_path)} ")
@@ -90,7 +81,6 @@ def execute_step_create_archives(
                 resolved_path = path.resolve()
                 arcname = path.resolve().relative_to(input_base_dir)
                 tar.add(resolved_path, arcname=arcname)
-                report.append_info(f"  tar add {str(resolved_path)} arcname {str(arcname)} ")
 
     return report
 
@@ -101,36 +91,34 @@ def step_create_archives_to_githubwf(
 
     install_dir_name = create_context_os_architecture_compiler_generator_string_github_matrix()
     install_subdir = step.base_install_dir / install_dir_name
-    input_full_path = Path(
-        step.base_install_dir / Path(step.input_id + "-" + install_dir_name + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
-    )
+    input_full_path = Path(step.base_install_dir / Path(create_version_file_name(install_dir_name)))
 
     lines = [
         "import json",
         "import os",
         "import sys",
         "import tarfile",
+        "from dataclasses import dataclass",
         "from pathlib import Path",
         "",
-        "packages = None",
-        f"input_path = '{input_full_path}'",
-        "with open(input_path) as f:",
-        "    line = f.read().strip()",
-        '    key, value = line.split("=", 1)',
-        f'    expected_key = "{step.input_dict}"',
-        "    if key != expected_key:",
-        '        sys.exit(f"unexpected key {key} in {str(input_path)}, expected {expected_key}")',
-        "    packages = json.loads(value)",
+    ]
+
+    lines += inspect.getsource(CMakeConfigPackageVersion).splitlines()
+    lines += [""]
+    lines += inspect.getsource(load_version_file).splitlines()
+    lines += [""]
+
+    lines += [
+        "",
+        f"packages = load_version_file('{input_full_path}')",
         "",
         "if packages is None:",
         "    sys.exit('packages was not loaded')",
         "",
-        "for entry in packages:",
-        "    name = entry['name']",
-        "    version = entry['version']",
+        "for item in packages:",
         f"    install_subdir = Path('{install_subdir.as_posix()}').resolve()",
-        "    source_path = Path(install_subdir / Path(name)).resolve()",
-        f"    output_path = Path(install_subdir / Path('{install_dir_name}' + '-' + name + '-' + version + '.tar.gz')).resolve()",  # noqa: E501
+        "    source_path = Path(install_subdir / Path(item.name)).resolve()",
+        f"    output_path = Path(install_subdir / Path('{install_dir_name}' + '-' + item.name + '-' + item.version + '.tar.gz')).resolve()",  # noqa: E501
         "",
         "    with tarfile.open(output_path, 'w:gz') as tar:",
         "        for path in source_path.rglob('*'):",

@@ -24,7 +24,8 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
-from csorchestrator.frontend.step.step_create_archives import CS_ORCHESTRATOR_VERSION_FILE_EXTENSION
+
+CS_ORCHESTRATOR_VERSION_FILE_EXTENSION = ".csOrchestratorVersion"
 
 
 @dataclass(frozen=True)
@@ -57,8 +58,6 @@ class StepGetVersionsFromCMakeConfigPackageVersionCapabilityLocalExecution(StepC
 
 @dataclass
 class StepGetVersionsFromCMakeConfigPackageVersion(StepBase):
-    id: str
-    output_dict_name: str
     base_install_dir: Path
     repos_config_file_list: list[CMakeConfigPackageVersionGrep] = field(default_factory=list)
     repos_auto_search_list: list[str] = field(default_factory=list)  # name of repos only,
@@ -128,13 +127,6 @@ class VersionSearchOutput:
     errors: list[str] = field(default_factory=list)
 
 
-def cmake_config_package_version_list_to_dict(src: list[CMakeConfigPackageVersion]) -> list[dict[str, str]]:
-    ret = []
-    for pv in src:
-        ret.append({"name": pv.name, "version": pv.version})
-    return ret
-
-
 def get_versions_helper(
     repos_config_file_list: list[CMakeConfigPackageVersionGrep],  # pairs of repo and files reporting versions
     repos_auto_search_list: list[str],  # repo name only
@@ -193,6 +185,34 @@ def get_versions_helper(
     return result
 
 
+def create_version_file_name(context_os_architecture_compiler_generator_string: str) -> str:
+    return context_os_architecture_compiler_generator_string + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION
+
+
+def write_version_file(dest: Path, src: list[CMakeConfigPackageVersion]) -> None:
+    ret = []
+    for pv in src:
+        ret.append({"name": pv.name, "version": pv.version})
+
+    with open(dest, "w", encoding="utf-8") as f:
+        json.dump(ret, f, indent=4, ensure_ascii=False)
+
+
+def load_version_file(src: Path) -> list[CMakeConfigPackageVersion]:
+    packages = []
+    with open(src, encoding="utf-8") as f:
+        packages = json.load(f)
+
+    # TODO make robust to errors
+    ret: list[CMakeConfigPackageVersion] = []
+    for item in packages:
+        name = item["name"]
+        version = item["version"]
+        ret.append(CMakeConfigPackageVersion(name, version))
+
+    return ret
+
+
 def execute_step_get_versions_from_cmake_config_package_version(
     step: StepGetVersionsFromCMakeConfigPackageVersion, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
 ) -> Report:
@@ -219,15 +239,8 @@ def execute_step_get_versions_from_cmake_config_package_version(
     for p in result.versions:
         report.append_info(f"repo: {p.name} version: {p.version}")
 
-    result_dict = cmake_config_package_version_list_to_dict(result.versions)
-
-    output_file = (
-        context.base_folder_path
-        / step.base_install_dir
-        / Path(step.id + "-" + install_subdir + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
-    )
-    with open(output_file, "w", encoding="utf-8") as f:
-        f.write(f"{step.output_dict_name}={json.dumps(result_dict)}\n")
+    output_file = context.base_folder_path / step.base_install_dir / Path(create_version_file_name(install_subdir))
+    write_version_file(output_file, result.versions)
 
     return report
 
@@ -268,6 +281,9 @@ def _create_python_list_class_version(src_list: list[CMakeConfigPackageVersion],
     return lines
 
 
+# TODO: minimze code repetition between local execution and github wf
+
+
 def step_get_versions_from_cmake_config_package_version_to_githubwf(
     step: StepGetVersionsFromCMakeConfigPackageVersion,
     wf_job: JobOrchestratorMatrixExecution,
@@ -288,7 +304,7 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
     body1 = inspect.getsource(grep_package_version).splitlines()
     body2 = inspect.getsource(find_cmake_config_version).splitlines()
     body3 = inspect.getsource(get_versions_helper).splitlines()
-    body4 = inspect.getsource(cmake_config_package_version_list_to_dict).splitlines()
+    body4 = inspect.getsource(write_version_file).splitlines()
 
     lines = (
         header
@@ -332,18 +348,14 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
         "    sys.exit('ERROR: getting package versions')",
     ]
     lines += [""]
-    lines += ["result_dict = cmake_config_package_version_list_to_dict(result.versions)"]
-
-    lines += [""]
 
     lines += [
         "output_file = (",
         f"    Path('{step.base_install_dir}')",
-        f"    / Path('{step.id}-{install_subdir}{CS_ORCHESTRATOR_VERSION_FILE_EXTENSION}')",
+        f"    / Path('{create_version_file_name(install_subdir)}')",
     ]
     lines += [")", ""]
-    lines += ['with open(output_file, "w", encoding="utf-8") as f:']
-    lines += [f'    f.write(f"{step.output_dict_name}={{json.dumps(result_dict)}}\\n")']
+    lines += ["write_version_file(output_file, result.versions)"]
     lines += [""]
 
     # produce output
@@ -354,7 +366,6 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
     wf_job.steps.append(
         StepRunCommand(
             name="Get Versions",
-            id=step.id,
             shell_type="python",
             run=run_str_list,
         )
