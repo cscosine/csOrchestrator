@@ -79,7 +79,7 @@ def execute_step_create_archives(
     for item in packages:
         name = item["name"]
         version = item["version"]
-        input_path = Path(input_base_dir / Path(name)).resolve()
+        input_path = Path(input_base_dir / install_subdir / Path(name)).resolve()
         output_path = Path(
             input_base_dir / Path(str(install_subdir) + "-" + name + "-" + version + ".tar.gz")
         ).resolve()
@@ -90,6 +90,8 @@ def execute_step_create_archives(
                 resolved_path = path.resolve()
                 arcname = path.resolve().relative_to(input_base_dir)
                 tar.add(resolved_path, arcname=arcname)
+                report.append_info(f"  tar add {str(resolved_path)} arcname {str(arcname)} ")
+
     return report
 
 
@@ -99,24 +101,39 @@ def step_create_archives_to_githubwf(
 
     install_dir_name = create_context_os_architecture_compiler_generator_string_github_matrix()
     install_subdir = step.base_install_dir / install_dir_name
+    input_full_path = Path(
+        step.base_install_dir / Path(step.input_id + "-" + install_dir_name + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)
+    )
 
     lines = [
         "import json",
         "import os",
+        "import sys",
         "import tarfile",
         "from pathlib import Path",
         "",
-        "versions = json.loads(os.environ['VERSIONS'])",
+        "packages = None",
+        f"input_path = '{input_full_path}'",
+        "with open(input_path) as f:",
+        "    line = f.read().strip()",
+        '    key, value = line.split("=", 1)',
+        f'    expected_key = "{step.input_dict}"',
+        "    if key != expected_key:",
+        '        sys.exit(f"unexpected key {key} in {str(input_path)}, expected {expected_key}")',
+        "    packages = json.loads(value)",
         "",
-        "for entry in versions:",
+        "if packages is None:",
+        "    sys.exit('packages was not loaded')",
+        "",
+        "for entry in packages:",
         "    name = entry['name']",
         "    version = entry['version']",
         f"    install_subdir = Path('{install_subdir.as_posix()}').resolve()",
-        "    input_path = Path(install_subdir / Path(name)).resolve()",
+        "    source_path = Path(install_subdir / Path(name)).resolve()",
         f"    output_path = Path(install_subdir / Path('{install_dir_name}' + '-' + name + '-' + version + '.tar.gz')).resolve()",  # noqa: E501
         "",
         "    with tarfile.open(output_path, 'w:gz') as tar:",
-        "        for path in input_path.rglob('*'):",
+        "        for path in source_path.rglob('*'):",
         "            resolved_path = path.resolve()",
         "            arcname = path.resolve().relative_to(install_subdir)",
         "            tar.add(resolved_path, arcname=arcname)",
@@ -129,7 +146,6 @@ def step_create_archives_to_githubwf(
         StepRunCommand(
             name="Create Archives",
             shell_type="python",
-            env=[f"VERSIONS: ${{{{ steps.{step.input_id}.outputs.{step.input_dict} }}}}"],
             run=run_str_list,
         )
     )

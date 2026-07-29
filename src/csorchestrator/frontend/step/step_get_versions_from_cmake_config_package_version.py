@@ -232,6 +232,42 @@ def execute_step_get_versions_from_cmake_config_package_version(
     return report
 
 
+def _create_python_list_string(src_list: list[str], list_name: str) -> list[str]:
+    lines: list[str] = []
+    if len(src_list) == 0:
+        lines += [f"{list_name} : list[str] = []", ""]
+    else:
+        lines += [f"{list_name} : list[str] = ["]
+        for r2 in src_list:
+            lines += [f"    '{r2}',"]
+        lines += ["]", ""]
+    return lines
+
+
+def _create_python_list_class_grep(src_list: list[CMakeConfigPackageVersionGrep], list_name: str) -> list[str]:
+    lines: list[str] = []
+    if len(src_list) == 0:
+        lines += [f"{list_name} : list[CMakeConfigPackageVersionGrep] = []", ""]
+    else:
+        lines += [f"{list_name} : list[CMakeConfigPackageVersionGrep] = ["]
+        for r1 in src_list:
+            lines += [f"    CMakeConfigPackageVersionGrep('{r1.name}', Path('{r1.version_file}')),"]
+        lines += ["]", ""]
+    return lines
+
+
+def _create_python_list_class_version(src_list: list[CMakeConfigPackageVersion], list_name: str) -> list[str]:
+    lines: list[str] = []
+    if len(src_list) == 0:
+        lines += [f"{list_name}: list[CMakeConfigPackageVersion] = []", ""]
+    else:
+        lines += [f"{list_name}: list[CMakeConfigPackageVersion] = ["]
+        for r3 in src_list:
+            lines += [f"    CMakeConfigPackageVersion('{r3.name}', '{r3.version}'),"]
+        lines += ["]", ""]
+    return lines
+
+
 def step_get_versions_from_cmake_config_package_version_to_githubwf(
     step: StepGetVersionsFromCMakeConfigPackageVersion,
     wf_job: JobOrchestratorMatrixExecution,
@@ -274,29 +310,9 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
 
     install_subdir = create_context_os_architecture_compiler_generator_string_github_matrix()
 
-    if len(step.repos_config_file_list) == 0:
-        lines += ["repos_config_file_list : list[CMakeConfigPackageVersionGrep] = []", ""]
-    else:
-        lines += ["repos_config_file_list : list[CMakeConfigPackageVersionGrep] = ["]
-        for r1 in step.repos_config_file_list:
-            lines += [f"    CMakeConfigPackageVersionGrep('{r1.name}', Path('{r1.version_file}')),"]
-        lines += ["]", ""]
-
-    if len(step.repos_auto_search_list) == 0:
-        lines += ["repos_auto_search_list : list[str] = []", ""]
-    else:
-        lines += ["repos_auto_search_list : list[str] = ["]
-        for r2 in step.repos_auto_search_list:
-            lines += [f"    '{r2}',"]
-        lines += ["]", ""]
-
-    if len(step.repos_version) == 0:
-        lines += ["repos_version: list[CMakeConfigPackageVersion] = []", ""]
-    else:
-        lines += ["repos_version: list[CMakeConfigPackageVersion] = ["]
-        for r3 in step.repos_version:
-            lines += [f"    CMakeConfigPackageVersion('{r3.name}', '{r3.version}'),"]
-        lines += ["]", ""]
+    lines += _create_python_list_class_grep(step.repos_config_file_list, "repos_config_file_list")
+    lines += _create_python_list_string(step.repos_auto_search_list, "repos_auto_search_list")
+    lines += _create_python_list_class_version(step.repos_version, "repos_version")
 
     lines += [
         "result = get_versions_helper(",
@@ -317,12 +333,6 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
     ]
     lines += [""]
     lines += ["result_dict = cmake_config_package_version_list_to_dict(result.versions)"]
-
-    lines += [""]
-    lines += ['output_file = os.environ["GITHUB_OUTPUT"]']
-    lines += ['with open(output_file, "w", encoding="utf-8") as f:']
-    lines += [f'    f.write(f"{step.output_dict_name}={{json.dumps(result_dict)}}\\n")']
-    lines += [""]
 
     lines += [""]
 
