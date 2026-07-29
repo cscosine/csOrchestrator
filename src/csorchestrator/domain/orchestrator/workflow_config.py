@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import StrEnum
+from pathlib import Path
 
 # =========================================================
 # Cron DSL
@@ -67,6 +68,8 @@ class RawCron(Cron):
 @dataclass
 class ReleaseCreationOnTagConfig:
     name: str
+    publish_cs_orchestrator_manifest: bool
+    base_install_dir: Path  # used only in local executions, not in github wf
 
 
 @dataclass
