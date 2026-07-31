@@ -30,6 +30,16 @@ def create_release_manifest(
     }
 
 
+def parse_release_manifest(src: dict[str, list[dict[str, str]]]) -> list[ManifestVersionsEntry]:
+    ret: list[ManifestVersionsEntry] = []
+    for variant, entries in src.items():
+        mv = ManifestVersionsEntry(variant)
+        for e in entries:
+            mv.entries.append(CMakeConfigPackageVersion(name=e["name"], version=e["version"]))
+        ret.append(mv)
+    return ret
+
+
 def write_release_manifest(
     manifest: dict[str, list[dict[str, str]]],
     filename: Path,

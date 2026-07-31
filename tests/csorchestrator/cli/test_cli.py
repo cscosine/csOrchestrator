@@ -13,11 +13,12 @@ def test_run_command_loads_project_script(tmp_path: Path, monkeypatch: pytest.Mo
         textwrap.dedent(
             """
             from typing import TypeAlias
+            from pathlib import Path
             from csorchestrator.foundation.core.report import Report
             from csorchestrator.application.factory.factory import OptionalOrchestratorWithReport
             from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 
-            def create_orchestrator() -> OptionalOrchestratorWithReport:
+            def create_orchestrator(target_folder_path : Path) -> OptionalOrchestratorWithReport:
                 return OptionalOrchestratorWithReport.createResultAndReport(
                     Orchestrator("myName", "0.0.0", "exec-job"), Report()
                 )

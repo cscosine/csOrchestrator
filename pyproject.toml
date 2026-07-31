@@ -192,6 +192,7 @@ name = "frontend layers"
 type = "layers"
 
 layers = [
+    "recipes",
     "release_manifest",
     "step",
     "github_workflow_translation : local_execution",
