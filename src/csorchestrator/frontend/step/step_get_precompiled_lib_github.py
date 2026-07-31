@@ -179,26 +179,32 @@ def step_get_precompiled_lib_to_githubwf(
 ) -> Report:
 
     release_name_part = create_context_os_architecture_compiler_generator_string_github_matrix()
-    src_filename = str(release_name_part + "-" + step.lib_name + "-" + step.lib_version + ".tar.gz")
-    step_id = sanitize_github_identifier(f"filename_{step.project_name}_{step.lib_name}")
-    filename_variable = f"{step_id}"
+    libs_subdir = step.base_libs_dir / release_name_part
 
     if step.mapping_function is None:
+        src_filename = str(release_name_part + "-" + step.lib_name + "-" + step.lib_version + ".tar.gz")
+
         wf_job.steps.append(
-            StepRunCommand(
-                name=step.name + " prepare filename",
-                id=step_id,
-                shell_type="python",
-                run=[
-                    "|",
-                    "import os",
-                    "",
-                    'with open(os.environ["GITHUB_OUTPUT"], "a") as f:',
-                    f'  f.write(f"{filename_variable}={src_filename}\\n")',
+            StepGitHubAction(
+                name=step.name + " download tar.gz",
+                uses="robinraju/release-downloader@v1.13",
+                with_list=[
+                    f"repository: {step.org}/{step.project_name}",
+                    f"tag: {step.project_tag}",
+                    f"fileName: {src_filename}",
+                    f"out-file-path: {libs_subdir.as_posix()}",
                 ],
             )
         )
+
+        tarfile_path = libs_subdir / f"{src_filename}"
+
     else:
+        # mapping needs two steps, one to prepare a dict of valid entries corresponding to execution matrix id,
+        # and then one to download the selected one
+        step_id = sanitize_github_identifier(f"filename_{step.project_name}_{step.lib_name}")
+        filename_variable = f"{step_id}"
+
         filenames_dict_lines: list[str] = []
         for matrix_id, matrix in enumerate(wf_job.strategy._matrix_includes):
             new_context = step.mapping_function(deepcopy(matrix.original_os_architecture_compiler_generator_list))
@@ -235,22 +241,22 @@ def step_get_precompiled_lib_to_githubwf(
             StepRunCommand(name=step.name + " prepare filename", id=step_id, shell_type="python", run=run_list)
         )
 
-    libs_subdir = step.base_libs_dir / release_name_part
-
-    wf_job.steps.append(
-        StepGitHubAction(
-            name=step.name + " download tar.gz",
-            uses="robinraju/release-downloader@v1.13",
-            with_list=[
-                f"repository: {step.org}/{step.project_name}",
-                f"tag: {step.project_tag}",
-                f"fileName: ${{{{ steps.{step_id}.outputs.{filename_variable} }}}}",
-                f"out-file-path: {libs_subdir.as_posix()}",
-            ],
+        wf_job.steps.append(
+            StepGitHubAction(
+                name=step.name + " download tar.gz",
+                uses="robinraju/release-downloader@v1.13",
+                with_list=[
+                    f"repository: {step.org}/{step.project_name}",
+                    f"tag: {step.project_tag}",
+                    f"fileName: ${{{{ steps.{step_id}.outputs.{filename_variable} }}}}",
+                    f"out-file-path: {libs_subdir.as_posix()}",
+                ],
+            )
         )
-    )
 
-    tarfile_path = libs_subdir / f"${{{{ steps.{step_id}.outputs.{filename_variable} }}}}"
+        tarfile_path = libs_subdir / f"${{{{ steps.{step_id}.outputs.{filename_variable} }}}}"
+
+    # finally, one step to extract the archive
 
     wf_job.steps.append(
         StepRunCommand(
