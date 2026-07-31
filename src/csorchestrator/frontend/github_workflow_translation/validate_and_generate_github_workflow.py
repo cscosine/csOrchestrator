@@ -17,7 +17,7 @@ from csorchestrator.domain.execution.execution import ExecutionResult
 from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_executor import execute_orchestrator
 from csorchestrator.domain.orchestrator.orchestrator_executor_reporter_base import OrchestratorExecutorReporterBase
-from csorchestrator.domain.orchestrator.workflow_config import WorkflowConfig
+from csorchestrator.domain.orchestrator.workflow_config import WorkflowTrigger
 from csorchestrator.foundation.core.expected import Expected
 from csorchestrator.foundation.file_system.directory import ensure_directory_exists_or_create_and_is_usable
 from csorchestrator.frontend.github_workflow_translation.github_workflow_config import (
@@ -26,7 +26,7 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_config 
     create_job_from_matrix_list,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_create_release import (
-    JobReleaseCreationFromArifacts,
+    JobReleaseCreationFromArtifacts,
 )
 from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
     OrchestratorVisitorGitHubWorkflowPreparation,
@@ -85,8 +85,10 @@ def orchestrator_matrix_to_github_wf_matrix(
     res: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude] = []
     errors: list[str] = []
 
-    counter: int = 0
+    counter: int = -1
     for entry in orchestrator_matrix.os_architecture_compiler_generator_list:
+        counter += 1
+
         runner_or_err = get_runner(entry)
         if runner_or_err.error is not None:
             errors.append(runner_or_err.error)
@@ -125,14 +127,13 @@ def orchestrator_matrix_to_github_wf_matrix(
                 toolset=toolset,
             )
         )
-        counter += 1
     if len(errors) > 0:
         return OrchestratorMatrixToGitHubWFExpected.make_error(errors)
 
     return OrchestratorMatrixToGitHubWFExpected.make_value(res)
 
 
-def create_github_wf(name: str, *, config: WorkflowConfig) -> GitHubWorkflow:
+def create_github_wf(name: str, *, config: WorkflowTrigger) -> GitHubWorkflow:
 
     gwf = GitHubWorkflow(name)
     if config.on_push_branches is not None or config.on_push_tags is not None:
@@ -192,7 +193,7 @@ def validate_and_generate_github_workflow(
         reporter.finalize_execution()
         return res
 
-    wf = create_github_wf(orchestrator.name, config=orchestrator.wf_config)
+    wf = create_github_wf(orchestrator.name, config=orchestrator.wf_config.trigger)
 
     if output_path is None:
         output_path = script_folder_path / Path(".github") / Path("workflows")
@@ -213,9 +214,11 @@ def validate_and_generate_github_workflow(
 
     if orchestrator.wf_config.create_release_on_tag is not None:
         wf.on_job_create_release_on_tag(
-            JobReleaseCreationFromArifacts(
-                name=orchestrator.wf_config.create_release_on_tag.name,
+            JobReleaseCreationFromArtifacts(
+                config=orchestrator.wf_config.create_release_on_tag,
                 needs=orchestrator.execution_matrix.name,
+                matrix_list=[item.original_os_architecture_compiler_generator_list for item in wf_matrix],
+                name_and_version_string=orchestrator.name_version_to_string(),
                 runs_on="ubuntu-latest",
                 if_str="${{ github.ref_type == 'tag' }}",
             )
@@ -238,4 +241,7 @@ def validate_and_generate_github_workflow(
     res.report_executions.append(report_execution)
 
     output_path.write_text("\n".join(wf.to_string_lines()), encoding="utf-8")
+
+    reporter.finalize_execution()
+
     return res

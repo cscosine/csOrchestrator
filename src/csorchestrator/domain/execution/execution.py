@@ -26,6 +26,9 @@ class ExecutionResult:
     #   and then it is terminated, without the report of the cycle 3)
     report_executions: list[OrchestratorExecutorVisitReports | None] = field(default_factory=list)
 
+    # report the post execution steps results
+    report_post_execution: list[Report] = field(default_factory=list)
+
     def is_execution_successful(
         self,
     ) -> bool:

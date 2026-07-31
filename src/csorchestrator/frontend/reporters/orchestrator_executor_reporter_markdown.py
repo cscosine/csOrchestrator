@@ -56,6 +56,18 @@ class OrchestratorExecutorReporterMarkdown(OrchestratorExecutorReporterBase):
         repo_to_reporter_sink(report, self.sink)
         self.sink.decrease_indentation()
 
+    # ---------------- POST EXECUTION ----------------
+
+    def report_postexecution(self, report: Report) -> None:
+        if report.has_errors():
+            self.sink.lines.append("❌ Post execution FAILED\n")
+        else:
+            self.sink.lines.append("✔ Post execution OK\n")
+
+        self.sink.increase_indentation()
+        repo_to_reporter_sink(report, self.sink)
+        self.sink.decrease_indentation()
+
     # ---------------- CREATION ----------------
 
     def report_orchestrator_creation_report(self, report: Report) -> None:

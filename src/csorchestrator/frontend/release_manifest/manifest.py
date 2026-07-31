@@ -1,6 +1,7 @@
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import cast
 
 from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import CMakeConfigPackageVersion
 
@@ -35,6 +36,7 @@ def write_release_manifest(
 ) -> None:
     """Write a release manifest to a JSON file."""
     path = Path(filename)
+    # TODO robustify and return possible errors
     with path.open("w", encoding="utf-8") as f:
         json.dump(manifest, f, indent=2, sort_keys=True)
 
@@ -45,4 +47,5 @@ def load_release_manifest(
     """Load a release manifest from a JSON file."""
     path = Path(filename)
     with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
+        # TODO robustify and return possible errors
+        return cast(dict[str, list[dict[str, str]]], json.load(f))

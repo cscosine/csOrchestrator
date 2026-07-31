@@ -1,6 +1,7 @@
-from dataclasses import dataclass
+from abc import ABC
+from dataclasses import dataclass, field
 from enum import StrEnum
-from pathlib import Path
+from typing import TypeVar
 
 # =========================================================
 # Cron DSL
@@ -65,18 +66,57 @@ class RawCron(Cron):
         return self.expr
 
 
+class ReleaseCreationOnTagConfigBaseCapability:
+    pass
+
+
+ReleaseCreationOnTagConfigBaseCapabilityT = TypeVar(
+    "ReleaseCreationOnTagConfigBaseCapabilityT", bound=ReleaseCreationOnTagConfigBaseCapability
+)
+
+
 @dataclass
-class ReleaseCreationOnTagConfig:
+class ReleaseCreationOnTagConfigBase(ABC):
     name: str
-    publish_cs_orchestrator_manifest: bool
-    base_install_dir: Path  # used only in local executions, not in github wf
+
+    _capabilities: dict[type, ReleaseCreationOnTagConfigBaseCapability] = field(
+        default_factory=dict,
+        kw_only=True,
+    )
+
+    def add_capability(
+        self,
+        capability: ReleaseCreationOnTagConfigBaseCapability,
+        key: type[ReleaseCreationOnTagConfigBaseCapability],  # use key = type(capability) to register as exact type,
+        # but if need generic, use a specific subclass of ReleaseCreationOnTagConfigBaseCapability
+    ) -> "ReleaseCreationOnTagConfigBase":
+        self._capabilities[key] = capability
+        return self
+
+    def get_capability(
+        self, t: type[ReleaseCreationOnTagConfigBaseCapabilityT]
+    ) -> ReleaseCreationOnTagConfigBaseCapabilityT | None:
+        capability = self._capabilities.get(t)
+        return capability if isinstance(capability, t) else None
+
+    def remove_capability(
+        self,
+        key: type[ReleaseCreationOnTagConfigBaseCapabilityT],
+    ) -> "ReleaseCreationOnTagConfigBase":
+        self._capabilities.pop(key, None)  # no exception if not exists
+        return self
 
 
 @dataclass
-class WorkflowConfig:
+class WorkflowTrigger:
     on_push_branches: list[str] | None = None
     on_push_tags: list[str] | None = None
     on_pull_request_branches: list[str] | None = None
     on_dispatch: bool | None = None
     on_schedule: Cron | None = None
-    create_release_on_tag: ReleaseCreationOnTagConfig | None = None
+
+
+@dataclass
+class WorkflowConfig:
+    trigger: WorkflowTrigger
+    create_release_on_tag: ReleaseCreationOnTagConfigBase | None = None

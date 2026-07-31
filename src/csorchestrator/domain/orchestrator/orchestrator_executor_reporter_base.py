@@ -27,6 +27,11 @@ class OrchestratorExecutorReporterBase(ABC):
         ...
 
     @abstractmethod
+    def report_postexecution(self, report: Report) -> None:
+        """Called to report post execution result"""
+        ...
+
+    @abstractmethod
     def on_begin_phase(self, phase: Phase) -> None:
         """Called before processing a phase"""
         ...

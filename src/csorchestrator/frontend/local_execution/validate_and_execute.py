@@ -17,22 +17,17 @@ from csorchestrator.domain.orchestrator.orchestrator_executor_reporter_base impo
 from csorchestrator.foundation.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.foundation.file_system.directory import ensure_directory_exists_or_create_and_is_usable
-from csorchestrator.frontend import release_manifest
 from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
     ContextLocalExecutionExtra,
 )
-from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
-from csorchestrator.frontend.release_manifest.manifest import (
-    ManifestVersionsEntry,
-    create_release_manifest,
-    write_release_manifest,
+from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import (
+    OrchestratorVisitorLocalExecutor,
+    ReleaseCreationOnTagConfigBaseCapabilityLocalExecution,
 )
-from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
-    create_version_file_name,
-    load_version_file,
+from csorchestrator.frontend.local_execution.release_creation_context_local_execution import (
+    ReleaseCreationContextLocalExecution,
 )
-from csorchestrator.frontend.step.step_upload_artifacts import create_artifact_prefix_from_orchestrator_name_version
 from csorchestrator.frontend.validation.validated_orchestrator import create_validated_orchestrator
 
 
@@ -115,13 +110,15 @@ def validate_and_execute_orchestrator(
     matrix = orchestrator.execution_matrix
 
     matrix_extras: dict[type, ContextLocalExecutionExtra] = {}
-    counter: int = 0
+    counter: int = -1
 
     assert isinstance(matrix, ExecutionMatrixOsArchCompilerGenerator)  # ensured by the validator
 
     # matrix execution
 
     for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
+        counter += 1
+
         match = os_architecture_compiler_generator.context_os_architecture.can_be_executed_on(
             os_and_path.os_architecture
         )
@@ -166,58 +163,37 @@ def validate_and_execute_orchestrator(
 
         # keep the matrix_extras modified for the next context
         matrix_extras = context.matrix_extras
-        counter += 1
 
-    reporter.finalize_execution()
+    all_executions_succeded = counter == (len(matrix.os_architecture_compiler_generator_list) - 1)
 
     # end matrix execution, execute the release part if any
-    if (
-        orchestrator.wf_config is not None
-        and orchestrator.wf_config.create_release_on_tag is not None
-        and orchestrator.wf_config.create_release_on_tag.publish_cs_orchestrator_manifest
-    ):
-        # first: matrix element string, second packages,version list
-        collected_version_entries: list[ManifestVersionsEntry] = []
-        base_install_dir = orchestrator.wf_config.create_release_on_tag.base_install_dir
-
-        for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
-            match = os_architecture_compiler_generator.context_os_architecture.can_be_executed_on(
-                os_and_path.os_architecture
+    if not all_executions_succeded:
+        report = Report().append_error("post execution skipped because execution was not successfull")
+        reporter.report_postexecution(report)
+        er.report_post_execution.append(report)
+    else:
+        if orchestrator.wf_config is not None and orchestrator.wf_config.create_release_on_tag is not None:
+            capability = orchestrator.wf_config.create_release_on_tag.get_capability(
+                ReleaseCreationOnTagConfigBaseCapabilityLocalExecution
             )
-            if not match:
-                # TODO introduce a new report section and report skipped
-                continue
-            # use the compatible os_arcchitecture, not the detected one.
-            # e.g. detected os is win 11, but we select win 10 in the matrix, which is compatible
-
-            context = ContextLocalExecution(
-                base_folder_path=os_and_path.path,
-                os_architecture=os_architecture_compiler_generator.context_os_architecture,
-                active_compiler_generator=os_architecture_compiler_generator.context_compiler_generator,
-                matrix_extras=matrix_extras,
-                matrix_execution_id=str(counter),
-            )
-
-            context_os_architecture_compiler_generator_string = (
-                create_context_os_architecture_compiler_generator_string(
-                    context.get_active_os_architecture_compiler_generator()
+            if capability is None:
+                report = Report().append_error("post execution skipped because capability is not supported")
+                reporter.report_postexecution(report)
+                er.report_post_execution.append(report)
+            else:
+                release_context = ReleaseCreationContextLocalExecution(
+                    matrix.os_architecture_compiler_generator_list,
+                    orchestrator.name_version_to_string(),
+                    os_and_path.os_architecture,
+                    os_and_path.path,
                 )
-            )
+                report = capability.execute_locally(release_context)
+                reporter.report_postexecution(report)
+                er.report_post_execution.append(report)
+        else:
+            report = Report().append_error("post execution skipped because not configured")
+            reporter.report_postexecution(report)
 
-            input_base_dir = Path(context.base_folder_path / base_install_dir).resolve()
-            input_full_path = Path(
-                input_base_dir / Path(create_version_file_name(context_os_architecture_compiler_generator_string))
-            ).resolve()
-
-            packages = load_version_file(input_full_path)
-            collected_version_entries.append(
-                ManifestVersionsEntry(context_os_architecture_compiler_generator_string, packages)
-            )
-        release_manifest = create_release_manifest(collected_version_entries)
-        write_release_manifest(
-            release_manifest,
-            base_install_dir
-            / Path(create_artifact_prefix_from_orchestrator_name_version(orchestrator) + "csorchestrator.manifest"),
-        )
+    reporter.finalize_execution()
 
     return er

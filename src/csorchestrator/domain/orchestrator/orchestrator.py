@@ -34,6 +34,9 @@ class Orchestrator:
     phases: list[Phase] = field(default_factory=list)
     wf_config: WorkflowConfig | None = None
 
+    def name_version_to_string(self, separator: str = "-") -> str:
+        return f"{self.name}{separator}{self.version}"
+
     def add_phase(self, phase: Phase) -> "Orchestrator":
         self.phases.append(phase)
         return self
