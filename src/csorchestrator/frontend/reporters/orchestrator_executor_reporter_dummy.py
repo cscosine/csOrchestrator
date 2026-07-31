@@ -21,6 +21,9 @@ class OrchestratorExecutorReporterDummy(OrchestratorExecutorReporterBase):
     def finalize_execution(self) -> None:
         pass
 
+    def report_postexecution(self, report: Report) -> None:
+        pass
+
     def on_begin_phase(self, phase: Phase) -> None:
         pass
 

@@ -4,8 +4,12 @@ from csorchestrator.domain.orchestrator.orchestrator_visitor_base import Orchest
 from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import StepBase, StepCapability
+from csorchestrator.domain.orchestrator.workflow_config import ReleaseCreationOnTagConfigBaseCapability
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.frontend.local_execution.context_local_execution import ContextLocalExecution
+from csorchestrator.frontend.local_execution.release_creation_context_local_execution import (
+    ReleaseCreationContextLocalExecution,
+)
 from csorchestrator.frontend.local_execution.step_utils import (
     StepExecuteOnlyOn,
     StepExecuteOnlyOncePerMatrix,
@@ -17,6 +21,14 @@ from csorchestrator.frontend.local_execution.step_utils import (
 class StepCapabilityLocalExecution(StepCapability):
     def execute_locally(self, context: ContextLocalExecution, reporter_sink: ReporterSinkBase) -> Report:
         return Report().append_error("StepCapabilityLocalExecution.execute_locally need to be imlemented in subclasses")
+
+
+@dataclass
+class ReleaseCreationOnTagConfigBaseCapabilityLocalExecution(ReleaseCreationOnTagConfigBaseCapability):
+    def execute_locally(self, context: ReleaseCreationContextLocalExecution) -> Report:
+        return Report().append_error(
+            "ReleaseCreationOnTagConfigBaseCapabilityLocalExecution.execute_locally need to be imlemented in subclasses"
+        )
 
 
 @dataclass

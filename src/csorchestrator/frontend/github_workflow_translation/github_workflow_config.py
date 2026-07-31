@@ -7,7 +7,7 @@ from csorchestrator.domain.context.context_os_architecture_compiler_generator im
 from csorchestrator.domain.orchestrator.workflow_config import Cron
 from csorchestrator.foundation.core.strings_utils import string_indent
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_create_release import (
-    JobReleaseCreationFromArifacts,
+    JobReleaseCreationFromArtifacts,
     job_release_on_tag_to_string_lines,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
@@ -156,7 +156,7 @@ class GitHubWorkflow:
     name: str
     _on: dict[str, TriggerUnion] = field(default_factory=dict)
     _jobs_matrix_exec: list[JobOrchestratorMatrixExecution] = field(default_factory=list)
-    _jobs_release_on_tag: list[JobReleaseCreationFromArifacts] = field(default_factory=list)
+    _jobs_release_on_tag: list[JobReleaseCreationFromArtifacts] = field(default_factory=list)
 
     # ---------------- PUSH ----------------
 
@@ -196,7 +196,7 @@ class GitHubWorkflow:
         self._jobs_matrix_exec.append(job)
         return self
 
-    def on_job_create_release_on_tag(self, job: JobReleaseCreationFromArifacts) -> Self:
+    def on_job_create_release_on_tag(self, job: JobReleaseCreationFromArtifacts) -> Self:
         self._jobs_release_on_tag.append(job)
         return self
 

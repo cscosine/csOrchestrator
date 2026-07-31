@@ -21,7 +21,13 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
     ContextLocalExecutionExtra,
 )
-from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import OrchestratorVisitorLocalExecutor
+from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import (
+    OrchestratorVisitorLocalExecutor,
+    ReleaseCreationOnTagConfigBaseCapabilityLocalExecution,
+)
+from csorchestrator.frontend.local_execution.release_creation_context_local_execution import (
+    ReleaseCreationContextLocalExecution,
+)
 from csorchestrator.frontend.validation.validated_orchestrator import create_validated_orchestrator
 
 
@@ -104,11 +110,15 @@ def validate_and_execute_orchestrator(
     matrix = orchestrator.execution_matrix
 
     matrix_extras: dict[type, ContextLocalExecutionExtra] = {}
-    counter: int = 0
+    counter: int = -1
 
     assert isinstance(matrix, ExecutionMatrixOsArchCompilerGenerator)  # ensured by the validator
 
+    # matrix execution
+
     for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
+        counter += 1
+
         match = os_architecture_compiler_generator.context_os_architecture.can_be_executed_on(
             os_and_path.os_architecture
         )
@@ -153,7 +163,37 @@ def validate_and_execute_orchestrator(
 
         # keep the matrix_extras modified for the next context
         matrix_extras = context.matrix_extras
-        counter += 1
+
+    all_executions_succeded = counter == (len(matrix.os_architecture_compiler_generator_list) - 1)
+
+    # end matrix execution, execute the release part if any
+    if not all_executions_succeded:
+        report = Report().append_error("post execution skipped because execution was not successfull")
+        reporter.report_postexecution(report)
+        er.report_post_execution.append(report)
+    else:
+        if orchestrator.wf_config is not None and orchestrator.wf_config.create_release_on_tag is not None:
+            capability = orchestrator.wf_config.create_release_on_tag.get_capability(
+                ReleaseCreationOnTagConfigBaseCapabilityLocalExecution
+            )
+            if capability is None:
+                report = Report().append_error("post execution skipped because capability is not supported")
+                reporter.report_postexecution(report)
+                er.report_post_execution.append(report)
+            else:
+                release_context = ReleaseCreationContextLocalExecution(
+                    matrix.os_architecture_compiler_generator_list,
+                    orchestrator.name_version_to_string(),
+                    os_and_path.os_architecture,
+                    os_and_path.path,
+                )
+                report = capability.execute_locally(release_context)
+                reporter.report_postexecution(report)
+                er.report_post_execution.append(report)
+        else:
+            report = Report().append_error("post execution skipped because not configured")
+            reporter.report_postexecution(report)
 
     reporter.finalize_execution()
+
     return er

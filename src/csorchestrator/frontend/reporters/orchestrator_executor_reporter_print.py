@@ -21,6 +21,16 @@ class OrchestratorExecutorReporterPrint(OrchestratorExecutorReporterBase):
     def finalize_execution(self) -> None:
         pass
 
+    def report_postexecution(self, report: Report) -> None:
+        if not report.has_errors():
+            self.reporter_sink.stdout("[Post execution OK]")
+        else:
+            self.reporter_sink.stdout("[Post execution FAIL]")
+
+        self.reporter_sink.increase_indentation()
+        repo_to_reporter_sink(report, self.reporter_sink)
+        self.reporter_sink.decrease_indentation()
+
     def on_end_visit(self, visit_complete: bool) -> None:
         if visit_complete:
             self.reporter_sink.stdout("[end visit OK]")

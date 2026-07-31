@@ -26,6 +26,10 @@ class OrchestratorExecutorReporterComposite(OrchestratorExecutorReporterBase):
         for r in self.reporters:
             r.finalize_execution()
 
+    def report_postexecution(self, report: Report) -> None:
+        for r in self.reporters:
+            r.report_postexecution(report)
+
     def on_begin_phase(self, phase: Phase) -> None:
         for r in self.reporters:
             r.on_begin_phase(phase)
