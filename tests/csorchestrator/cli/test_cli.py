@@ -18,7 +18,7 @@ def test_run_command_loads_project_script(tmp_path: Path, monkeypatch: pytest.Mo
             from csorchestrator.application.factory.factory import OptionalOrchestratorWithReport
             from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 
-            def create_orchestrator(target_folder_path : Path) -> OptionalOrchestratorWithReport:
+            def create_orchestrator() -> OptionalOrchestratorWithReport:
                 return OptionalOrchestratorWithReport.createResultAndReport(
                     Orchestrator("myName", "0.0.0", "exec-job"), Report()
                 )

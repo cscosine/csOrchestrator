@@ -31,7 +31,7 @@ from csorchestrator.frontend.reporters.reporter_sink_colorama_print import Repor
 from csorchestrator.frontend.reporters.reporter_sink_colored_print import ReporterSinkColoredPrint
 from csorchestrator.frontend.reporters.reporter_sink_print import ReporterSinkPrint, ReporterSinkPrintBase
 
-CreateOrchestratorFn = Callable[[Path], OptionalResultWithReport[Orchestrator]]
+CreateOrchestratorFn = Callable[[], OptionalResultWithReport[Orchestrator]]
 
 SINK_TYPES = ("print", "colored", "colorama", "none")
 SinkType = Literal["print", "colored", "colorama", "none"]  # keep aligned with SINK_TYPES
@@ -107,9 +107,7 @@ def assert_create_orchestrator(module: ModuleType) -> Expected[CreateOrchestrato
     return Expected[CreateOrchestratorFn, str].make_value(module.create_orchestrator)
 
 
-def project_script_preparation(
-    script_path: Path, target_folder: Path, reporter: OrchestratorExecutorReporterBase
-) -> Orchestrator | None:
+def project_script_preparation(script_path: Path, reporter: OrchestratorExecutorReporterBase) -> Orchestrator | None:
 
     module_or_error = load_project_module(script_path)
     if module_or_error.error is not None:
@@ -131,7 +129,7 @@ def project_script_preparation(
     assert create_orchestrator_expected.value is not None
     create_orchestrator = create_orchestrator_expected.value
 
-    orchestrator_result = create_orchestrator(target_folder)
+    orchestrator_result = create_orchestrator()
 
     reporter.report_orchestrator_creation_report(orchestrator_result.report)
 
@@ -145,7 +143,7 @@ def execute_project_script(
 
     target_folder = resolve_target_folder(script_path, target_folder)
 
-    orchestrator_or_none = project_script_preparation(script_path, target_folder, reporter)
+    orchestrator_or_none = project_script_preparation(script_path, reporter)
     if orchestrator_or_none is None:
         return 1
 
@@ -157,13 +155,11 @@ def execute_project_script(
 
 
 def generate_github_workflow_project_script(
-    script_path: Path, target_folder: Path | None, output_path: Path | None, reporter: OrchestratorExecutorReporterBase
+    script_path: Path, output_path: Path | None, reporter: OrchestratorExecutorReporterBase
 ) -> int:
     """Load a project script's create_orchestrator() function and use it to generate a github wf."""
 
-    target_folder = resolve_target_folder(script_path, target_folder)
-
-    orchestrator_or_none = project_script_preparation(script_path, target_folder, reporter)
+    orchestrator_or_none = project_script_preparation(script_path, reporter)
     if orchestrator_or_none is None:
         return 1
 
@@ -209,13 +205,6 @@ def run(ctx: click.Context, script_path: Path, target_folder: Path | None) -> in
     type=click.Path(exists=True, dir_okay=False, path_type=Path),
 )  # type: ignore[untyped-decorator]
 @click.option(
-    "--target-folder",
-    "-t",
-    type=click.Path(file_okay=False, dir_okay=True, path_type=Path),
-    default=None,
-    help="Base folder for orchestrator execution. Defaults to the project script location.",
-)  # type: ignore[untyped-decorator]
-@click.option(
     "--output",
     "-o",
     type=click.Path(dir_okay=False, path_type=Path),
@@ -223,7 +212,7 @@ def run(ctx: click.Context, script_path: Path, target_folder: Path | None) -> in
     help="Write workflow to this file. Defaults to stdout.",
 )  # type: ignore[untyped-decorator]
 @click.pass_context  # type: ignore[untyped-decorator]
-def gen_wf(ctx: click.Context, script_path: Path, target_folder: Path | None, output: Path | None) -> int:
+def gen_wf(ctx: click.Context, script_path: Path, output: Path | None) -> int:
     """Load a Python project script and create the gitHub workflow for create_orchestrator() result."""
     config: CLIConfig = ctx.obj["config"]
 
@@ -234,7 +223,7 @@ def gen_wf(ctx: click.Context, script_path: Path, target_folder: Path | None, ou
     if config.markdown_path is not None:
         reporter.reporters.append(OrchestratorExecutorReporterMarkdown(path=config.markdown_path))
 
-    return generate_github_workflow_project_script(script_path, target_folder, output, reporter)
+    return generate_github_workflow_project_script(script_path, output, reporter)
 
 
 COMMANDS_WITH_OPTIONAL_SCRIPT = {
