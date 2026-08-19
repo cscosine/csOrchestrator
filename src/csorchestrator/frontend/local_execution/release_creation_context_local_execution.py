@@ -5,11 +5,14 @@ from csorchestrator.domain.context.context_os_architecture import ContextOsArchi
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
 )
+from csorchestrator.domain.orchestrator.orchestrator import OrchestratorDescription
 
 
 @dataclass(frozen=True)
 class ReleaseCreationContextLocalExecution:
     os_architecture_compiler_generator_list: list[ContextOsArchitectureCompilerGenerator]
-    name_and_version_string: str
+    orchestrator_name: str
+    orchestrator_version: str
+    orchestrator_description: OrchestratorDescription
     os_architecture: ContextOsArchitecture
     base_path: Path

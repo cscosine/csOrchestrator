@@ -183,7 +183,9 @@ def validate_and_execute_orchestrator(
             else:
                 release_context = ReleaseCreationContextLocalExecution(
                     matrix.os_architecture_compiler_generator_list,
-                    orchestrator.name_version_to_string(),
+                    orchestrator.name,
+                    orchestrator.version,
+                    orchestrator.createOrchestratorDescription(),
                     os_and_path.os_architecture,
                     os_and_path.path,
                 )

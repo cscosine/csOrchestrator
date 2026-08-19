@@ -6,6 +6,7 @@ from csorchestrator.domain.context.context_os_architecture_compiler_generator im
     ContextOsArchitectureCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
 )
+from csorchestrator.domain.orchestrator.orchestrator import OrchestratorDescription
 from csorchestrator.domain.orchestrator.workflow_config import (
     ReleaseCreationOnTagConfigBase,
 )
@@ -22,8 +23,8 @@ from csorchestrator.frontend.local_execution.release_creation_context_local_exec
     ReleaseCreationContextLocalExecution,
 )
 from csorchestrator.frontend.release_manifest.manifest import (
+    Manifest,
     ManifestVersionsEntry,
-    create_release_manifest,
     write_release_manifest,
 )
 from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
@@ -42,11 +43,11 @@ class ReleaseCreationOnTagConfigCapabilityGithubWorkflow(ReleaseCreationOnTagCon
     def to_githubwf_lines(
         self,
         matrix_list: list[ContextOsArchitectureCompilerGenerator],
-        name_and_version_string: str,
+        orchestrator_description: OrchestratorDescription,
         artifacts_folder: str,
     ) -> list[str]:
         return release_creation_on_tag_config_to_githubwf(
-            self.step, matrix_list, name_and_version_string, artifacts_folder
+            self.step, matrix_list, orchestrator_description, artifacts_folder
         )
 
     def getReleaseFilesExtension(self) -> str | None:
@@ -79,7 +80,7 @@ class ReleaseCreationOnTagConfig(ReleaseCreationOnTagConfigBase):
 def release_creation_on_tag_config_to_githubwf(
     step: ReleaseCreationOnTagConfig,
     matrix_list: list[ContextOsArchitectureCompilerGenerator],
-    name_and_version_string: str,
+    orchestrator_description: OrchestratorDescription,
     artifacts_folder: str,
 ) -> list[str]:
     lines: list[str] = ["|"]
@@ -94,7 +95,11 @@ def release_creation_on_tag_config_to_githubwf(
         input_files_list.append(
             Path(
                 # TODO not nice to use "-" directly here
-                Path(name_and_version_string + "-" + context_os_architecture_compiler_generator_string)
+                Path(
+                    orchestrator_description.name_and_version_string
+                    + "-"
+                    + context_os_architecture_compiler_generator_string
+                )
                 / Path(create_version_file_name(context_os_architecture_compiler_generator_string))
             ).as_posix()
         )
@@ -103,27 +108,28 @@ def release_creation_on_tag_config_to_githubwf(
         return lines
 
     header = [
-        "from dataclasses import dataclass, field",
+        "from dataclasses import dataclass, field, asdict",
+        "from typing import Any, ClassVar",
         "from pathlib import Path",
         "import json",
         "",
     ]
     class1 = inspect.getsource(CMakeConfigPackageVersion).splitlines()
     class2 = inspect.getsource(ManifestVersionsEntry).splitlines()
-    fun1 = inspect.getsource(create_release_manifest).splitlines()
-    fun2 = inspect.getsource(write_release_manifest).splitlines()
-    fun3 = inspect.getsource(load_version_file).splitlines()
+    class3 = inspect.getsource(Manifest).splitlines()
+    fun1 = inspect.getsource(write_release_manifest).splitlines()
+    fun2 = inspect.getsource(load_version_file).splitlines()
 
     lines += header
     lines += class1
     lines += [""]
     lines += class2
     lines += [""]
+    lines += class3
+    lines += [""]
     lines += fun1
     lines += [""]
     lines += fun2
-    lines += [""]
-    lines += fun3
     lines += [""]
 
     lines += ["input_files_list = ["]
@@ -142,8 +148,15 @@ def release_creation_on_tag_config_to_githubwf(
     lines += ["    ManifestVersionsEntry(name, packages)"]
     lines += ["  )"]
     lines += [""]
-    lines += ["release_manifest = create_release_manifest(collected_version_entries)"]
-    lines += [f"output_filename = Path('{name_and_version_string}{CS_ORCHESTRATOR_MANIFEST_EXTENSION}')"]
+    lines += ["release_manifest = Manifest("]
+    lines += ["  manifest_version=Manifest.MANIFEST_VERSION,"]
+    lines += [f"  project_name='{orchestrator_description.orchestrator_name}',"]
+    lines += [f"  project_version='{orchestrator_description.orchestrator_version}',"]
+    lines += ["  variants=collected_version_entries,"]
+    lines += [")"]
+    lines += [
+        f"output_filename = Path('{orchestrator_description.name_and_version_string}{CS_ORCHESTRATOR_MANIFEST_EXTENSION}')"  # noqa: E501
+    ]
     lines += ["write_release_manifest(release_manifest,output_filename)"]
     lines += [""]
 
@@ -196,9 +209,15 @@ def release_creation_on_tag_config_execute_local(
         collected_version_entries.append(
             ManifestVersionsEntry(context_os_architecture_compiler_generator_string, packages)
         )
-    release_manifest = create_release_manifest(collected_version_entries)
+
+    release_manifest = Manifest(
+        manifest_version=Manifest.MANIFEST_VERSION,
+        project_name=relase_context.orchestrator_description.orchestrator_name,
+        project_version=relase_context.orchestrator_description.orchestrator_version,
+        variants=collected_version_entries,
+    )
     output_filename = step.base_install_dir / Path(
-        relase_context.name_and_version_string + CS_ORCHESTRATOR_MANIFEST_EXTENSION
+        relase_context.orchestrator_description.name_and_version_string + CS_ORCHESTRATOR_MANIFEST_EXTENSION
     )
     write_release_manifest(
         release_manifest,

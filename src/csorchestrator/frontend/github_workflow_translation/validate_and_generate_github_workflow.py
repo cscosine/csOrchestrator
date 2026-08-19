@@ -218,7 +218,7 @@ def validate_and_generate_github_workflow(
                 config=orchestrator.wf_config.create_release_on_tag,
                 needs=orchestrator.execution_matrix.name,
                 matrix_list=[item.original_os_architecture_compiler_generator_list for item in wf_matrix],
-                name_and_version_string=orchestrator.name_version_to_string(),
+                orchestrator_description=orchestrator.createOrchestratorDescription(),
                 runs_on="ubuntu-latest",
                 if_str="${{ github.ref_type == 'tag' }}",
             )

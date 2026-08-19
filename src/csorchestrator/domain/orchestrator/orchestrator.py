@@ -19,6 +19,13 @@ class MatrixExecutionBase(ABC):
 
 
 @dataclass
+class OrchestratorDescription:
+    orchestrator_name: str
+    orchestrator_version: str
+    name_and_version_string: str
+
+
+@dataclass
 class Orchestrator:
     # - create phase (e.g. setup / config / build)
     # per each phase allows to add
@@ -34,8 +41,15 @@ class Orchestrator:
     phases: list[Phase] = field(default_factory=list)
     wf_config: WorkflowConfig | None = None
 
-    def name_version_to_string(self, separator: str = "-") -> str:
-        return f"{self.name}{separator}{self.version}"
+    def createOrchestratorDescription(self) -> OrchestratorDescription:
+        return OrchestratorDescription(
+            orchestrator_name=self.name,
+            orchestrator_version=self.version,
+            name_and_version_string=self.name_version_to_string(),
+        )
+
+    def name_version_to_string(self) -> str:
+        return f"{self.name}-{self.version}"
 
     def add_phase(self, phase: Phase) -> "Orchestrator":
         self.phases.append(phase)

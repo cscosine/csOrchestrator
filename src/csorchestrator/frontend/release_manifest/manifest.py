@@ -1,51 +1,73 @@
 import json
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import cast
+from typing import Any, ClassVar
 
 from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import CMakeConfigPackageVersion
 
 
 @dataclass
 class ManifestVersionsEntry:
-    variant_string_description: str
+    variant: str
     entries: list[CMakeConfigPackageVersion] = field(default_factory=list)
 
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "variant": self.variant,
+            "entries": [entry.to_dict() for entry in self.entries],
+        }
 
-# return smt like
-# {
-#   "variant1": [
-#     {"name": "foo", "version": "1.2.3"}
-#   ],
-#   "variant2": [
-#     {"name": "bar", "version": "2.0.0"}
-#   ]
-# }
-def create_release_manifest(
-    entries: list[ManifestVersionsEntry],
-) -> dict[str, list[dict[str, str]]]:
-    return {
-        entry.variant_string_description: [{"name": pv.name, "version": pv.version} for pv in entry.entries]
-        for entry in entries
-    }
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ManifestVersionsEntry":
+        return cls(
+            variant=data["variant"],
+            entries=[CMakeConfigPackageVersion.from_dict(entry) for entry in data["entries"]],
+        )
+
+
+@dataclass
+class Manifest:
+    manifest_version: str
+    project_name: str
+    project_version: str
+    variants: list[ManifestVersionsEntry] = field(default_factory=list)
+
+    MANIFEST_VERSION: ClassVar[str] = "1.0"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "manifest_version": self.manifest_version,
+            "project_name": self.project_name,
+            "project_version": self.project_version,
+            "variants": [variant.to_dict() for variant in self.variants],
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "Manifest":
+        return cls(
+            manifest_version=data["manifest_version"],
+            project_name=data["project_name"],
+            project_version=data["project_version"],
+            variants=[ManifestVersionsEntry.from_dict(variant) for variant in data["variants"]],
+        )
 
 
 def write_release_manifest(
-    manifest: dict[str, list[dict[str, str]]],
+    manifest: Manifest,
     filename: Path,
 ) -> None:
     """Write a release manifest to a JSON file."""
     path = Path(filename)
     # TODO robustify and return possible errors
     with path.open("w", encoding="utf-8") as f:
-        json.dump(manifest, f, indent=2, sort_keys=True)
+        json.dump(manifest.to_dict(), f, indent=2, sort_keys=True)
 
 
 def load_release_manifest(
     filename: Path,
-) -> dict[str, list[dict[str, str]]]:
+) -> Manifest:
     """Load a release manifest from a JSON file."""
     path = Path(filename)
+    # TODO robustify and return possible errors
     with path.open("r", encoding="utf-8") as f:
-        # TODO robustify and return possible errors
-        return cast(dict[str, list[dict[str, str]]], json.load(f))
+        return Manifest.from_dict(json.load(f))
