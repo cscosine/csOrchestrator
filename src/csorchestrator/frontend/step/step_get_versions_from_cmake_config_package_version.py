@@ -1,7 +1,7 @@
 import inspect
 import json
 import re
-from dataclasses import dataclass, field
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
@@ -38,6 +38,13 @@ class CMakeConfigPackageVersionGrep:
 class CMakeConfigPackageVersion:
     name: str
     version: str
+
+    def to_dict(self) -> dict[str, str]:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: dict[str, str]) -> "CMakeConfigPackageVersion":
+        return cls(**data)
 
 
 @dataclass
@@ -190,9 +197,7 @@ def create_version_file_name(context_os_architecture_compiler_generator_string: 
 
 
 def write_version_file(dest: Path, src: list[CMakeConfigPackageVersion]) -> None:
-    ret = []
-    for pv in src:
-        ret.append({"name": pv.name, "version": pv.version})
+    ret = [entry.to_dict() for entry in src]
 
     with open(dest, "w", encoding="utf-8") as f:
         json.dump(ret, f, indent=4, ensure_ascii=False)
@@ -204,11 +209,7 @@ def load_version_file(src: Path) -> list[CMakeConfigPackageVersion]:
         packages = json.load(f)
 
     # TODO make robust to errors
-    ret: list[CMakeConfigPackageVersion] = []
-    for item in packages:
-        name = item["name"]
-        version = item["version"]
-        ret.append(CMakeConfigPackageVersion(name, version))
+    ret = [CMakeConfigPackageVersion.from_dict(entry) for entry in packages]
 
     return ret
 
@@ -295,7 +296,8 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
         "import json",
         "import sys",
         "import os",
-        "from dataclasses import dataclass, field",
+        "from dataclasses import dataclass, field, asdict",
+        "from typing import Any, ClassVar",
         "",
     ]
     class1 = inspect.getsource(CMakeConfigPackageVersionGrep).splitlines()

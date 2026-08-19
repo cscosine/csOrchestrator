@@ -30,8 +30,8 @@ class StepUploadArtifactsCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
         return step_upload_artifacts_to_githubwf(self.step, wf_job, reporter_sink)
 
 
-def create_artifact_prefix_from_orchestrator_name_version(o: Orchestrator, suffix: str = "-") -> str:
-    return o.name_version_to_string() + suffix
+def create_artifact_prefix_from_orchestrator_name_version(o: Orchestrator) -> str:
+    return o.name_version_to_string() + "-"
 
 
 @dataclass
