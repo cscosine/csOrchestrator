@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Self
+from typing import Any, Self
 
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
@@ -8,7 +8,6 @@ from csorchestrator.domain.orchestrator.workflow_config import Cron
 from csorchestrator.foundation.core.strings_utils import string_indent
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_create_release import (
     JobReleaseCreationFromArtifacts,
-    job_release_on_tag_to_string_lines,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
@@ -202,20 +201,24 @@ class GitHubWorkflow:
 
     # ---------------- OUTPUT ----------------
 
-    def to_string_lines(self) -> list[str]:
-        lines = [f"name: {self.name}"]
-        lines += [""]
-        lines += ["on:"]
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "on": [trigger.to_dict() for trigger in self._on.values()],
+            # "jobs": {
+            # **{job.name: job_orchestrator_matrix_execution_to_string_lines(job) for job in self._jobs_matrix_exec},
+            # **{
+            # job.name: job_release_on_tag_to_string_lines(job)
+            # for job in self._jobs_release_on_tag
+            # },
+            # },
+        }
 
-        for trigger in self._on.values():
-            lines.extend(trigger.to_string_lines(indent=2))
-        lines += [""]
+        # if len(self._jobs_matrix_exec) > 0 or len(self._jobs_release_on_tag) > 0:
+        #     lines += ["jobs:"]
+        #     for job_r in self._jobs_release_on_tag:
+        #         lines += job_release_on_tag_to_string_lines(job_r, indent=2)
+        #     for job_m in self._jobs_matrix_exec:
+        #         lines += job_orchestrator_matrix_execution_to_string_lines(job_m, indent=2)
 
-        if len(self._jobs_matrix_exec) > 0 or len(self._jobs_release_on_tag) > 0:
-            lines += ["jobs:"]
-            for job_r in self._jobs_release_on_tag:
-                lines += job_release_on_tag_to_string_lines(job_r, indent=2)
-            for job_m in self._jobs_matrix_exec:
-                lines += job_orchestrator_matrix_execution_to_string_lines(job_m, indent=2)
-
-        return lines
+        # return lines

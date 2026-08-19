@@ -22,16 +22,6 @@
       "justMyCode": false
     },
     {
-      "name": "\ud83d\udcc1 tests/csorchestrator/ci/github tests",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/ci/github"
-      ],
-      "justMyCode": false
-    },
-    {
       "name": "\ud83d\udcc1 tests/csorchestrator/cli tests",
       "type": "debugpy",
       "request": "launch",
@@ -308,16 +298,6 @@
       "module": "pytest",
       "args": [
         "tests/csorchestrator/_archive/compilers/test_compiler_generator.py::test_windows_msvc_real"
-      ],
-      "justMyCode": false
-    },
-    {
-      "name": "\ud83e\uddea tests/csorchestrator/ci/github/test_github_workflow_config \u2192 test_workflow_with_triggers",
-      "type": "debugpy",
-      "request": "launch",
-      "module": "pytest",
-      "args": [
-        "tests/csorchestrator/ci/github/test_github_workflow_config.py::test_workflow_with_triggers"
       ],
       "justMyCode": false
     },

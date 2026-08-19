@@ -1,6 +1,8 @@
 from pathlib import Path
 from typing import TypeAlias
 
+import yaml
+
 from csorchestrator.domain.context.context_compiler_generator import ContextCompilerGenerator, Generator
 from csorchestrator.domain.context.context_os_architecture import (
     OS,
@@ -240,7 +242,15 @@ def validate_and_generate_github_workflow(
 
     res.report_executions.append(report_execution)
 
-    output_path.write_text("\n".join(wf.to_string_lines()), encoding="utf-8")
+    print(wf.to_dict())
+
+    lines = yaml.safe_dump(
+        wf.to_dict(),
+        sort_keys=False,
+        default_flow_style=False,
+    )
+
+    output_path.write_text(lines, encoding="utf-8")
 
     reporter.finalize_execution()
 
