@@ -1,6 +1,7 @@
 import inspect
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
@@ -40,17 +41,17 @@ CS_ORCHESTRATOR_MANIFEST_EXTENSION: str = ".csOrchestratorManifest"
 class ReleaseCreationOnTagConfigCapabilityGithubWorkflow(ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow):
     step: "ReleaseCreationOnTagConfig"
 
-    def to_githubwf_lines(
+    def to_steps_dict(
         self,
         matrix_list: list[ContextOsArchitectureCompilerGenerator],
         orchestrator_description: OrchestratorDescription,
         artifacts_folder: str,
-    ) -> list[str]:
+    ) -> list[dict[str, Any]]:
         return release_creation_on_tag_config_to_githubwf(
             self.step, matrix_list, orchestrator_description, artifacts_folder
         )
 
-    def getReleaseFilesExtension(self) -> str | None:
+    def getReleaseFilesExtension(self) -> str:
         return CS_ORCHESTRATOR_MANIFEST_EXTENSION
 
 
@@ -82,8 +83,7 @@ def release_creation_on_tag_config_to_githubwf(
     matrix_list: list[ContextOsArchitectureCompilerGenerator],
     orchestrator_description: OrchestratorDescription,
     artifacts_folder: str,
-) -> list[str]:
-    lines: list[str] = ["|"]
+) -> list[dict[str, Any]]:
 
     input_files_list: list[str] = []
     input_names_list: list[str] = []
@@ -105,7 +105,9 @@ def release_creation_on_tag_config_to_githubwf(
         )
 
     if len(input_files_list) == 0 or len(input_names_list) == 0:
-        return lines
+        return []
+
+    lines: list[str] = []
 
     header = [
         "from dataclasses import dataclass, field, asdict",
@@ -164,7 +166,9 @@ def release_creation_on_tag_config_to_githubwf(
         name="Manifest creation", run=lines, shell_type="python", working_directory=artifacts_folder
     )
 
-    return step_github.to_string_lines() + [""]
+    return [
+        step_github.to_dict(),
+    ]
 
 
 def release_creation_on_tag_config_execute_local(

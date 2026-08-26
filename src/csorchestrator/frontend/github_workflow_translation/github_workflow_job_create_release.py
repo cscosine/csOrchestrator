@@ -1,4 +1,6 @@
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from typing import Any
 
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
@@ -8,20 +10,99 @@ from csorchestrator.domain.orchestrator.workflow_config import (
     ReleaseCreationOnTagConfigBase,
     ReleaseCreationOnTagConfigBaseCapability,
 )
-from csorchestrator.foundation.core.strings_utils import string_indent
+from csorchestrator.frontend.github_workflow_translation.YamlStringDumper import (
+    LiteralString,
+)
 
 
 class ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow(ReleaseCreationOnTagConfigBaseCapability):
-    def to_githubwf_lines(
+    # TODO: make virtual methods
+
+    def to_steps_dict(
         self,
         matrix_list: list[ContextOsArchitectureCompilerGenerator],
         orchestrator_description: OrchestratorDescription,
         artifacts_folder: str,
-    ) -> list[str]:
+    ) -> list[dict[str, Any]]:
         return []
 
-    def getReleaseFilesExtension(self) -> str | None:
-        return None
+    # TODO abstract? but not compatible with concrete class required by capability
+    def getReleaseFilesExtension(self) -> str:
+        return ""
+
+
+class Step(ABC):
+    @abstractmethod
+    def to_dict(self) -> dict[str, Any]:
+        pass
+
+
+@dataclass(frozen=True)
+class DownloadAllArtifacts(Step):
+    artifacts_folder: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": "Download all artifacts",
+            "uses": "actions/download-artifact@v8",
+            "with": {
+                "path": self.artifacts_folder,
+            },
+        }
+
+
+@dataclass(frozen=True)
+class ShowDownloadedFiles(Step):
+    artifacts_folder: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": "Show downloaded files",
+            "run": f"find {self.artifacts_folder} -type f",
+        }
+
+
+@dataclass(frozen=True)
+class CreateGitHubRelease(Step):
+    artifacts_folder: str
+    if_str: str
+    extra_extension_for_release_files: str | None
+
+    def to_dict(self) -> dict[str, Any]:
+        extension_files = [f"{self.artifacts_folder}/**/*.tar.gz"]
+        if self.extra_extension_for_release_files is not None:
+            extension_files.append(f"{self.artifacts_folder}/**/*{self.extra_extension_for_release_files}")
+
+        ret: dict[str, Any] = {
+            "name": "Create GitHub Release",
+            "uses": "softprops/action-gh-release@v3",
+            "with": {
+                "files": extension_files,
+            },
+        }
+        ret["if"] = self.if_str
+
+        return ret
+
+
+@dataclass(
+    frozen=True,
+)
+class StepGitHubUploadArtifactsNew(Step):
+    name: str
+    with_name: str
+    with_path: list[str]
+    uses: str = "actions/upload-artifact@v7"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "uses": self.uses,
+            "with": {
+                "name": self.with_name,
+                "path": LiteralString("\n".join(self.with_path)),
+            },
+        }
 
 
 @dataclass
@@ -33,58 +114,33 @@ class JobReleaseCreationFromArtifacts:
     runs_on: str
     if_str: str
 
+    def to_dict(self) -> dict[str, Any]:
+        artifacts_folder = "artifacts"
 
-def job_release_on_tag_to_string_lines(job: JobReleaseCreationFromArtifacts, indent: int = 0) -> list[str]:
-    artifacts_folder = "artifacts"
+        steps = [
+            DownloadAllArtifacts(artifacts_folder).to_dict(),
+            ShowDownloadedFiles(artifacts_folder).to_dict(),
+        ]
 
-    capability = job.config.get_capability(ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow)
-    add_lines = []
-    if capability is not None:
-        add_lines = capability.to_githubwf_lines(job.matrix_list, job.orchestrator_description, artifacts_folder)
+        capability = self.config.get_capability(ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow)
+        extra_extension_for_release_files = None
+        if capability is not None:
+            steps.extend(capability.to_steps_dict(self.matrix_list, self.orchestrator_description, artifacts_folder))
+            extra_extension_for_release_files = capability.getReleaseFilesExtension()
+            steps.append(
+                StepGitHubUploadArtifactsNew(
+                    name="Upload artifacts",
+                    with_name="manifest" + extra_extension_for_release_files,
+                    with_path=[f"{artifacts_folder}/**/*{extra_extension_for_release_files}"],
+                ).to_dict()
+            )
 
-    line_list = [f"{string_indent(indent)}{job.config.name}:"]
-    line_list += [f"{string_indent(indent + 2)}needs: {job.needs}"]
-    line_list += [f"{string_indent(indent + 2)}runs-on: {job.runs_on}"]
-    line_list += [""]
-    line_list += [""]
-    line_list += [f"{string_indent(indent + 2)}permissions:"]
-    line_list += [f"{string_indent(indent + 4)}contents: write"]
-    line_list += [""]
-    line_list += [f"{string_indent(indent + 2)}steps:"]
-    line_list += [f"{string_indent(indent + 4)}- name: Download all artifacts"]
-    line_list += [f"{string_indent(indent + 6)}uses: actions/download-artifact@v8"]
-    line_list += [f"{string_indent(indent + 6)}with:"]
-    line_list += [f"{string_indent(indent + 8)}path: {artifacts_folder}"]
-    line_list += [""]
-    line_list += [f"{string_indent(indent + 4)}- name: Show downloaded files"]
-    line_list += [f"{string_indent(indent + 6)}run: find {artifacts_folder} -type f"]
-    line_list += [""]
-    if len(add_lines) > 0:
-        for line in add_lines:
-            if line != "":
-                line_list += [f"{string_indent(indent + 4)}{line}"]
-            else:
-                line_list += [""]
+        steps.append(CreateGitHubRelease(artifacts_folder, self.if_str, extra_extension_for_release_files).to_dict())
 
-    if capability is not None:
-        ext = capability.getReleaseFilesExtension()
-        if ext is not None:
-            line_list += [f"{string_indent(indent + 4)}- name: Upload manifest"]
-            line_list += [f"{string_indent(indent + 4)}  uses: actions/upload-artifact@v4"]
-            line_list += [f"{string_indent(indent + 4)}  with:"]
-            line_list += [f"{string_indent(indent + 4)}    name: manifest" + ext]
-            line_list += [f"{string_indent(indent + 4)}    path: artifacts/**/*" + ext]
-            line_list += [""]
-
-    line_list += [f"{string_indent(indent + 4)}- name: Create GitHub Release"]
-    line_list += [f"{string_indent(indent + 6)}if: {job.if_str}"]
-    line_list += [f"{string_indent(indent + 6)}uses: softprops/action-gh-release@v3"]
-    line_list += [f"{string_indent(indent + 6)}with:"]
-    line_list += [f"{string_indent(indent + 8)}files: |"]
-    line_list += [f"{string_indent(indent + 10)}{artifacts_folder}/**/*.tar.gz"]
-    if capability is not None:
-        ext = capability.getReleaseFilesExtension()
-        if ext is not None:
-            line_list += [f"{string_indent(indent + 10)}{artifacts_folder}/**/*" + ext]
-    line_list += [""]
-    return line_list
+        return {
+            "name": self.config.name,
+            "needs": self.needs,
+            "runs-on": self.runs_on,
+            "permissions": {"contents": "write"},
+            "steps": steps,
+        }

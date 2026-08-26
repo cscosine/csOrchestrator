@@ -1,7 +1,9 @@
 from dataclasses import dataclass, field
+from typing import Any
 
 from csorchestrator.foundation.core.strings_utils import string_indent
 from csorchestrator.frontend.github_workflow_translation.github_workflow_config import StepToStringLines
+from csorchestrator.frontend.github_workflow_translation.YamlStringDumper import LiteralString
 
 # =========================================================
 # Steps models
@@ -101,33 +103,29 @@ class StepRunCommand(StepToStringLines):
     env: list[str] | None = None
     working_directory: str | None = None
 
-    def to_string_lines(self, indent: int = 0) -> list[str]:
-        lines = [f"{string_indent(indent)}- name: {self.name}"]
+    def to_dict(self) -> dict[str, Any]:
+        step_dict: dict[str, Any] = {
+            "name": self.name,
+            "run": LiteralString("\n".join(self.run)),
+        }
 
         if self.id is not None:
-            lines += [f"{string_indent(indent)}  id: {self.id}"]
+            step_dict["id"] = self.id
 
         if self.if_str is not None:
-            lines += [f"{string_indent(indent)}  if: {self.if_str}"]
-
-        if self.env is not None and len(self.env) > 0:
-            lines += [f"{string_indent(indent)}  env:"]
-            for line in self.env:
-                lines += [f"{string_indent(indent)}    {line}"]
+            step_dict["if"] = self.if_str
 
         if self.shell_type is not None:
-            lines += [f"{string_indent(indent)}  shell: {self.shell_type}"]
+            step_dict["shell"] = self.shell_type
 
-        if len(self.run) > 0:
-            lines += [f"{string_indent(indent)}  run: {self.run[0]}"]
-            for i in range(1, len(self.run)):
-                line = self.run[i]
-                if line == "":
-                    lines += [""]
-                else:
-                    lines += [f"{string_indent(indent)}    {line}"]
+        if self.env is not None and len(self.env) > 0:
+            env_dict: dict[str, str] = {}
+            for line in self.env:
+                key, value = line.split("=", 1)
+                env_dict[key.strip()] = value.strip()
+            step_dict["env"] = env_dict
 
         if self.working_directory is not None:
-            lines += [f"{string_indent(indent)}  working-directory: {self.working_directory}"]
+            step_dict["working-directory"] = self.working_directory
 
-        return lines
+        return step_dict

@@ -202,23 +202,12 @@ class GitHubWorkflow:
     # ---------------- OUTPUT ----------------
 
     def to_dict(self) -> dict[str, Any]:
-        return {
-            "name": self.name,
-            "on": [trigger.to_dict() for trigger in self._on.values()],
-            # "jobs": {
-            # **{job.name: job_orchestrator_matrix_execution_to_string_lines(job) for job in self._jobs_matrix_exec},
-            # **{
-            # job.name: job_release_on_tag_to_string_lines(job)
-            # for job in self._jobs_release_on_tag
-            # },
-            # },
-        }
-
-        # if len(self._jobs_matrix_exec) > 0 or len(self._jobs_release_on_tag) > 0:
-        #     lines += ["jobs:"]
-        #     for job_r in self._jobs_release_on_tag:
-        #         lines += job_release_on_tag_to_string_lines(job_r, indent=2)
-        #     for job_m in self._jobs_matrix_exec:
-        #         lines += job_orchestrator_matrix_execution_to_string_lines(job_m, indent=2)
-
-        # return lines
+        ret: dict[str, Any] = {}
+        ret["name"] = self.name
+        ret["on"] = [trigger.to_dict() for trigger in self._on.values()]
+        if len(self._jobs_matrix_exec) > 0 or len(self._jobs_release_on_tag) > 0:
+            release_jobs = [job.to_dict() for job in self._jobs_release_on_tag]
+            matrix_jobs: list[dict[str, Any]] = []  # [job.to_dict() for job in self._jobs_matrix_exec]
+            jobs = release_jobs + matrix_jobs
+            ret["jobs"] = jobs
+        return ret
