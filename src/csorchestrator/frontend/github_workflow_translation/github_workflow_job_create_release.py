@@ -10,7 +10,7 @@ from csorchestrator.domain.orchestrator.workflow_config import (
     ReleaseCreationOnTagConfigBase,
     ReleaseCreationOnTagConfigBaseCapability,
 )
-from csorchestrator.frontend.github_workflow_translation.YamlStringDumper import (
+from csorchestrator.frontend.github_workflow_translation.yaml_string_dumper import (
     LiteralString,
 )
 
@@ -32,6 +32,7 @@ class ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow(ReleaseCreationOnTa
 
 
 class Step(ABC):
+    # TODO remove we already have a base class for this
     @abstractmethod
     def to_dict(self) -> dict[str, Any]:
         pass
@@ -138,9 +139,10 @@ class JobReleaseCreationFromArtifacts:
         steps.append(CreateGitHubRelease(artifacts_folder, self.if_str, extra_extension_for_release_files).to_dict())
 
         return {
-            "name": self.config.name,
-            "needs": self.needs,
-            "runs-on": self.runs_on,
-            "permissions": {"contents": "write"},
-            "steps": steps,
+            self.config.name: {
+                "needs": self.needs,
+                "runs-on": self.runs_on,
+                "permissions": {"contents": "write"},
+                "steps": steps,
+            }
         }

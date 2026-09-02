@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Any, TypeAlias
+from typing import Any
 
 from csorchestrator.domain.orchestrator.workflow_config import Cron
 
@@ -68,6 +68,3 @@ class ScheduleTrigger(Trigger):
 
     def to_dict(self) -> dict[str, Any]:
         return {"schedule": [{"cron": self.cron.to_string()}]}
-
-
-TriggerUnion: TypeAlias = PushTrigger | PullRequestTrigger | WorkflowDispatchTrigger | ScheduleTrigger

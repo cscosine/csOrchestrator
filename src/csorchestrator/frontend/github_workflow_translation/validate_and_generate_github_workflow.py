@@ -248,6 +248,7 @@ def validate_and_generate_github_workflow(
         wf.to_dict(),
         sort_keys=False,
         default_flow_style=False,
+        width=1000,  # keep a generous limit
     )
 
     output_path.write_text(lines, encoding="utf-8")

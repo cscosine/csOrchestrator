@@ -1,9 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-from csorchestrator.foundation.core.strings_utils import string_indent
-from csorchestrator.frontend.github_workflow_translation.github_workflow_config import StepToStringLines
-from csorchestrator.frontend.github_workflow_translation.YamlStringDumper import LiteralString
+from csorchestrator.frontend.github_workflow_translation.github_workflow_config import StepToDictInterface
+from csorchestrator.frontend.github_workflow_translation.yaml_string_dumper import LiteralString
 
 # =========================================================
 # Steps models
@@ -11,25 +10,24 @@ from csorchestrator.frontend.github_workflow_translation.YamlStringDumper import
 
 
 @dataclass
-class StepGitHubAction(StepToStringLines):
+class StepGitHubAction(StepToDictInterface):
     name: str
     uses: str
     id: str | None = None
     if_str: str | None = None
     with_list: list[str] = field(default_factory=list)
 
-    def to_string_lines(self, indent: int = 0) -> list[str]:
-        lines = [f"{string_indent(indent)}- name: {self.name}"]
+    def to_dict(self) -> dict[str, Any]:
+        ret: dict[str, Any] = {"name": self.name}
         if self.id is not None:
-            lines += [f"{string_indent(indent)}  id: {self.id}"]
-        lines += [f"{string_indent(indent)}  uses: {self.uses}"]
+            ret["id"] = self.id
+        ret["uses"] = self.uses
         if self.if_str is not None:
-            lines += [f"{string_indent(indent)}  if: {self.if_str}"]
+            ret["if"] = self.if_str
         if len(self.with_list) > 0:
-            lines += [f"{string_indent(indent)}  with:"]
-            for w in self.with_list:
-                lines += [f"{string_indent(indent + 2)}  {w}"]
-        return lines
+            ret["with"] = self.with_list
+
+        return ret
 
 
 @dataclass
@@ -40,61 +38,67 @@ class StepCheckoutRepositoryWith:
     fetch_depth: str | None
     token: str | None
 
-    def to_string_lines(self, indent: int = 0) -> list[str]:
-        lines = []
+    def to_dict(self) -> dict[str, Any] | None:
+
+        ret: dict[str, Any] = {}
 
         if self.repository:
-            lines += [f"{string_indent(indent + 2)}repository: {self.repository}"]
+            ret["repository"] = self.repository
         if self.path:
-            lines += [f"{string_indent(indent + 2)}path: {self.path}"]
+            ret["path"] = self.path
         if self.ref:
-            lines += [f"{string_indent(indent + 2)}ref: {self.ref}"]
+            ret["ref"] = self.ref
         if self.fetch_depth:
-            lines += [f"{string_indent(indent + 2)}fetch-depth: {self.fetch_depth}"]
+            ret["fetch-depth"] = self.fetch_depth
         if self.token:
-            lines += [f"{string_indent(indent + 2)}token: {self.token}"]
+            ret["token"] = self.token
 
-        if len(lines) > 0:
-            lines = [f"{string_indent(indent)}with:"] + lines
-
-        return lines
+        if len(ret.items()) == 0:
+            return None
+        return ret
 
 
 @dataclass(frozen=True, slots=True)
-class StepCheckoutRepository(StepToStringLines):
+class StepCheckoutRepository(StepToDictInterface):
     name: str
     uses: str = "actions/checkout@v6"
     with_step: StepCheckoutRepositoryWith | None = None
 
-    def to_string_lines(self, indent: int = 0) -> list[str]:
-        lines = [f"{string_indent(indent)}- name: {self.name}"]
-        lines += [f"{string_indent(indent)}  uses: {self.uses}"]
-        if self.with_step is not None:
-            lines += self.with_step.to_string_lines(indent + 2)
+    def to_dict(self) -> dict[str, Any]:
+        ret: dict[str, Any] = {
+            "name": self.name,
+            "uses": self.uses,
+        }
 
-        return lines
+        with_opt = None
+        if self.with_step is not None:
+            with_opt = self.with_step.to_dict()
+
+        if with_opt is not None:
+            ret["with"] = with_opt
+
+        return ret
 
 
 @dataclass(frozen=True, slots=True)
-class StepGitHubUploadArtifacts(StepToStringLines):
+class StepGitHubUploadArtifacts(StepToDictInterface):
     name: str
     with_name: str
     with_path: list[str]
     uses: str = "actions/upload-artifact@v7"
 
-    def to_string_lines(self, indent: int = 0) -> list[str]:
-        lines = [f"{string_indent(indent)}- name: {self.name}"]
-        lines += [f"{string_indent(indent)}  uses: {self.uses}"]
-        lines += [f"{string_indent(indent)}  with:"]
-        lines += [f"{string_indent(indent)}    name: {self.with_name}"]
-        lines += [f"{string_indent(indent)}    path: |"]
-        for p in self.with_path:
-            lines += [f"{string_indent(indent)}      {p}"]
-        return lines
+    def to_dict(self) -> dict[str, Any]:
+        ret: dict[str, Any] = {"name": self.name, "uses": self.uses, "with": {"name": self.with_name}}
+        if len(self.with_path) > 0:
+            ret["with"]["path"] = []
+            for p in self.with_path:
+                ret["with"]["path"].append(p)
+
+        return ret
 
 
 @dataclass(frozen=True, slots=True)
-class StepRunCommand(StepToStringLines):
+class StepRunCommand(StepToDictInterface):
     name: str
     run: list[str]
     id: str | None = None
