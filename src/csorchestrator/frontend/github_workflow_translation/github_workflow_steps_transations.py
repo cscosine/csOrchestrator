@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-from csorchestrator.frontend.github_workflow_translation.github_workflow_config import StepToDictInterface
+from csorchestrator.frontend.github_workflow_translation.github_steps import StepToDictInterface
 from csorchestrator.frontend.github_workflow_translation.yaml_string_dumper import LiteralString
 
 # =========================================================
@@ -81,23 +81,6 @@ class StepCheckoutRepository(StepToDictInterface):
 
 
 @dataclass(frozen=True, slots=True)
-class StepGitHubUploadArtifacts(StepToDictInterface):
-    name: str
-    with_name: str
-    with_path: list[str]
-    uses: str = "actions/upload-artifact@v7"
-
-    def to_dict(self) -> dict[str, Any]:
-        ret: dict[str, Any] = {"name": self.name, "uses": self.uses, "with": {"name": self.with_name}}
-        if len(self.with_path) > 0:
-            ret["with"]["path"] = []
-            for p in self.with_path:
-                ret["with"]["path"].append(p)
-
-        return ret
-
-
-@dataclass(frozen=True, slots=True)
 class StepRunCommand(StepToDictInterface):
     name: str
     run: list[str]
@@ -133,3 +116,71 @@ class StepRunCommand(StepToDictInterface):
             step_dict["working-directory"] = self.working_directory
 
         return step_dict
+
+
+@dataclass(frozen=True)
+class DownloadAllArtifacts(StepToDictInterface):
+    artifacts_folder: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": "Download all artifacts",
+            "uses": "actions/download-artifact@v8",
+            "with": {
+                "path": self.artifacts_folder,
+            },
+        }
+
+
+@dataclass(frozen=True)
+class ShowDownloadedFiles(StepToDictInterface):
+    artifacts_folder: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": "Show downloaded files",
+            "run": f"find {self.artifacts_folder} -type f",
+        }
+
+
+@dataclass(frozen=True)
+class CreateGitHubRelease(StepToDictInterface):
+    artifacts_folder: str
+    if_str: str
+    extra_extension_for_release_files: str | None
+
+    def to_dict(self) -> dict[str, Any]:
+        extension_files = [f"{self.artifacts_folder}/**/*.tar.gz"]
+        if self.extra_extension_for_release_files is not None:
+            extension_files.append(f"{self.artifacts_folder}/**/*{self.extra_extension_for_release_files}")
+
+        ret: dict[str, Any] = {
+            "name": "Create GitHub Release",
+            "uses": "softprops/action-gh-release@v3",
+            "with": {
+                "files": LiteralString("\n".join(extension_files)),
+            },
+        }
+        ret["if"] = self.if_str
+
+        return ret
+
+
+@dataclass(
+    frozen=True,
+)
+class StepGitHubUploadArtifacts(StepToDictInterface):
+    name: str
+    with_name: str
+    with_path: list[str]
+    uses: str = "actions/upload-artifact@v7"
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "uses": self.uses,
+            "with": {
+                "name": self.with_name,
+                "path": LiteralString("\n".join(self.with_path)),
+            },
+        }

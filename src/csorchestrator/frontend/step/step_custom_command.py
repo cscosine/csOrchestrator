@@ -289,15 +289,12 @@ def step_custom_command_to_githubwf(
 
     cmd_evaluated = evaluate_cmd_variable_subst_github_wf(step.cmd)
 
-    run_str_list = ["|"]
-    run_str_list += cmd_evaluated
-
     wf_job.steps.append(
         StepRunCommand(
             name=f"Run command {step.name}",
             if_str=get_if_str(step),
             shell_type="bash",
-            run=run_str_list,
+            run=cmd_evaluated,
         )
     )
 
@@ -330,15 +327,12 @@ def step_win_ps_command_to_githubwf(
 
     cmd_evaluated = evaluate_cmd_variable_subst_github_wf(step.cmd)
 
-    run_str_list = ["|"]
-    run_str_list += cmd_evaluated
-
     wf_job.steps.append(
         StepRunCommand(
             name=f"Run command {step.name}",
             if_str=get_if_str(step),
             shell_type="powershell",
-            run=run_str_list,
+            run=cmd_evaluated,
         )
     )
 

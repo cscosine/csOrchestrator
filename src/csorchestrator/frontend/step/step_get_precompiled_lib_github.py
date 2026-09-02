@@ -215,7 +215,6 @@ def step_get_precompiled_lib_to_githubwf(
             ]
 
         run_list = [
-            "|",
             "import os",
             "import sys",
             "",
@@ -263,7 +262,6 @@ def step_get_precompiled_lib_to_githubwf(
             name=step.name + " extract tar.gz",
             shell_type="bash",
             run=[
-                "|",
                 f"tar -xzf {tarfile_path.as_posix()} -C {libs_subdir.as_posix()}",
                 f"rm -f {tarfile_path.as_posix()}",
             ],

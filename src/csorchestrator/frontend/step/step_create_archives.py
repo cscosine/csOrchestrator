@@ -128,13 +128,12 @@ def step_create_archives_to_githubwf(
     ]
 
     # produce output
-    run_str_list = ["|"] + lines
 
     wf_job.steps.append(
         StepRunCommand(
             name="Create Archives",
             shell_type="python",
-            run=run_str_list,
+            run=lines,
         )
     )
 

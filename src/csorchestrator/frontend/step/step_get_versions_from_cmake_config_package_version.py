@@ -361,15 +361,12 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
     lines += [""]
 
     # produce output
-    run_str_list = [
-        "|",
-    ] + lines
 
     wf_job.steps.append(
         StepRunCommand(
             name="Get Versions",
             shell_type="python",
-            run=run_str_list,
+            run=lines,
         )
     )
 

@@ -154,9 +154,7 @@ def step_cmake_workflow_to_githubwf_powershell(
     # create a step with a if inside base on single/multi config (
     # - in single config need to launch N cmake workflow if I have to configure/build/test N
     # - in multi config the command is one
-    run_str_list = [
-        "|",
-    ]
+    run_str_list = []
     run_str_list += StepCMakeWorkflowGithubExtraCommandsPrefix.get_extra_cmd_prefix(step)
     run_str_list += [f'$gen = "{MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED}"']
     first_cycle = False
@@ -218,7 +216,7 @@ def step_cmake_workflow_to_githubwf(
     # create a step with a if inside base on single/multi config (
     # - in single config need to launch N cmake workflow if I have to configure/build/test N
     # - in multi config the command is one
-    run_str_list = ["|", "set -e"]
+    run_str_list = ["set -e"]
     run_str_list += StepCMakeWorkflowGithubExtraCommandsPrefix.get_extra_cmd_prefix(step)
     first_cycle = False
     for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:

@@ -1,4 +1,3 @@
-from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from typing import Any, Self
 
@@ -6,6 +5,7 @@ from csorchestrator.domain.context.context_os_architecture_compiler_generator im
     ContextOsArchitectureCompilerGenerator,
 )
 from csorchestrator.domain.orchestrator.workflow_config import Cron
+from csorchestrator.frontend.github_workflow_translation.github_steps import StepToDictInterface
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_create_release import (
     JobReleaseCreationFromArtifacts,
 )
@@ -86,16 +86,11 @@ class JobStrategy:
         if len(self._matrix_includes) > 0:
             includes = []
             for matrix_include in self._matrix_includes:
-                includes.append({"include": matrix_include.to_dict()})
-            ret["matrix"] = includes
+                includes.append(matrix_include.to_dict())
+            ret["matrix"] = {}
+            ret["matrix"]["include"] = includes
 
         return ret
-
-
-class StepToDictInterface(ABC):
-    @abstractmethod
-    def to_dict(self) -> dict[str, Any]:
-        raise NotImplementedError
 
 
 @dataclass
@@ -187,10 +182,10 @@ class GitHubWorkflow:
     def to_dict(self) -> dict[str, Any]:
         ret: dict[str, Any] = {}
         ret["name"] = self.name
-        ret["on"] = [trigger.to_dict() for trigger in self._on.values()]
+        ret["on"] = {key: value for trigger in self._on.values() for key, value in trigger.to_dict().items()}
         if len(self._jobs_matrix_exec) > 0 or len(self._jobs_release_on_tag) > 0:
-            release_jobs = [job.to_dict() for job in self._jobs_release_on_tag]
-            matrix_jobs = [job.to_dict() for job in self._jobs_matrix_exec]
-            jobs = release_jobs + matrix_jobs
+            release_jobs = {key: value for job in self._jobs_release_on_tag for key, value in job.to_dict().items()}
+            matrix_jobs = {key: value for job in self._jobs_matrix_exec for key, value in job.to_dict().items()}
+            jobs = release_jobs | matrix_jobs
             ret["jobs"] = jobs
         return ret
