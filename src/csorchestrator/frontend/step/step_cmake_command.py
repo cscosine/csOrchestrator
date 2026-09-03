@@ -22,7 +22,9 @@ from csorchestrator.frontend.cscmake_presets.supported_variants import (
     workflow_name_from_components,
     workflow_name_from_description,
 )
-from csorchestrator.frontend.github_workflow_translation.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
+    JobOrchestratorMatrixExecution,
+)
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
 )

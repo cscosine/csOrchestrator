@@ -21,13 +21,13 @@ class TriggerType(StrEnum):
 # =========================================================
 
 
-class Trigger:
+class TriggerInterface:
     def to_dict(self) -> dict[str, object]:
         raise NotImplementedError
 
 
 @dataclass(frozen=True, slots=True)
-class PushTrigger(Trigger):
+class PushTrigger(TriggerInterface):
     branches: list[str] | None = None
     tags: list[str] | None = None
 
@@ -44,7 +44,7 @@ class PushTrigger(Trigger):
 
 
 @dataclass(frozen=True, slots=True)
-class PullRequestTrigger(Trigger):
+class PullRequestTrigger(TriggerInterface):
     branches: list[str] | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -57,13 +57,13 @@ class PullRequestTrigger(Trigger):
 
 
 @dataclass(frozen=True, slots=True)
-class WorkflowDispatchTrigger(Trigger):
+class WorkflowDispatchTrigger(TriggerInterface):
     def to_dict(self) -> dict[str, Any]:
         return {"workflow_dispatch": {}}
 
 
 @dataclass(frozen=True, slots=True)
-class ScheduleTrigger(Trigger):
+class ScheduleTrigger(TriggerInterface):
     cron: Cron
 
     def to_dict(self) -> dict[str, Any]:

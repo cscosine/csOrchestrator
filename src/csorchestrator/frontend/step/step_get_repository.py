@@ -8,7 +8,9 @@ from csorchestrator.foundation.file_system.path import is_clean_relative_path
 from csorchestrator.foundation.git.repo_clone_checkout import try_git_clone_checkout
 from csorchestrator.foundation.git.repo_validate_and_sync import validate_and_sync_repo
 from csorchestrator.foundation.git.resolve_url import RepoUrlParts
-from csorchestrator.frontend.github_workflow_translation.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
+    JobOrchestratorMatrixExecution,
+)
 from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import (
     StepCheckoutRepository,
     StepCheckoutRepositoryWith,

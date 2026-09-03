@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any
 
-from csorchestrator.frontend.github_workflow_translation.github_steps import StepToDictInterface
+from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
 from csorchestrator.frontend.github_workflow_translation.yaml_string_dumper import LiteralString
 
 # =========================================================
@@ -10,7 +10,7 @@ from csorchestrator.frontend.github_workflow_translation.yaml_string_dumper impo
 
 
 @dataclass
-class StepGitHubAction(StepToDictInterface):
+class StepGitHubAction(GithubStepInterface):
     name: str
     uses: str
     id: str | None = None
@@ -59,7 +59,7 @@ class StepCheckoutRepositoryWith:
 
 
 @dataclass(frozen=True, slots=True)
-class StepCheckoutRepository(StepToDictInterface):
+class StepCheckoutRepository(GithubStepInterface):
     name: str
     uses: str = "actions/checkout@v6"
     with_step: StepCheckoutRepositoryWith | None = None
@@ -81,7 +81,7 @@ class StepCheckoutRepository(StepToDictInterface):
 
 
 @dataclass(frozen=True, slots=True)
-class StepRunCommand(StepToDictInterface):
+class StepRunCommand(GithubStepInterface):
     name: str
     run: list[str]
     id: str | None = None
@@ -119,7 +119,7 @@ class StepRunCommand(StepToDictInterface):
 
 
 @dataclass(frozen=True)
-class DownloadAllArtifacts(StepToDictInterface):
+class DownloadAllArtifacts(GithubStepInterface):
     artifacts_folder: str
 
     def to_dict(self) -> dict[str, Any]:
@@ -133,7 +133,7 @@ class DownloadAllArtifacts(StepToDictInterface):
 
 
 @dataclass(frozen=True)
-class ShowDownloadedFiles(StepToDictInterface):
+class ShowDownloadedFiles(GithubStepInterface):
     artifacts_folder: str
 
     def to_dict(self) -> dict[str, Any]:
@@ -144,7 +144,7 @@ class ShowDownloadedFiles(StepToDictInterface):
 
 
 @dataclass(frozen=True)
-class CreateGitHubRelease(StepToDictInterface):
+class CreateGitHubRelease(GithubStepInterface):
     artifacts_folder: str
     if_str: str
     extra_extension_for_release_files: str | None
@@ -169,7 +169,7 @@ class CreateGitHubRelease(StepToDictInterface):
 @dataclass(
     frozen=True,
 )
-class StepGitHubUploadArtifacts(StepToDictInterface):
+class StepGitHubUploadArtifacts(GithubStepInterface):
     name: str
     with_name: str
     with_path: list[str]

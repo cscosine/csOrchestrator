@@ -15,7 +15,9 @@ from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
 )
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.frontend.github_workflow_translation.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
+    JobOrchestratorMatrixExecution,
+)
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
     create_context_os_architecture_compiler_generator_string_github_matrix,

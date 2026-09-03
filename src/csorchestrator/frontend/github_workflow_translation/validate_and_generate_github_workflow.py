@@ -24,11 +24,13 @@ from csorchestrator.foundation.core.expected import Expected
 from csorchestrator.foundation.file_system.directory import ensure_directory_exists_or_create_and_is_usable
 from csorchestrator.frontend.github_workflow_translation.github_workflow_config import (
     GitHubWorkflow,
-    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
-    create_job_from_matrix_list,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_create_release import (
     JobReleaseCreationFromArtifacts,
+)
+from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
+    MatrixOsArchCompilerGeneratorRunnerEntryInclude,
+    create_job_from_matrix_list,
 )
 from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
     OrchestratorVisitorGitHubWorkflowPreparation,
@@ -241,8 +243,6 @@ def validate_and_generate_github_workflow(
     reporter.report_execution_report(report_execution)
 
     res.report_executions.append(report_execution)
-
-    print(wf.to_dict())
 
     lines = yaml.safe_dump(
         wf.to_dict(),

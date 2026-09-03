@@ -5,7 +5,9 @@ from csorchestrator.domain.orchestrator.phase import Phase
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import StepBase, StepCapability
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.frontend.github_workflow_translation.github_workflow_config import JobOrchestratorMatrixExecution
+from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
+    JobOrchestratorMatrixExecution,
+)
 
 
 @dataclass
