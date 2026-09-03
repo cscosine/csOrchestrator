@@ -1,3 +1,5 @@
+import shutil
+from importlib.resources import as_file, files
 from pathlib import Path
 from typing import TypeAlias
 
@@ -137,6 +139,15 @@ def orchestrator_matrix_to_github_wf_matrix(
     return OrchestratorMatrixToGitHubWFExpected.make_value(res)
 
 
+def copy_portable_csOrchestrator(output_folder: Path) -> None:
+
+    source = files("csorchestrator").joinpath("portable")
+    destination = output_folder / "csorchestrator" / "portable"
+
+    with as_file(source) as source_path:
+        shutil.copytree(source_path, destination, dirs_exist_ok=True)
+
+
 def create_github_wf(name: str, *, config: WorkflowTrigger) -> GitHubWorkflow:
 
     gwf = GitHubWorkflow(name)
@@ -211,7 +222,8 @@ def validate_and_generate_github_workflow(
         return res
 
     assert dir_creation_res.value
-    output_path = dir_creation_res.value / Path(f"{wf.name}.yml")
+    output_folder = dir_creation_res.value
+    output_path = output_folder / Path(f"{wf.name}.yml")
 
     # end pre execution
     reporter.report_pre_execution_report(res.report_pre_execution)
@@ -253,6 +265,8 @@ def validate_and_generate_github_workflow(
     )
 
     output_path.write_text(lines, encoding="utf-8")
+
+    copy_portable_csOrchestrator(output_folder)
 
     reporter.finalize_execution()
 
