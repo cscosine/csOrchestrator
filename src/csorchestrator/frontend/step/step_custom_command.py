@@ -16,7 +16,7 @@ from csorchestrator.domain.orchestrator.step_base import (
 )
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecution,
+    JobOrchestratorMatrixExecutionContext,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
@@ -37,7 +37,7 @@ from csorchestrator.frontend.local_execution.step_utils import StepExecuteOnlyOn
 class StepBashScriptCommandCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepBashScriptCommand"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
         return step_custom_command_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -63,7 +63,7 @@ class StepBashScriptCommand(StepBase):
 class StepWinPSCommandCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepWinPSCommand"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
         return step_win_ps_command_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -286,12 +286,12 @@ def get_if_str(step: StepBase) -> str | None:
 
 
 def step_custom_command_to_githubwf(
-    step: StepBashScriptCommand, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+    step: StepBashScriptCommand, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
 ) -> Report:
 
     cmd_evaluated = evaluate_cmd_variable_subst_github_wf(step.cmd)
 
-    wf_job.steps.append(
+    wf_job.job.steps.append(
         StepRunCommand(
             name=f"Run command {step.name}",
             if_str=get_if_str(step),
@@ -324,12 +324,12 @@ def execute_step_win_ps_command(
 
 
 def step_win_ps_command_to_githubwf(
-    step: StepWinPSCommand, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+    step: StepWinPSCommand, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
 ) -> Report:
 
     cmd_evaluated = evaluate_cmd_variable_subst_github_wf(step.cmd)
 
-    wf_job.steps.append(
+    wf_job.job.steps.append(
         StepRunCommand(
             name=f"Run command {step.name}",
             if_str=get_if_str(step),

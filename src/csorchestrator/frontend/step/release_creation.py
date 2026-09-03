@@ -23,18 +23,14 @@ from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor
 from csorchestrator.frontend.local_execution.release_creation_context_local_execution import (
     ReleaseCreationContextLocalExecution,
 )
-from csorchestrator.frontend.release_manifest.manifest import (
-    Manifest,
-    ManifestVersionsEntry,
-    write_release_manifest,
-)
 from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
-    CMakeConfigPackageVersion,
     create_version_file_name,
-    load_version_file,
 )
-
-CS_ORCHESTRATOR_MANIFEST_EXTENSION: str = ".csOrchestratorManifest"
+from csorchestrator.portable.package_version import PackageVersion
+from csorchestrator.portable.release_manifest import (
+    ManifestVersionsEntry,
+    ReleaseManifest,
+)
 
 
 @dataclass
@@ -50,9 +46,6 @@ class ReleaseCreationOnTagConfigCapabilityGithubWorkflow(ReleaseCreationOnTagCon
         return release_creation_on_tag_config_to_githubwf(
             self.step, matrix_list, orchestrator_description, artifacts_folder
         )
-
-    def getReleaseFilesExtension(self) -> str:
-        return CS_ORCHESTRATOR_MANIFEST_EXTENSION
 
 
 @dataclass
@@ -100,7 +93,12 @@ def release_creation_on_tag_config_to_githubwf(
                     + "-"
                     + context_os_architecture_compiler_generator_string
                 )
-                / Path(create_version_file_name(context_os_architecture_compiler_generator_string))
+                / Path(
+                    create_version_file_name(
+                        orchestrator_description.name_and_version_string,
+                        context_os_architecture_compiler_generator_string,
+                    )
+                )
             ).as_posix()
         )
 
@@ -116,11 +114,9 @@ def release_creation_on_tag_config_to_githubwf(
         "import json",
         "",
     ]
-    class1 = inspect.getsource(CMakeConfigPackageVersion).splitlines()
+    class1 = inspect.getsource(PackageVersion).splitlines()
     class2 = inspect.getsource(ManifestVersionsEntry).splitlines()
-    class3 = inspect.getsource(Manifest).splitlines()
-    fun1 = inspect.getsource(write_release_manifest).splitlines()
-    fun2 = inspect.getsource(load_version_file).splitlines()
+    class3 = inspect.getsource(ReleaseManifest).splitlines()
 
     lines += header
     lines += class1
@@ -128,10 +124,6 @@ def release_creation_on_tag_config_to_githubwf(
     lines += class2
     lines += [""]
     lines += class3
-    lines += [""]
-    lines += fun1
-    lines += [""]
-    lines += fun2
     lines += [""]
 
     lines += ["input_files_list = ["]
@@ -157,9 +149,9 @@ def release_creation_on_tag_config_to_githubwf(
     lines += ["  variants=collected_version_entries,"]
     lines += [")"]
     lines += [
-        f"output_filename = Path('{orchestrator_description.name_and_version_string}{CS_ORCHESTRATOR_MANIFEST_EXTENSION}')"  # noqa: E501
+        f"output_filename = Path('{orchestrator_description.name_and_version_string}{ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION}')"  # noqa: E501
     ]
-    lines += ["write_release_manifest(release_manifest,output_filename)"]
+    lines += ["release_manifest.write_release_manifest(output_filename)"]
     lines += [""]
 
     step_github = StepRunCommand(
@@ -193,6 +185,7 @@ def release_creation_on_tag_config_execute_local(
         # e.g. detected os is win 11, but we select win 10 in the matrix, which is compatible
 
         context = ContextLocalExecution(
+            orchestrator_description=relase_context.orchestrator_description,
             base_folder_path=relase_context.base_path,
             os_architecture=os_architecture_compiler_generator.context_os_architecture,
             active_compiler_generator=os_architecture_compiler_generator.context_compiler_generator,
@@ -206,25 +199,40 @@ def release_creation_on_tag_config_execute_local(
 
         input_base_dir = Path(context.base_folder_path / step.base_install_dir).resolve()
         input_full_path = Path(
-            input_base_dir / Path(create_version_file_name(context_os_architecture_compiler_generator_string))
+            input_base_dir
+            / Path(
+                create_version_file_name(
+                    relase_context.orchestrator_description.name_and_version_string,
+                    context_os_architecture_compiler_generator_string,
+                )
+            )
         ).resolve()
 
-        packages = load_version_file(input_full_path)
-        collected_version_entries.append(
-            ManifestVersionsEntry(context_os_architecture_compiler_generator_string, packages)
-        )
+        packages = ReleaseManifest.load_release_manifest(input_full_path)
+        if len(packages.variants) == 0 or len(packages.variants) > 1:
+            report.append_error(
+                f"release manifest {str(input_full_path)} has {len(packages.variants)} variants, expected 1"
+            )
+            return report
 
-    release_manifest = Manifest(
-        manifest_version=Manifest.MANIFEST_VERSION,
+        if context_os_architecture_compiler_generator_string != packages.variants[0].variant:
+            report.append_error(
+                f"release manifest {str(input_full_path)} has variant name {packages.variants[0].variant}, expected {context_os_architecture_compiler_generator_string}"  # noqa: E501
+            )
+            return report
+
+        collected_version_entries.append(packages.variants[0])
+
+    release_manifest = ReleaseManifest(
         project_name=relase_context.orchestrator_description.orchestrator_name,
         project_version=relase_context.orchestrator_description.orchestrator_version,
         variants=collected_version_entries,
     )
     output_filename = step.base_install_dir / Path(
-        relase_context.orchestrator_description.name_and_version_string + CS_ORCHESTRATOR_MANIFEST_EXTENSION
+        relase_context.orchestrator_description.name_and_version_string
+        + ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION
     )
-    write_release_manifest(
-        release_manifest,
+    release_manifest.write_release_manifest(
         output_filename,
     )
 

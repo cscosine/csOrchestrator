@@ -1,7 +1,6 @@
 import inspect
-import json
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
@@ -13,7 +12,7 @@ from csorchestrator.domain.orchestrator.step_base import (
 )
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecution,
+    JobOrchestratorMatrixExecutionContext,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
@@ -26,8 +25,8 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
-
-CS_ORCHESTRATOR_VERSION_FILE_EXTENSION = ".csOrchestratorVersion"
+from csorchestrator.portable.package_version import PackageVersion
+from csorchestrator.portable.release_manifest import ManifestVersionsEntry, ReleaseManifest
 
 
 @dataclass(frozen=True)
@@ -36,24 +35,11 @@ class CMakeConfigPackageVersionGrep:
     version_file: Path
 
 
-@dataclass(frozen=True)
-class CMakeConfigPackageVersion:
-    name: str
-    version: str
-
-    def to_dict(self) -> dict[str, str]:
-        return asdict(self)
-
-    @classmethod
-    def from_dict(cls, data: dict[str, str]) -> "CMakeConfigPackageVersion":
-        return cls(**data)
-
-
 @dataclass
 class StepGetVersionsFromCMakeConfigPackageVersionCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepGetVersionsFromCMakeConfigPackageVersion"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
         return step_get_versions_from_cmake_config_package_version_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -70,7 +56,7 @@ class StepGetVersionsFromCMakeConfigPackageVersion(StepBase):
     base_install_dir: Path
     repos_config_file_list: list[CMakeConfigPackageVersionGrep] = field(default_factory=list)
     repos_auto_search_list: list[str] = field(default_factory=list)  # name of repos only,
-    repos_version: list[CMakeConfigPackageVersion] = field(default_factory=list)
+    repos_version: list[PackageVersion] = field(default_factory=list)
     # will look for {name}-config-version.cmake or {name}ConfigVersion.cmake
 
     def __post_init__(self) -> None:
@@ -132,14 +118,14 @@ def find_cmake_config_version(search_path: Path, name: str) -> tuple[Path | None
 
 @dataclass
 class VersionSearchOutput:
-    versions: list[CMakeConfigPackageVersion] = field(default_factory=list)
+    versions: list[PackageVersion] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
 
 
 def get_versions_helper(
     repos_config_file_list: list[CMakeConfigPackageVersionGrep],  # pairs of repo and files reporting versions
     repos_auto_search_list: list[str],  # repo name only
-    repos_version: list[CMakeConfigPackageVersion],  # pairs of repo and versions
+    repos_version: list[PackageVersion],  # pairs of repo and versions
     base_install_dir: Path,
     install_subdir: Path,
     base_folder_path: Path | None,
@@ -148,7 +134,7 @@ def get_versions_helper(
 
     # fixed versions
     for repo_v in repos_version:
-        result.versions.append(CMakeConfigPackageVersion(name=repo_v.name, version=repo_v.version))
+        result.versions.append(PackageVersion(name=repo_v.name, version=repo_v.version))
 
     # repo with version with file hint
     for repo in repos_config_file_list:
@@ -165,7 +151,7 @@ def get_versions_helper(
         else:
             assert version_or_err[0] is not None
             version = version_or_err[0]
-            result.versions.append(CMakeConfigPackageVersion(name=repo.name, version=version))
+            result.versions.append(PackageVersion(name=repo.name, version=version))
 
     # repo with version autosearch
     for name in repos_auto_search_list:
@@ -189,31 +175,20 @@ def get_versions_helper(
             else:
                 assert version_or_err[0] is not None
                 version = version_or_err[0]
-                result.versions.append(CMakeConfigPackageVersion(name=name, version=version))
+                result.versions.append(PackageVersion(name=name, version=version))
 
     return result
 
 
-def create_version_file_name(context_os_architecture_compiler_generator_string: str) -> str:
-    return context_os_architecture_compiler_generator_string + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION
-
-
-def write_version_file(dest: Path, src: list[CMakeConfigPackageVersion]) -> None:
-    ret = [entry.to_dict() for entry in src]
-
-    with open(dest, "w", encoding="utf-8") as f:
-        json.dump(ret, f, indent=4, ensure_ascii=False)
-
-
-def load_version_file(src: Path) -> list[CMakeConfigPackageVersion]:
-    packages = []
-    with open(src, encoding="utf-8") as f:
-        packages = json.load(f)
-
-    # TODO make robust to errors
-    ret = [CMakeConfigPackageVersion.from_dict(entry) for entry in packages]
-
-    return ret
+def create_version_file_name(
+    orchestrator_name_and_version_string: str, context_os_architecture_compiler_generator_string: str
+) -> str:
+    return (
+        orchestrator_name_and_version_string
+        + "-"
+        + context_os_architecture_compiler_generator_string
+        + ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION
+    )
 
 
 def execute_step_get_versions_from_cmake_config_package_version(
@@ -221,7 +196,7 @@ def execute_step_get_versions_from_cmake_config_package_version(
 ) -> Report:
     report = Report()
 
-    install_subdir = create_context_os_architecture_compiler_generator_string(
+    context_os_architecture_compiler_generator_string = create_context_os_architecture_compiler_generator_string(
         context.get_active_os_architecture_compiler_generator()
     )
 
@@ -230,7 +205,7 @@ def execute_step_get_versions_from_cmake_config_package_version(
         step.repos_auto_search_list,
         step.repos_version,
         step.base_install_dir,
-        Path(install_subdir),
+        Path(context_os_architecture_compiler_generator_string),
         context.base_folder_path,
     )
 
@@ -242,8 +217,25 @@ def execute_step_get_versions_from_cmake_config_package_version(
     for p in result.versions:
         report.append_info(f"repo: {p.name} version: {p.version}")
 
-    output_file = context.base_folder_path / step.base_install_dir / Path(create_version_file_name(install_subdir))
-    write_version_file(output_file, result.versions)
+    output_file = (
+        context.base_folder_path
+        / step.base_install_dir
+        / Path(
+            create_version_file_name(
+                context.orchestrator_description.name_and_version_string,
+                context_os_architecture_compiler_generator_string,
+            )
+        )
+    )
+
+    entry = ManifestVersionsEntry(variant=context_os_architecture_compiler_generator_string, entries=result.versions)
+    manifest = ReleaseManifest(
+        project_name=context.orchestrator_description.orchestrator_name,
+        project_version=context.orchestrator_description.orchestrator_version,
+        variants=[entry],
+    )
+
+    manifest.write_release_manifest(output_file)
 
     return report
 
@@ -272,7 +264,7 @@ def _create_python_list_class_grep(src_list: list[CMakeConfigPackageVersionGrep]
     return lines
 
 
-def _create_python_list_class_version(src_list: list[CMakeConfigPackageVersion], list_name: str) -> list[str]:
+def _create_python_list_class_version(src_list: list[PackageVersion], list_name: str) -> list[str]:
     lines: list[str] = []
     if len(src_list) == 0:
         lines += [f"{list_name}: list[CMakeConfigPackageVersion] = []", ""]
@@ -289,7 +281,7 @@ def _create_python_list_class_version(src_list: list[CMakeConfigPackageVersion],
 
 def step_get_versions_from_cmake_config_package_version_to_githubwf(
     step: StepGetVersionsFromCMakeConfigPackageVersion,
-    wf_job: JobOrchestratorMatrixExecution,
+    wf_job: JobOrchestratorMatrixExecutionContext,
     reporter_sink: ReporterSinkBase,
 ) -> Report:
     header = [
@@ -303,30 +295,13 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
         "",
     ]
     class1 = inspect.getsource(CMakeConfigPackageVersionGrep).splitlines()
-    class2 = inspect.getsource(CMakeConfigPackageVersion).splitlines()
+    class2 = inspect.getsource(PackageVersion).splitlines()
     class3 = inspect.getsource(VersionSearchOutput).splitlines()
     body1 = inspect.getsource(grep_package_version).splitlines()
     body2 = inspect.getsource(find_cmake_config_version).splitlines()
     body3 = inspect.getsource(get_versions_helper).splitlines()
-    body4 = inspect.getsource(write_version_file).splitlines()
 
-    lines = (
-        header
-        + class1
-        + [""]
-        + class2
-        + [""]
-        + class3
-        + [""]
-        + body1
-        + [""]
-        + body2
-        + [""]
-        + body3
-        + [""]
-        + body4
-        + [""]
-    )
+    lines = header + class1 + [""] + class2 + [""] + class3 + [""] + body1 + [""] + body2 + [""] + body3 + [""]
 
     install_subdir = create_context_os_architecture_compiler_generator_string_github_matrix()
 
@@ -356,7 +331,7 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
     lines += [
         "output_file = (",
         f"    Path('{step.base_install_dir}')",
-        f"    / Path('{create_version_file_name(install_subdir)}')",
+        f"    / Path('{create_version_file_name(wf_job.orchestrator_description.name_and_version_string, install_subdir)}')",  # noqa: E501
     ]
     lines += [")", ""]
     lines += ["write_version_file(output_file, result.versions)"]
@@ -364,7 +339,7 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
 
     # produce output
 
-    wf_job.steps.append(
+    wf_job.job.steps.append(
         StepRunCommand(
             name="Get Versions",
             shell_type="python",

@@ -18,7 +18,7 @@ from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.foundation.file_system.directory import ensure_directory_exists_or_create_and_is_usable
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecution,
+    JobOrchestratorMatrixExecutionContext,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
@@ -40,7 +40,7 @@ from csorchestrator.frontend.step.step_get_repository import StepGetRepositoryGi
 class StepGetPrecompiledLibGithubCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepGetPrecompiledLibGithub"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
         return step_get_precompiled_lib_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -177,7 +177,7 @@ def sanitize_github_identifier(value: str) -> str:
 
 
 def step_get_precompiled_lib_to_githubwf(
-    step: StepGetPrecompiledLibGithub, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+    step: StepGetPrecompiledLibGithub, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
 ) -> Report:
 
     release_name_part = create_context_os_architecture_compiler_generator_string_github_matrix()
@@ -186,7 +186,7 @@ def step_get_precompiled_lib_to_githubwf(
     if step.mapping_function is None:
         src_filename = str(release_name_part + "-" + step.lib_name + "-" + step.lib_version + ".tar.gz")
 
-        wf_job.steps.append(
+        wf_job.job.steps.append(
             StepGitHubAction(
                 name=step.name + " download tar.gz",
                 uses="robinraju/release-downloader@v1.13",
@@ -208,7 +208,7 @@ def step_get_precompiled_lib_to_githubwf(
         filename_variable = f"{step_id}"
 
         filenames_dict_lines: list[str] = []
-        for matrix_id, matrix in enumerate(wf_job.strategy._matrix_includes):
+        for matrix_id, matrix in enumerate(wf_job.job.strategy._matrix_includes):
             new_context = step.mapping_function(deepcopy(matrix.original_os_architecture_compiler_generator_list))
             if new_context is None:
                 return Report().append_error(f"error evaluating mapping function for {step.name} in github translation")
@@ -238,11 +238,11 @@ def step_get_precompiled_lib_to_githubwf(
             f'    f.write(f"{filename_variable}={{filename}}\\n")',
         ]
 
-        wf_job.steps.append(
+        wf_job.job.steps.append(
             StepRunCommand(name=step.name + " prepare filename", id=step_id, shell_type="python", run=run_list)
         )
 
-        wf_job.steps.append(
+        wf_job.job.steps.append(
             StepGitHubAction(
                 name=step.name + " download tar.gz",
                 uses="robinraju/release-downloader@v1.13",
@@ -259,7 +259,7 @@ def step_get_precompiled_lib_to_githubwf(
 
     # finally, one step to extract the archive
 
-    wf_job.steps.append(
+    wf_job.job.steps.append(
         StepRunCommand(
             name=step.name + " extract tar.gz",
             shell_type="bash",

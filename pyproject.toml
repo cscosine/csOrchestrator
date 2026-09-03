@@ -156,6 +156,7 @@ layers = [
     "frontend",
     "domain",
     "foundation",
+    "portable",
 ]
 containers = [
     "csorchestrator"
@@ -195,7 +196,6 @@ type = "layers"
 
 layers = [
     "recipes",
-    "release_manifest",
     "step",
     "github_workflow_translation : local_execution",
     "validation",

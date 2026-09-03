@@ -9,8 +9,8 @@ from urllib.parse import urljoin
 from csorchestrator.foundation.core.optional_result_with_report import OptionalResultWithReport
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.foundation.file_system.directory import ensure_directory_exists_or_create_and_is_usable
-from csorchestrator.frontend.release_manifest.release_creation import CS_ORCHESTRATOR_MANIFEST_EXTENSION
 from csorchestrator.frontend.step.step_get_repository import StepGetRepositoryGitHub
+from csorchestrator.portable.release_manifest import ReleaseManifest
 
 
 @dataclass(frozen=True)
@@ -47,7 +47,7 @@ def download_manifest(manifest_description: ManifestGithub, output_folder: Path)
         manifest_description.project_name
         + "-"
         + manifest_description.project_version
-        + CS_ORCHESTRATOR_MANIFEST_EXTENSION
+        + ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION
     )
     target_filename = target_dir / source_filename
 

@@ -23,7 +23,7 @@ from csorchestrator.frontend.cscmake_presets.supported_variants import (
     workflow_name_from_description,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecution,
+    JobOrchestratorMatrixExecutionContext,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
@@ -43,7 +43,7 @@ from csorchestrator.frontend.step.step_custom_command import execute_command, ge
 class StepCMakeWorkflowCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepCMakeWorkflow"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
         if self.step.get_extra(StepCMakeWorkflowGithubPowershell):
             return step_cmake_workflow_to_githubwf_powershell(self.step, wf_job, reporter_sink)
         return step_cmake_workflow_to_githubwf(self.step, wf_job, reporter_sink)
@@ -151,7 +151,7 @@ def execute_step_cmake_workflow(
 
 
 def step_cmake_workflow_to_githubwf_powershell(
-    step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+    step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
 ) -> Report:
     # create a step with a if inside base on single/multi config (
     # - in single config need to launch N cmake workflow if I have to configure/build/test N
@@ -198,7 +198,7 @@ def step_cmake_workflow_to_githubwf_powershell(
     run_str_list += ["  exit 1"]
     run_str_list += ["}"]
 
-    wf_job.steps.append(
+    wf_job.job.steps.append(
         StepRunCommand(
             name=f"cmake workflow on {step.name} for config(s) {step.config.value}",
             shell_type="powershell",
@@ -212,7 +212,7 @@ def step_cmake_workflow_to_githubwf_powershell(
 
 
 def step_cmake_workflow_to_githubwf(
-    step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+    step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
 ) -> Report:
 
     # create a step with a if inside base on single/multi config (
@@ -264,7 +264,7 @@ def step_cmake_workflow_to_githubwf(
     run_str_list += ["  exit 1"]
     run_str_list += ["fi"]
 
-    wf_job.steps.append(
+    wf_job.job.steps.append(
         StepRunCommand(
             name=f"cmake workflow on {step.name} for config(s) {step.config.value}",
             shell_type="bash",

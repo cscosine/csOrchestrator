@@ -10,7 +10,7 @@ from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBa
 from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecution,
+    JobOrchestratorMatrixExecutionContext,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
@@ -24,17 +24,17 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
 from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
-    CMakeConfigPackageVersion,
     create_version_file_name,
-    load_version_file,
 )
+from csorchestrator.portable.package_version import PackageVersion
+from csorchestrator.portable.release_manifest import ReleaseManifest
 
 
 @dataclass
 class StepCreateArchivesCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepCreateArchives"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
         return step_create_archives_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -67,11 +67,30 @@ def execute_step_create_archives(
         context.get_active_os_architecture_compiler_generator()
     )
     input_base_dir = Path(context.base_folder_path / step.base_install_dir).resolve()
-    input_full_path = Path(input_base_dir / Path(create_version_file_name(install_subdir))).resolve()
+    input_full_path = Path(
+        input_base_dir
+        / Path(create_version_file_name(context.orchestrator_description.name_and_version_string, install_subdir))
+    ).resolve()
 
-    packages = load_version_file(input_full_path)
+    # load which packages to create archives for from the version file (eg. eigen3: 3.4.0, boost: 1.82.0, etc)
+    packages = ReleaseManifest.load_release_manifest(input_full_path)
+    if len(packages.variants) == 0 or len(packages.variants) > 1:
+        report.append_error(
+            f"release manifest {str(input_full_path)} has {len(packages.variants)} variants, expected 1"
+        )
+        return report
 
-    for item in packages:
+    context_os_architecture_compiler_generator_string = create_context_os_architecture_compiler_generator_string(
+        context.get_active_os_architecture_compiler_generator()
+    )
+
+    if context_os_architecture_compiler_generator_string != packages.variants[0].variant:
+        report.append_error(
+            f"release manifest {str(input_full_path)} has variant name {packages.variants[0].variant}, expected {context_os_architecture_compiler_generator_string}"  # noqa: E501
+        )
+        return report
+
+    for item in packages.variants[0].entries:
         input_path = Path(input_base_dir / install_subdir / Path(item.name)).resolve()
         output_path = Path(
             input_base_dir / Path(str(install_subdir) + "-" + item.name + "-" + item.version + ".tar.gz")
@@ -88,12 +107,15 @@ def execute_step_create_archives(
 
 
 def step_create_archives_to_githubwf(
-    step: StepCreateArchives, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+    step: StepCreateArchives, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
 ) -> Report:
 
     install_dir_name = create_context_os_architecture_compiler_generator_string_github_matrix()
     install_subdir = step.base_install_dir / install_dir_name
-    input_full_path = Path(step.base_install_dir / Path(create_version_file_name(install_dir_name)))
+    input_full_path = Path(
+        step.base_install_dir
+        / Path(create_version_file_name(wf_job.orchestrator_description.name_and_version_string, install_dir_name))
+    )
 
     lines = [
         "import json",
@@ -105,9 +127,7 @@ def step_create_archives_to_githubwf(
         "",
     ]
 
-    lines += inspect.getsource(CMakeConfigPackageVersion).splitlines()
-    lines += [""]
-    lines += inspect.getsource(load_version_file).splitlines()
+    lines += inspect.getsource(PackageVersion).splitlines()
     lines += [""]
 
     lines += [
@@ -131,7 +151,7 @@ def step_create_archives_to_githubwf(
 
     # produce output
 
-    wf_job.steps.append(
+    wf_job.job.steps.append(
         StepRunCommand(
             name="Create Archives",
             shell_type="python",

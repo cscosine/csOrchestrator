@@ -6,19 +6,19 @@ from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBa
 from csorchestrator.domain.orchestrator.step_base import StepBase, StepCapability
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecution,
+    JobOrchestratorMatrixExecutionContext,
 )
 
 
 @dataclass
 class StepCapabilityGithubWorkflow(StepCapability):
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
         return Report().append_error("StepCapabilityGithubWorkflow.to_githubwf need to be imlemented in subclasses")
 
 
 @dataclass
 class OrchestratorVisitorGitHubWorkflowPreparation(OrchestratorVisitorBase):
-    wf_job: JobOrchestratorMatrixExecution
+    wf_job: JobOrchestratorMatrixExecutionContext
 
     def init_visit(self) -> None:
         pass

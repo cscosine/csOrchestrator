@@ -8,7 +8,7 @@ from csorchestrator.domain.orchestrator.step_base import (
 )
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecution,
+    JobOrchestratorMatrixExecutionContext,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
@@ -19,16 +19,14 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_t
 from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
     StepCapabilityGithubWorkflow,
 )
-from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
-    CS_ORCHESTRATOR_VERSION_FILE_EXTENSION,
-)
+from csorchestrator.portable.release_manifest import ReleaseManifest
 
 
 @dataclass
 class StepUploadArtifactsCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepUploadArtifacts"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
         return step_upload_artifacts_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -46,20 +44,20 @@ class StepUploadArtifacts(StepBase):
 
 
 def step_upload_artifacts_to_githubwf(
-    step: StepUploadArtifacts, wf_job: JobOrchestratorMatrixExecution, reporter_sink: ReporterSinkBase
+    step: StepUploadArtifacts, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
 ) -> Report:
 
     install_subdir = create_context_os_architecture_compiler_generator_string_github_matrix()
 
     artifact_name = f"{step.artifact_prefix}{install_subdir}"
 
-    wf_job.steps.append(
+    wf_job.job.steps.append(
         StepGitHubUploadArtifacts(
             name="Upload Artifacts",
             with_name=artifact_name,
             with_path=[
                 (step.base_install_dir / install_subdir / "*.tar.gz").as_posix(),
-                (step.base_install_dir / ("*" + CS_ORCHESTRATOR_VERSION_FILE_EXTENSION)).as_posix(),
+                (step.base_install_dir / ("*" + ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION)).as_posix(),
             ],
         )
     )

@@ -7,6 +7,7 @@ from typing import Any
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
     ContextOsArchitectureCompilerGenerator,
 )
+from csorchestrator.domain.orchestrator.orchestrator import OrchestratorDescription
 from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
@@ -98,11 +99,18 @@ class JobOrchestratorMatrixExecution:
         }
 
 
+@dataclass
+class JobOrchestratorMatrixExecutionContext:
+    job: JobOrchestratorMatrixExecution
+    orchestrator_description: OrchestratorDescription
+
+
 def create_job_from_matrix_list(
     name: str,
     matrix_list: list[MatrixOsArchCompilerGeneratorRunnerEntryInclude],
+    orchestrator_description: OrchestratorDescription,
     fail_fast: bool,
-) -> JobOrchestratorMatrixExecution:
+) -> JobOrchestratorMatrixExecutionContext:
 
     jd = JobOrchestratorMatrixExecution(
         name=name,
@@ -113,4 +121,4 @@ def create_job_from_matrix_list(
     for matrix in matrix_list:
         jd.strategy.add_matrix_include(matrix)
 
-    return jd
+    return JobOrchestratorMatrixExecutionContext(job=jd, orchestrator_description=orchestrator_description)

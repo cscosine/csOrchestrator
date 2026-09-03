@@ -15,6 +15,7 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_t
     ShowDownloadedFiles,
     StepGitHubUploadArtifacts,
 )
+from csorchestrator.portable.release_manifest import ReleaseManifest
 
 
 class ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow(ReleaseCreationOnTagConfigBaseCapability):
@@ -27,10 +28,6 @@ class ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow(ReleaseCreationOnTa
         artifacts_folder: str,
     ) -> list[dict[str, Any]]:
         return []
-
-    # TODO abstract? but not compatible with concrete class required by capability
-    def getReleaseFilesExtension(self) -> str:
-        return ""
 
 
 @dataclass
@@ -54,7 +51,7 @@ class JobReleaseCreationFromArtifacts:
         extra_extension_for_release_files = None
         if capability is not None:
             steps.extend(capability.to_steps_dict(self.matrix_list, self.orchestrator_description, artifacts_folder))
-            extra_extension_for_release_files = capability.getReleaseFilesExtension()
+            extra_extension_for_release_files = ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION
             steps.append(
                 StepGitHubUploadArtifacts(
                     name="Upload artifacts",

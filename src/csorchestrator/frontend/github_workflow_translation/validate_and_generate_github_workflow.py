@@ -231,9 +231,10 @@ def validate_and_generate_github_workflow(
     wf_job = create_job_from_matrix_list(
         name=matrix.name,
         matrix_list=wf_matrix,
+        orchestrator_description=orchestrator.createOrchestratorDescription(),
         fail_fast=matrix.fail_fast,
     )
-    wf.on_job_matrix_exec(job=wf_job)
+    wf.on_job_matrix_exec(job=wf_job.job)
 
     reporter.report_start_execution("orchestrator execution without matrix")
     # execute the orchestrator visitor, which will execute the step to clone the repo, build, etc...
