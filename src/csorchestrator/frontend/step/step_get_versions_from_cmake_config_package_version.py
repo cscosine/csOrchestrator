@@ -1,4 +1,3 @@
-import re
 from dataclasses import dataclass, field
 from importlib.resources import files
 from pathlib import Path
@@ -27,6 +26,7 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+from csorchestrator.frontend.step.templates.utils import fix_path_repr, replace_template_variable
 from csorchestrator.portable.package_version import (
     CMakeConfigPackageVersionGrep,
     PackageVersion,
@@ -119,33 +119,6 @@ def execute_step_get_versions_from_cmake_config_package_version(
         report.append_error(e)
 
     return report
-
-
-def fix_path_repr(src: str) -> str:
-    return src.replace("PosixPath(", "Path(").replace("WindowsPath(", "Path(")
-
-
-def replace_template_variable(
-    source: str,
-    variable_name: str,
-    replacement_value: str,
-) -> str:
-    pattern = re.compile(
-        rf"^(?P<indent>[ \t]*){re.escape(variable_name)}\s*=.*$",
-        re.MULTILINE,
-    )
-
-    match = pattern.search(source)
-    if match is None:
-        # TODO add mechanism for not found values
-        return source
-
-    indent = match.group("indent")
-
-    replacement_value = variable_name + " = " + replacement_value
-    replacement = "\n".join(indent + line if line else line for line in replacement_value.splitlines())
-
-    return source[: match.start()] + replacement + source[match.end() :]
 
 
 def step_get_versions_from_cmake_config_package_version_to_githubwf(
