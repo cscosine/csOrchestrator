@@ -3,7 +3,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any, ClassVar
 
-from csorchestrator.portable.package_version import PackageVersion
+from csorchestrator.portable.package_version import (
+    CMakeConfigPackageVersionGrep,
+    PackageVersion,
+    get_package_versions_helper,
+)
 
 
 @dataclass
@@ -77,3 +81,38 @@ class ReleaseManifest:
         # TODO robustify and return possible errors
         with path.open("r", encoding="utf-8") as f:
             return ReleaseManifest.from_dict(json.load(f))
+
+
+def get_package_versions_and_write_single_variant_manifest(
+    repos_config_file_list: list[CMakeConfigPackageVersionGrep],  # pairs of repo and files reporting versions
+    repos_auto_search_list: list[str],  # repo name only
+    repos_version: list[PackageVersion],  # pairs of repo and versions
+    base_install_dir: Path,
+    install_subdir: Path,
+    variant_string: str,
+    project_name: str,
+    project_version: str,
+    output_file: Path,
+) -> list[str]:  # return errors
+
+    result = get_package_versions_helper(
+        repos_config_file_list,
+        repos_auto_search_list,
+        repos_version,
+        base_install_dir,
+        install_subdir,
+    )
+
+    if result.errors:
+        return result.errors
+
+    entry = ManifestVersionsEntry(variant=variant_string, entries=result.versions)
+    manifest = ReleaseManifest(
+        project_name=project_name,
+        project_version=project_version,
+        variants=[entry],
+    )
+
+    manifest.write_release_manifest(output_file)
+
+    return []

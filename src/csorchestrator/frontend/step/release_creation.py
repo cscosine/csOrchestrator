@@ -22,6 +22,7 @@ from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor
 from csorchestrator.frontend.local_execution.release_creation_context_local_execution import (
     ReleaseCreationContextLocalExecution,
 )
+from csorchestrator.frontend.local_execution.validate_and_execute import create_context_os_architecture_string
 from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
     create_version_file_name,
 )
@@ -162,15 +163,19 @@ def release_creation_on_tag_config_execute_local(
     # first: matrix element string, second packages,version list
     collected_version_entries: list[ManifestVersionsEntry] = []
 
-    counter: int = -1
-    for os_architecture_compiler_generator in relase_context.os_architecture_compiler_generator_list:
-        counter += 1
-
+    for counter, os_architecture_compiler_generator in enumerate(
+        relase_context.os_architecture_compiler_generator_list
+    ):
         match = os_architecture_compiler_generator.context_os_architecture.can_be_executed_on(
             relase_context.os_architecture
         )
         if not match:
-            # TODO introduce a new report section and report skipped
+            report.append_info(
+                "skip release creation on not compatible matrix config: "
+                f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
+                ", current os and architecture:  "
+                f"{create_context_os_architecture_string(relase_context.os_architecture)}"
+            )
             continue
         # use the compatible os_arcchitecture, not the detected one.
         # e.g. detected os is win 11, but we select win 10 in the matrix, which is compatible

@@ -40,7 +40,7 @@ class OsArchitectureAndPath:
 OptionalOsArchitectureAndPathWithReport: TypeAlias = OptionalResultWithReport[OsArchitectureAndPath]
 
 
-def _create_context_os_architecture_string(
+def create_context_os_architecture_string(
     os_architecture: ContextOsArchitecture,
 ) -> str:
     parts: list[str] = []
@@ -110,15 +110,13 @@ def validate_and_execute_orchestrator(
     matrix = orchestrator.execution_matrix
 
     matrix_extras: dict[type, ContextLocalExecutionExtra] = {}
-    counter: int = -1
 
     assert isinstance(matrix, ExecutionMatrixOsArchCompilerGenerator)  # ensured by the validator
 
     # matrix execution
 
-    for os_architecture_compiler_generator in matrix.os_architecture_compiler_generator_list:
-        counter += 1
-
+    any_failed = False
+    for counter, os_architecture_compiler_generator in enumerate(matrix.os_architecture_compiler_generator_list):
         match = os_architecture_compiler_generator.context_os_architecture.can_be_executed_on(
             os_and_path.os_architecture
         )
@@ -126,7 +124,7 @@ def validate_and_execute_orchestrator(
             reporter.report_skip_execution(
                 "skip orchestrator execution on not compatible matrix config: "
                 f"{create_context_os_architecture_compiler_generator_string(os_architecture_compiler_generator)}"
-                f", current os and architecture:  {_create_context_os_architecture_string(os_and_path.os_architecture)}"
+                f", current os and architecture:  {create_context_os_architecture_string(os_and_path.os_architecture)}"
             )
             er.report_executions.append(None)
             continue
@@ -156,6 +154,7 @@ def validate_and_execute_orchestrator(
         if executor_visit_reports_has_any_error(report_execution):
             reporter.report_execution_report(report_execution)
             er.report_executions.append(report_execution)
+            any_failed = True
             break
 
         reporter.report_execution_report(report_execution)
@@ -165,10 +164,8 @@ def validate_and_execute_orchestrator(
         # keep the matrix_extras modified for the next context
         matrix_extras = context.matrix_extras
 
-    all_executions_succeded = counter == (len(matrix.os_architecture_compiler_generator_list) - 1)
-
     # end matrix execution, execute the release part if any
-    if not all_executions_succeded:
+    if any_failed:
         report = Report().append_error("post execution skipped because execution was not successfull")
         reporter.report_postexecution(report)
         er.report_post_execution.append(report)
