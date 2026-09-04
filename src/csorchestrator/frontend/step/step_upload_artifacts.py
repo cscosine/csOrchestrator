@@ -11,7 +11,7 @@ from csorchestrator.frontend.github_workflow_translation.github_step_interface i
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
-from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import (
+from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_translations import (
     StepGitHubUploadArtifacts,
 )
 from csorchestrator.frontend.github_workflow_translation.matrix_execution_context import (

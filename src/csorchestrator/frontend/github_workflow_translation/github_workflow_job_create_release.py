@@ -5,7 +5,7 @@ from csorchestrator.domain.orchestrator.workflow_config import (
     ReleaseCreationOnTagConfigBase,
     ReleaseCreationOnTagConfigBaseCapability,
 )
-from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import (
+from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_translations import (
     CreateGitHubRelease,
     DownloadAllArtifacts,
     ShowDownloadedFiles,

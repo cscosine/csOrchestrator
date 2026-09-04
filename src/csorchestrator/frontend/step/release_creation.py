@@ -13,7 +13,7 @@ from csorchestrator.foundation.core.report import Report
 from csorchestrator.frontend.github_workflow_translation.github_workflow_job_create_release import (
     ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow,
 )
-from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_translations import StepRunCommand
 from csorchestrator.frontend.github_workflow_translation.release_creation_context import ReleaseCreationContext
 from csorchestrator.frontend.local_execution.context_local_execution import ContextLocalExecution
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import (

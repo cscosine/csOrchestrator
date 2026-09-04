@@ -6,7 +6,7 @@ from csorchestrator.domain.orchestrator.step_base import (
 )
 from csorchestrator.foundation.core.report import Report
 from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
-from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import StepGitHubAction
+from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_translations import StepGitHubAction
 from csorchestrator.frontend.github_workflow_translation.matrix_execution_context import (
     JobOrchestratorMatrixExecutionContext,
 )

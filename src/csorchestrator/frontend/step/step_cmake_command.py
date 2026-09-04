@@ -26,7 +26,7 @@ from csorchestrator.frontend.github_workflow_translation.github_step_interface i
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
 )
-from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_translations import StepRunCommand
 from csorchestrator.frontend.github_workflow_translation.matrix_execution_context import (
     JobOrchestratorMatrixExecutionContext,
 )

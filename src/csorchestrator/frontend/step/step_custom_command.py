@@ -20,7 +20,7 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_
     MatrixOsArchCompilerGeneratorGithubConstants,
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
-from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_translations import StepRunCommand
 from csorchestrator.frontend.github_workflow_translation.matrix_execution_context import (
     JobOrchestratorMatrixExecutionContext,
 )
