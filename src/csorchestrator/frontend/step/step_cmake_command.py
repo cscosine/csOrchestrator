@@ -22,14 +22,16 @@ from csorchestrator.frontend.cscmake_presets.supported_variants import (
     workflow_name_from_components,
     workflow_name_from_description,
 )
-from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecutionContext,
-)
+from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.frontend.github_workflow_translation.matrix_execution_context import (
+    JobOrchestratorMatrixExecutionContext,
+)
 from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
+    OptionalListGithubStepsWithReport,
     StepCapabilityGithubWorkflow,
 )
 from csorchestrator.frontend.local_execution.context_local_execution import (
@@ -43,7 +45,9 @@ from csorchestrator.frontend.step.step_custom_command import execute_command, ge
 class StepCMakeWorkflowCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepCMakeWorkflow"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(
+        self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
+    ) -> OptionalListGithubStepsWithReport:
         if self.step.get_extra(StepCMakeWorkflowGithubPowershell):
             return step_cmake_workflow_to_githubwf_powershell(self.step, wf_job, reporter_sink)
         return step_cmake_workflow_to_githubwf(self.step, wf_job, reporter_sink)
@@ -152,7 +156,7 @@ def execute_step_cmake_workflow(
 
 def step_cmake_workflow_to_githubwf_powershell(
     step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
-) -> Report:
+) -> OptionalListGithubStepsWithReport:
     # create a step with a if inside base on single/multi config (
     # - in single config need to launch N cmake workflow if I have to configure/build/test N
     # - in multi config the command is one
@@ -173,8 +177,10 @@ def step_cmake_workflow_to_githubwf_powershell(
                 selected_configs += [supported_config]
 
         if len(selected_configs) == 0:
-            return Report().append_error(
-                f"Requested config {step.config.value} is not supported for generator type {generator_type.value}"
+            return OptionalListGithubStepsWithReport.createReport(
+                Report().append_error(
+                    f"Requested config {step.config.value} is not supported for generator type {generator_type.value}"
+                )
             )
 
         for config in selected_configs:
@@ -191,14 +197,16 @@ def step_cmake_workflow_to_githubwf_powershell(
             run_str_list += ["  cmake --workflow " + wf_name]
         run_str_list += ["}"]
     if not first_cycle:
-        return Report().append_error("Defensive: no generators in for loop in step_cmake_workflow_to_githubwf?!?")
+        return OptionalListGithubStepsWithReport.createReport(
+            Report().append_error("Defensive: no generators in for loop in step_cmake_workflow_to_githubwf?!?")
+        )
 
     run_str_list += ["else {"]
     run_str_list += ['   Write-Host "Unknown generator_type: $gen"']
     run_str_list += ["  exit 1"]
     run_str_list += ["}"]
 
-    wf_job.job.steps.append(
+    steps: list[GithubStepInterface] = [
         StepRunCommand(
             name=f"cmake workflow on {step.name} for config(s) {step.config.value}",
             shell_type="powershell",
@@ -206,14 +214,14 @@ def step_cmake_workflow_to_githubwf_powershell(
             if_str=get_if_str(step),
             working_directory=step.source_dir,
         )
-    )
+    ]
 
-    return Report()
+    return OptionalListGithubStepsWithReport.createResultAndReport(steps, Report())
 
 
 def step_cmake_workflow_to_githubwf(
     step: StepCMakeWorkflow, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
-) -> Report:
+) -> OptionalListGithubStepsWithReport:
 
     # create a step with a if inside base on single/multi config (
     # - in single config need to launch N cmake workflow if I have to configure/build/test N
@@ -237,8 +245,10 @@ def step_cmake_workflow_to_githubwf(
                 selected_configs += [supported_config]
 
         if len(selected_configs) == 0:
-            return Report().append_error(
-                f"Requested config {step.config.value} is not supported for generator type {generator_type.value}"
+            return OptionalListGithubStepsWithReport.createReport(
+                Report().append_error(
+                    f"Requested config {step.config.value} is not supported for generator type {generator_type.value}"
+                )
             )
 
         for config in selected_configs:
@@ -254,7 +264,9 @@ def step_cmake_workflow_to_githubwf(
             )
             run_str_list += ["  cmake --workflow " + wf_name]
     if not first_cycle:
-        return Report().append_error("Defensive: no generators in for loop in step_cmake_workflow_to_githubwf?!?")
+        return OptionalListGithubStepsWithReport.createReport(
+            Report().append_error("Defensive: no generators in for loop in step_cmake_workflow_to_githubwf?!?")
+        )
 
     run_str_list += ["else"]
     run_str_list += [
@@ -264,7 +276,7 @@ def step_cmake_workflow_to_githubwf(
     run_str_list += ["  exit 1"]
     run_str_list += ["fi"]
 
-    wf_job.job.steps.append(
+    steps: list[GithubStepInterface] = [
         StepRunCommand(
             name=f"cmake workflow on {step.name} for config(s) {step.config.value}",
             shell_type="bash",
@@ -272,6 +284,6 @@ def step_cmake_workflow_to_githubwf(
             if_str=get_if_str(step),
             working_directory=step.source_dir,
         )
-    )
+    ]
 
-    return Report()
+    return OptionalListGithubStepsWithReport.createResultAndReport(steps, Report())

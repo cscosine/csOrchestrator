@@ -4,10 +4,8 @@ from pathlib import Path
 from typing import Any
 
 from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
-    ContextOsArchitectureCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
 )
-from csorchestrator.domain.orchestrator.orchestrator import OrchestratorDescription
 from csorchestrator.domain.orchestrator.workflow_config import (
     ReleaseCreationOnTagConfigBase,
 )
@@ -16,6 +14,7 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_job_cre
     ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.frontend.github_workflow_translation.release_creation_context import ReleaseCreationContext
 from csorchestrator.frontend.local_execution.context_local_execution import ContextLocalExecution
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import (
     ReleaseCreationOnTagConfigBaseCapabilityLocalExecution,
@@ -37,15 +36,8 @@ from csorchestrator.portable.release_manifest import (
 class ReleaseCreationOnTagConfigCapabilityGithubWorkflow(ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow):
     step: "ReleaseCreationOnTagConfig"
 
-    def to_steps_dict(
-        self,
-        matrix_list: list[ContextOsArchitectureCompilerGenerator],
-        orchestrator_description: OrchestratorDescription,
-        artifacts_folder: str,
-    ) -> list[dict[str, Any]]:
-        return release_creation_on_tag_config_to_githubwf(
-            self.step, matrix_list, orchestrator_description, artifacts_folder
-        )
+    def to_steps_dict(self, release_creation_context: ReleaseCreationContext) -> list[dict[str, Any]]:
+        return release_creation_on_tag_config_to_githubwf(self.step, release_creation_context)
 
 
 @dataclass
@@ -72,30 +64,26 @@ class ReleaseCreationOnTagConfig(ReleaseCreationOnTagConfigBase):
 
 
 def release_creation_on_tag_config_to_githubwf(
-    step: ReleaseCreationOnTagConfig,
-    matrix_list: list[ContextOsArchitectureCompilerGenerator],
-    orchestrator_description: OrchestratorDescription,
-    artifacts_folder: str,
+    step: ReleaseCreationOnTagConfig, release_creation_context: ReleaseCreationContext
 ) -> list[dict[str, Any]]:
 
     input_files_list: list[str] = []
     input_names_list: list[str] = []
-    for context in matrix_list:
+    for context in release_creation_context.matrix_list:
         context_os_architecture_compiler_generator_string = create_context_os_architecture_compiler_generator_string(
             context
         )
         input_names_list.append(context_os_architecture_compiler_generator_string)
         input_files_list.append(
             Path(
-                # TODO not nice to use "-" directly here
                 Path(
-                    orchestrator_description.name_and_version_string
+                    release_creation_context.orchestrator_description.name_and_version_string
                     + "-"
                     + context_os_architecture_compiler_generator_string
                 )
                 / Path(
                     create_version_file_name(
-                        orchestrator_description.name_and_version_string,
+                        release_creation_context.orchestrator_description.name_and_version_string,
                         context_os_architecture_compiler_generator_string,
                     )
                 )
@@ -144,18 +132,21 @@ def release_creation_on_tag_config_to_githubwf(
     lines += [""]
     lines += ["release_manifest = Manifest("]
     lines += ["  manifest_version=Manifest.MANIFEST_VERSION,"]
-    lines += [f"  project_name='{orchestrator_description.orchestrator_name}',"]
-    lines += [f"  project_version='{orchestrator_description.orchestrator_version}',"]
+    lines += [f"  project_name='{release_creation_context.orchestrator_description.orchestrator_name}',"]
+    lines += [f"  project_version='{release_creation_context.orchestrator_description.orchestrator_version}',"]
     lines += ["  variants=collected_version_entries,"]
     lines += [")"]
     lines += [
-        f"output_filename = Path('{orchestrator_description.name_and_version_string}{ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION}')"  # noqa: E501
+        f"output_filename = Path('{release_creation_context.orchestrator_description.name_and_version_string}{ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION}')"  # noqa: E501
     ]
     lines += ["release_manifest.write_release_manifest(output_filename)"]
     lines += [""]
 
     step_github = StepRunCommand(
-        name="Manifest creation", run=lines, shell_type="python", working_directory=artifacts_folder
+        name="Manifest creation",
+        run=lines,
+        shell_type="python",
+        working_directory=release_creation_context.artifacts_folder,
     )
 
     return [

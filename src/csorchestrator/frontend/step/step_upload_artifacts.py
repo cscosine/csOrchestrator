@@ -7,16 +7,18 @@ from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
 )
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecutionContext,
-)
+from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import (
     StepGitHubUploadArtifacts,
 )
+from csorchestrator.frontend.github_workflow_translation.matrix_execution_context import (
+    JobOrchestratorMatrixExecutionContext,
+)
 from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
+    OptionalListGithubStepsWithReport,
     StepCapabilityGithubWorkflow,
 )
 from csorchestrator.portable.release_manifest import ReleaseManifest
@@ -26,7 +28,9 @@ from csorchestrator.portable.release_manifest import ReleaseManifest
 class StepUploadArtifactsCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepUploadArtifacts"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(
+        self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
+    ) -> OptionalListGithubStepsWithReport:
         return step_upload_artifacts_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -45,13 +49,13 @@ class StepUploadArtifacts(StepBase):
 
 def step_upload_artifacts_to_githubwf(
     step: StepUploadArtifacts, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
-) -> Report:
+) -> OptionalListGithubStepsWithReport:
 
     install_subdir = create_context_os_architecture_compiler_generator_string_github_matrix()
 
     artifact_name = f"{step.artifact_prefix}{install_subdir}"
 
-    wf_job.job.steps.append(
+    steps: list[GithubStepInterface] = [
         StepGitHubUploadArtifacts(
             name="Upload Artifacts",
             with_name=artifact_name,
@@ -60,6 +64,6 @@ def step_upload_artifacts_to_githubwf(
                 (step.base_install_dir / ("*" + ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION)).as_posix(),
             ],
         )
-    )
+    ]
 
-    return Report()
+    return OptionalListGithubStepsWithReport.createResultAndReport(steps, Report())

@@ -9,14 +9,16 @@ from csorchestrator.domain.context.context_os_architecture_compiler_generator im
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecutionContext,
-)
+from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.frontend.github_workflow_translation.matrix_execution_context import (
+    JobOrchestratorMatrixExecutionContext,
+)
 from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
+    OptionalListGithubStepsWithReport,
     StepCapabilityGithubWorkflow,
 )
 from csorchestrator.frontend.local_execution.context_local_execution import (
@@ -34,7 +36,9 @@ from csorchestrator.portable.release_manifest import ReleaseManifest
 class StepCreateArchivesCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepCreateArchives"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(
+        self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
+    ) -> OptionalListGithubStepsWithReport:
         return step_create_archives_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -108,7 +112,7 @@ def execute_step_create_archives(
 
 def step_create_archives_to_githubwf(
     step: StepCreateArchives, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
-) -> Report:
+) -> OptionalListGithubStepsWithReport:
 
     install_dir_name = create_context_os_architecture_compiler_generator_string_github_matrix()
     install_subdir = step.base_install_dir / install_dir_name
@@ -151,12 +155,12 @@ def step_create_archives_to_githubwf(
 
     # produce output
 
-    wf_job.job.steps.append(
+    steps: list[GithubStepInterface] = [
         StepRunCommand(
             name="Create Archives",
             shell_type="python",
             run=lines,
         )
-    )
+    ]
 
-    return Report()
+    return OptionalListGithubStepsWithReport.createResultAndReport(steps, Report())

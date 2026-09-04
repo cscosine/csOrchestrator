@@ -15,15 +15,17 @@ from csorchestrator.domain.orchestrator.step_base import (
     StepBase,
 )
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.frontend.github_workflow_translation.github_workflow_job_matrix_execution import (
-    JobOrchestratorMatrixExecutionContext,
-)
+from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
     create_context_os_architecture_compiler_generator_string_github_matrix,
 )
 from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_transations import StepRunCommand
+from csorchestrator.frontend.github_workflow_translation.matrix_execution_context import (
+    JobOrchestratorMatrixExecutionContext,
+)
 from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_github_wf_generator import (
+    OptionalListGithubStepsWithReport,
     StepCapabilityGithubWorkflow,
 )
 from csorchestrator.frontend.local_execution.context_local_execution import (
@@ -37,7 +39,9 @@ from csorchestrator.frontend.local_execution.step_utils import StepExecuteOnlyOn
 class StepBashScriptCommandCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepBashScriptCommand"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(
+        self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
+    ) -> OptionalListGithubStepsWithReport:
         return step_custom_command_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -63,7 +67,9 @@ class StepBashScriptCommand(StepBase):
 class StepWinPSCommandCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
     step: "StepWinPSCommand"
 
-    def to_githubwf(self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase) -> Report:
+    def to_githubwf(
+        self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
+    ) -> OptionalListGithubStepsWithReport:
         return step_win_ps_command_to_githubwf(self.step, wf_job, reporter_sink)
 
 
@@ -287,20 +293,20 @@ def get_if_str(step: StepBase) -> str | None:
 
 def step_custom_command_to_githubwf(
     step: StepBashScriptCommand, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
-) -> Report:
+) -> OptionalListGithubStepsWithReport:
 
     cmd_evaluated = evaluate_cmd_variable_subst_github_wf(step.cmd)
 
-    wf_job.job.steps.append(
+    steps: list[GithubStepInterface] = [
         StepRunCommand(
             name=f"Run command {step.name}",
             if_str=get_if_str(step),
             shell_type="bash",
             run=cmd_evaluated,
         )
-    )
+    ]
 
-    return Report()
+    return OptionalListGithubStepsWithReport.createResultAndReport(steps, Report())
 
 
 # ------------------------------
@@ -325,17 +331,17 @@ def execute_step_win_ps_command(
 
 def step_win_ps_command_to_githubwf(
     step: StepWinPSCommand, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
-) -> Report:
+) -> OptionalListGithubStepsWithReport:
 
     cmd_evaluated = evaluate_cmd_variable_subst_github_wf(step.cmd)
 
-    wf_job.job.steps.append(
+    steps: list[GithubStepInterface] = [
         StepRunCommand(
             name=f"Run command {step.name}",
             if_str=get_if_str(step),
             shell_type="powershell",
             run=cmd_evaluated,
         )
-    )
+    ]
 
-    return Report()
+    return OptionalListGithubStepsWithReport.createResultAndReport(steps, Report())
