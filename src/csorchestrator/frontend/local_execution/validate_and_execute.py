@@ -128,7 +128,7 @@ def validate_and_execute_orchestrator(
             )
             er.report_executions.append(None)
             continue
-        # use the compatible os_arcchitecture, not the detected one.
+        # use the compatible os_architecture, not the detected one.
         # e.g. detected os is win 11, but we select win 10 in the matrix, which is compatible
 
         context = ContextLocalExecution(

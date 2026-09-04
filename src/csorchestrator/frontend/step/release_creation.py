@@ -1,5 +1,5 @@
-import inspect
 from dataclasses import dataclass
+from importlib.resources import files
 from pathlib import Path
 from typing import Any
 
@@ -26,10 +26,10 @@ from csorchestrator.frontend.local_execution.validate_and_execute import create_
 from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
     create_version_file_name,
 )
-from csorchestrator.portable.package_version import PackageVersion
+from csorchestrator.frontend.step.templates.utils import fix_path_repr, replace_template_variable
 from csorchestrator.portable.release_manifest import (
-    ManifestVersionsEntry,
     ReleaseManifest,
+    collect_release_manifest_single_variant_and_prepare_manifest,
 )
 
 
@@ -68,86 +68,53 @@ def release_creation_on_tag_config_to_githubwf(
     step: ReleaseCreationOnTagConfig, release_creation_context: ReleaseCreationContext
 ) -> list[dict[str, Any]]:
 
-    input_files_list: list[str] = []
-    input_names_list: list[str] = []
+    input_manifest_path_variant: list[tuple[Path, str]] = []
     for context in release_creation_context.matrix_list:
         context_os_architecture_compiler_generator_string = create_context_os_architecture_compiler_generator_string(
             context
         )
-        input_names_list.append(context_os_architecture_compiler_generator_string)
-        input_files_list.append(
+        input_path = Path(
             Path(
-                Path(
-                    release_creation_context.orchestrator_description.name_and_version_string
-                    + "-"
-                    + context_os_architecture_compiler_generator_string
+                release_creation_context.orchestrator_description.name_and_version_string
+                + "-"
+                + context_os_architecture_compiler_generator_string
+            )
+            / Path(
+                create_version_file_name(
+                    release_creation_context.orchestrator_description.name_and_version_string,
+                    context_os_architecture_compiler_generator_string,
                 )
-                / Path(
-                    create_version_file_name(
-                        release_creation_context.orchestrator_description.name_and_version_string,
-                        context_os_architecture_compiler_generator_string,
-                    )
-                )
-            ).as_posix()
+            )
         )
 
-    if len(input_files_list) == 0 or len(input_names_list) == 0:
-        return []
+        input_manifest_path_variant.append((input_path, context_os_architecture_compiler_generator_string))
 
-    lines: list[str] = []
+    output_filepath = Path(
+        f"{release_creation_context.orchestrator_description.name_and_version_string}{ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION}"
+    )
 
-    header = [
-        "from dataclasses import dataclass, field, asdict",
-        "from typing import Any, ClassVar",
-        "from pathlib import Path",
-        "import json",
-        "",
-    ]
-    class1 = inspect.getsource(PackageVersion).splitlines()
-    class2 = inspect.getsource(ManifestVersionsEntry).splitlines()
-    class3 = inspect.getsource(ReleaseManifest).splitlines()
+    template_file = files("csorchestrator.frontend.step").joinpath("templates").joinpath("create_release_manifest.py")
+    python_code = template_file.read_text(encoding="utf-8")
 
-    lines += header
-    lines += class1
-    lines += [""]
-    lines += class2
-    lines += [""]
-    lines += class3
-    lines += [""]
+    python_code = replace_template_variable(
+        python_code, "input_manifest_path_variant", fix_path_repr(repr(input_manifest_path_variant))
+    )
+    python_code = replace_template_variable(python_code, "output_filepath", fix_path_repr(repr(output_filepath)))
+    python_code = replace_template_variable(
+        python_code, "project_name", repr(release_creation_context.orchestrator_description.orchestrator_name)
+    )
+    python_code = replace_template_variable(
+        python_code, "repos_version", repr(release_creation_context.orchestrator_description.orchestrator_version)
+    )
 
-    lines += ["input_files_list = ["]
-    lines += [f"  '{x}'," for x in input_files_list]
-    lines += ["]"]
-    lines += [""]
-    lines += ["input_names_list = ["]
-    lines += [f"  '{x}'," for x in input_names_list]
-    lines += ["]"]
-    lines += [""]
-    lines += ["collected_version_entries: list[ManifestVersionsEntry] = []"]
-    lines += [""]
-    lines += ["for name,f in zip(input_names_list,input_files_list):"]
-    lines += ["  packages = load_version_file(f)"]
-    lines += ["  collected_version_entries.append("]
-    lines += ["    ManifestVersionsEntry(name, packages)"]
-    lines += ["  )"]
-    lines += [""]
-    lines += ["release_manifest = Manifest("]
-    lines += ["  manifest_version=Manifest.MANIFEST_VERSION,"]
-    lines += [f"  project_name='{release_creation_context.orchestrator_description.orchestrator_name}',"]
-    lines += [f"  project_version='{release_creation_context.orchestrator_description.orchestrator_version}',"]
-    lines += ["  variants=collected_version_entries,"]
-    lines += [")"]
-    lines += [
-        f"output_filename = Path('{release_creation_context.orchestrator_description.name_and_version_string}{ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION}')"  # noqa: E501
-    ]
-    lines += ["release_manifest.write_release_manifest(output_filename)"]
-    lines += [""]
+    python_lines = python_code.splitlines()
 
     step_github = StepRunCommand(
         name="Manifest creation",
-        run=lines,
+        run=python_lines,
         shell_type="python",
         working_directory=release_creation_context.artifacts_folder,
+        env={"PYTHONPATH": "${{ github.workspace }}"},
     )
 
     return [
@@ -160,9 +127,8 @@ def release_creation_on_tag_config_execute_local(
 ) -> Report:
     report = Report()
 
-    # first: matrix element string, second packages,version list
-    collected_version_entries: list[ManifestVersionsEntry] = []
-
+    # collect all input manifest for each variant
+    input_manifest_path_variant: list[tuple[Path, str]] = []
     for counter, os_architecture_compiler_generator in enumerate(
         relase_context.os_architecture_compiler_generator_list
     ):
@@ -177,7 +143,7 @@ def release_creation_on_tag_config_execute_local(
                 f"{create_context_os_architecture_string(relase_context.os_architecture)}"
             )
             continue
-        # use the compatible os_arcchitecture, not the detected one.
+        # use the compatible os_architecture, not the detected one.
         # e.g. detected os is win 11, but we select win 10 in the matrix, which is compatible
 
         context = ContextLocalExecution(
@@ -203,34 +169,23 @@ def release_creation_on_tag_config_execute_local(
                 )
             )
         ).resolve()
+        input_manifest_path_variant.append((input_full_path, context_os_architecture_compiler_generator_string))
 
-        packages = ReleaseManifest.load_release_manifest(input_full_path)
-        if len(packages.variants) == 0 or len(packages.variants) > 1:
-            report.append_error(
-                f"release manifest {str(input_full_path)} has {len(packages.variants)} variants, expected 1"
-            )
-            return report
-
-        if context_os_architecture_compiler_generator_string != packages.variants[0].variant:
-            report.append_error(
-                f"release manifest {str(input_full_path)} has variant name {packages.variants[0].variant}, expected {context_os_architecture_compiler_generator_string}"  # noqa: E501
-            )
-            return report
-
-        collected_version_entries.append(packages.variants[0])
-
-    release_manifest = ReleaseManifest(
-        project_name=relase_context.orchestrator_description.orchestrator_name,
-        project_version=relase_context.orchestrator_description.orchestrator_version,
-        variants=collected_version_entries,
-    )
-    output_filename = step.base_install_dir / Path(
+    output_filepath = step.base_install_dir / Path(
         relase_context.orchestrator_description.name_and_version_string
         + ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION
     )
-    release_manifest.write_release_manifest(
-        output_filename,
-    )
 
-    report.append_info(f"release manifest written to {str(output_filename)}")
+    errors = collect_release_manifest_single_variant_and_prepare_manifest(
+        input_manifest_path_variant=input_manifest_path_variant,
+        output_filepath=output_filepath,
+        project_name=relase_context.orchestrator_description.orchestrator_name,
+        project_version=relase_context.orchestrator_description.orchestrator_version,
+    )
+    if len(errors) > 0:
+        for e in errors:
+            report.append_error(e)
+    else:
+        report.append_info(f"release manifest written to {str(output_filepath)}")
+
     return report
