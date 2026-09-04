@@ -214,7 +214,9 @@ def validate_and_generate_github_workflow(
 
     wf = create_github_wf(orchestrator.name, config=orchestrator.wf_config.trigger)
 
+    portable_output_folder = None
     if output_path is None:
+        portable_output_folder = script_folder_path
         output_path = script_folder_path / Path(".github") / Path("workflows")
 
     dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(output_path.resolve()))
@@ -279,7 +281,8 @@ def validate_and_generate_github_workflow(
 
     output_path.write_text(lines, encoding="utf-8")
 
-    copy_portable_csOrchestrator(output_folder)
+    if portable_output_folder is not None:
+        copy_portable_csOrchestrator(portable_output_folder)
 
     reporter.finalize_execution()
 

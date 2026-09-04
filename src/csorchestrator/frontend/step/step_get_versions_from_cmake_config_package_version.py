@@ -206,9 +206,7 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
 
     steps: list[GithubStepInterface] = [
         StepRunCommand(
-            name="Get Versions",
-            shell_type="python",
-            run=python_lines,
+            name="Get Versions", shell_type="python", run=python_lines, env={"PYTHONPATH": "${{ github.workspace }}"}
         )
     ]
 

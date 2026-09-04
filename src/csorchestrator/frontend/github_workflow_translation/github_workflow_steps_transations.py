@@ -87,7 +87,7 @@ class StepRunCommand(GithubStepInterface):
     id: str | None = None
     if_str: str | None = None
     shell_type: str | None = None
-    env: list[str] | None = None
+    env: dict[str, str] | None = None  # key value
     working_directory: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -106,11 +106,7 @@ class StepRunCommand(GithubStepInterface):
             step_dict["shell"] = self.shell_type
 
         if self.env is not None and len(self.env) > 0:
-            env_dict: dict[str, str] = {}
-            for line in self.env:
-                key, value = line.split("=", 1)
-                env_dict[key.strip()] = value.strip()
-            step_dict["env"] = env_dict
+            step_dict["env"] = self.env
 
         if self.working_directory is not None:
             step_dict["working-directory"] = self.working_directory
