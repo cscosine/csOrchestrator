@@ -9,6 +9,7 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_steps_t
     CreateGitHubRelease,
     DownloadAllArtifacts,
     ShowDownloadedFiles,
+    StepCheckoutRepository,
     StepGitHubUploadArtifacts,
 )
 from csorchestrator.frontend.github_workflow_translation.release_creation_context import ReleaseCreationContext
@@ -29,10 +30,20 @@ class JobReleaseCreationFromArtifacts:
     release_creation_context: ReleaseCreationContext
     runs_on: str
     if_str: str
+    self_checkout_repo: bool = True
 
     def to_dict(self) -> dict[str, Any]:
 
-        steps = [
+        steps = []
+
+        if self.self_checkout_repo:
+            steps += [
+                StepCheckoutRepository(
+                    name="Repo Self Checkout",
+                ).to_dict(),
+            ]
+
+        steps += [
             DownloadAllArtifacts(self.release_creation_context.artifacts_folder).to_dict(),
             ShowDownloadedFiles(self.release_creation_context.artifacts_folder).to_dict(),
         ]
