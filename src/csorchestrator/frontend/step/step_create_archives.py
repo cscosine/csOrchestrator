@@ -27,7 +27,11 @@ from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor
 from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
     create_version_file_name,
 )
-from csorchestrator.frontend.step.templates.utils import fix_path_repr, replace_template_variable
+from csorchestrator.frontend.step.templates.utils import (
+    fix_path_repr,
+    relocate_portable_imports,
+    replace_template_variable,
+)
 from csorchestrator.portable.release_manifest import (
     load_release_manifest_single_variant_and_prepare_archive,
 )
@@ -112,6 +116,8 @@ def step_create_archives_to_githubwf(
 
     template_file = files("csorchestrator.frontend.step").joinpath("templates").joinpath("create_archives.py")
     python_code = template_file.read_text(encoding="utf-8")
+
+    python_code = relocate_portable_imports(python_code)
 
     python_code = replace_template_variable(python_code, "input_full_path", fix_path_repr(repr(input_full_path)))
     python_code = replace_template_variable(

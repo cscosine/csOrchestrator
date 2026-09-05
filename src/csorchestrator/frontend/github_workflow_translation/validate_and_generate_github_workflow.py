@@ -146,7 +146,7 @@ def orchestrator_matrix_to_github_wf_matrix(
 def copy_portable_csOrchestrator(output_folder: Path) -> None:
 
     source = files("csorchestrator").joinpath("portable")
-    destination = output_folder / "csorchestrator" / "portable"
+    destination = output_folder / "csorchestrator" / "sdk" / "portable"
 
     with as_file(source) as source_path:
         shutil.copytree(source_path, destination, dirs_exist_ok=True)

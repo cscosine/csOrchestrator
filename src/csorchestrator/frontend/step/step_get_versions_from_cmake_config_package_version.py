@@ -26,7 +26,11 @@ from csorchestrator.frontend.local_execution.context_local_execution import (
     ContextLocalExecution,
 )
 from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
-from csorchestrator.frontend.step.templates.utils import fix_path_repr, replace_template_variable
+from csorchestrator.frontend.step.templates.utils import (
+    fix_path_repr,
+    relocate_portable_imports,
+    replace_template_variable,
+)
 from csorchestrator.portable.package_version import (
     CMakeConfigPackageVersionGrep,
     PackageVersion,
@@ -142,6 +146,8 @@ def step_get_versions_from_cmake_config_package_version_to_githubwf(
         .joinpath("get_versions_from_cmake_config_package_version.py")
     )
     python_code = template_file.read_text(encoding="utf-8")
+
+    python_code = relocate_portable_imports(python_code)
 
     python_code = replace_template_variable(
         python_code, "repos_config_file_list", fix_path_repr(repr(step.repos_config_file_list))

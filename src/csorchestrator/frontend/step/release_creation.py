@@ -26,7 +26,11 @@ from csorchestrator.frontend.local_execution.validate_and_execute import create_
 from csorchestrator.frontend.step.step_get_versions_from_cmake_config_package_version import (
     create_version_file_name,
 )
-from csorchestrator.frontend.step.templates.utils import fix_path_repr, replace_template_variable
+from csorchestrator.frontend.step.templates.utils import (
+    fix_path_repr,
+    relocate_portable_imports,
+    replace_template_variable,
+)
 from csorchestrator.portable.release_manifest import (
     ReleaseManifest,
     collect_release_manifest_single_variant_and_prepare_manifest,
@@ -95,6 +99,8 @@ def release_creation_on_tag_config_to_githubwf(
 
     template_file = files("csorchestrator.frontend.step").joinpath("templates").joinpath("create_release_manifest.py")
     python_code = template_file.read_text(encoding="utf-8")
+
+    python_code = relocate_portable_imports(python_code)
 
     python_code = replace_template_variable(
         python_code, "input_manifest_path_variant", fix_path_repr(repr(input_manifest_path_variant))

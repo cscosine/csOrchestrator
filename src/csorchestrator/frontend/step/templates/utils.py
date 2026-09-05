@@ -26,3 +26,11 @@ def replace_template_variable(
     replacement = "\n".join(indent + line if line else line for line in replacement_value.splitlines())
 
     return source[: match.start()] + replacement + source[match.end() :]
+
+
+def relocate_portable_imports(code: str) -> str:
+    """Rewrite portable imports from csOrchestrator to csorchestrator.sdk."""
+    return code.replace(
+        "from csorchestrator.portable",
+        "from csorchestrator.sdk.portable",
+    )
