@@ -195,7 +195,6 @@ name = "frontend layers"
 type = "layers"
 
 layers = [
-    "recipes",
     "step",
     "github_workflow_translation : local_execution",
     "validation",
@@ -211,7 +210,9 @@ name = "application layers"
 type = "layers"
 
 layers = [
-    "cli | factory"
+    "cli",
+    "recipes",
+    "factory"
 ]
 containers = [
     "csorchestrator.application"

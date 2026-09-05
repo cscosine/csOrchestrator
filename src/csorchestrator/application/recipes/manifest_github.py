@@ -23,7 +23,7 @@ class ManifestGithub:
 
     GITHUB_BASE_URL_HTTPS: str = StepGetRepositoryGitHub.GITHUB_BASE_URL_HTTPS
 
-    # TODO for private repo, will need to use API url and a api request to download, using a toke,
+    # TODO for private repo, will need to use API url and a api request to download, using a token,
     # with keyring in local and token in github
 
 
