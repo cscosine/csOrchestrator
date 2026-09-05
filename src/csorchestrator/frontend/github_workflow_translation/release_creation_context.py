@@ -10,4 +10,3 @@ from csorchestrator.domain.orchestrator.orchestrator import OrchestratorDescript
 class ReleaseCreationContext:
     orchestrator_description: OrchestratorDescription
     matrix_list: list[ContextOsArchitectureCompilerGenerator]
-    artifacts_folder: str

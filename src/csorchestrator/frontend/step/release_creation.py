@@ -44,6 +44,9 @@ class ReleaseCreationOnTagConfigCapabilityGithubWorkflow(ReleaseCreationOnTagCon
     def to_steps_dict(self, release_creation_context: ReleaseCreationContext) -> list[dict[str, Any]]:
         return release_creation_on_tag_config_to_githubwf(self.step, release_creation_context)
 
+    def get_artifacts_dir(self) -> str:
+        return self.step.artifacts_dir
+
 
 @dataclass
 class ReleaseCreationOnTagConfiCapabilityLocalExecution(ReleaseCreationOnTagConfigBaseCapabilityLocalExecution):
@@ -56,6 +59,7 @@ class ReleaseCreationOnTagConfiCapabilityLocalExecution(ReleaseCreationOnTagConf
 @dataclass
 class ReleaseCreationOnTagConfig(ReleaseCreationOnTagConfigBase):
     base_install_dir: Path  # used only in local executions, not in github wf where artifacts are downloaded
+    artifacts_dir: str  # used only in github execution, specfify folders where artifacts are downloaded
 
     def __post_init__(self) -> None:
         self.add_capability(
@@ -119,7 +123,7 @@ def release_creation_on_tag_config_to_githubwf(
         name="Manifest creation",
         run=python_lines,
         shell_type="python",
-        working_directory=release_creation_context.artifacts_folder,
+        working_directory=step.artifacts_dir,
         env={"PYTHONPATH": "${{ github.workspace }}"},
     )
 

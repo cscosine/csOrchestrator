@@ -87,7 +87,10 @@ def execute_step_create_archives(
     ).resolve()
 
     errors_list = load_release_manifest_single_variant_and_prepare_archive(
-        input_full_path, context_os_architecture_compiler_generator_string, input_base_dir
+        input_full_path,
+        context.orchestrator_description.name_and_version_string,
+        context_os_architecture_compiler_generator_string,
+        input_base_dir,
     )
 
     for e in errors_list:
@@ -120,6 +123,9 @@ def step_create_archives_to_githubwf(
     python_code = relocate_portable_imports(python_code)
 
     python_code = replace_template_variable(python_code, "input_full_path", fix_path_repr(repr(input_full_path)))
+    python_code = replace_template_variable(
+        python_code, "project_name_and_version", repr(wf_job.orchestrator_description.name_and_version_string)
+    )
     python_code = replace_template_variable(
         python_code,
         "context_os_architecture_compiler_generator_string",

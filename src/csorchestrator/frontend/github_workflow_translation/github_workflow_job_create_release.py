@@ -22,6 +22,9 @@ class ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow(ReleaseCreationOnTa
     def to_steps_dict(self, release_creation_context: ReleaseCreationContext) -> list[dict[str, Any]]:
         return []
 
+    def get_artifacts_dir(self) -> str:
+        return ""
+
 
 @dataclass
 class JobReleaseCreationFromArtifacts:
@@ -35,6 +38,11 @@ class JobReleaseCreationFromArtifacts:
     def to_dict(self) -> dict[str, Any]:
 
         steps = []
+        capability = self.config.get_capability(ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow)
+        if capability is None:
+            return {}  # this should be an error to be reported
+
+        artifacts_dir = capability.get_artifacts_dir()
 
         if self.self_checkout_repo:
             steps += [
@@ -44,8 +52,8 @@ class JobReleaseCreationFromArtifacts:
             ]
 
         steps += [
-            DownloadAllArtifacts(self.release_creation_context.artifacts_folder).to_dict(),
-            ShowDownloadedFiles(self.release_creation_context.artifacts_folder).to_dict(),
+            DownloadAllArtifacts(artifacts_dir).to_dict(),
+            ShowDownloadedFiles(artifacts_dir).to_dict(),
         ]
 
         capability = self.config.get_capability(ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow)
@@ -57,17 +65,11 @@ class JobReleaseCreationFromArtifacts:
                 StepGitHubUploadArtifacts(
                     name="Upload artifacts",
                     with_name="manifest" + extra_extension_for_release_files,
-                    with_path=[
-                        f"{self.release_creation_context.artifacts_folder}/**/*{extra_extension_for_release_files}"
-                    ],
+                    with_path=[f"{artifacts_dir}/**/*{extra_extension_for_release_files}"],
                 ).to_dict()
             )
 
-        steps.append(
-            CreateGitHubRelease(
-                self.release_creation_context.artifacts_folder, self.if_str, extra_extension_for_release_files
-            ).to_dict()
-        )
+        steps.append(CreateGitHubRelease(artifacts_dir, self.if_str, extra_extension_for_release_files).to_dict())
 
         return {
             self.config.name: {

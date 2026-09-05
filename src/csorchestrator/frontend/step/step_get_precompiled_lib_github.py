@@ -109,6 +109,7 @@ def execute_step_get_precompiled_lib(
     assert dir_creation_res.value is not None
     target_dir = dir_creation_res.value
 
+    # TODO: correct name, use the proper function to generate
     source_filename = release_name_part + "-" + step.lib_name + "-" + step.lib_version + ".tar.gz"
     target_filename = target_dir / str(release_name_part + "-" + step.lib_name + "-" + step.lib_version + ".tar.gz")
 

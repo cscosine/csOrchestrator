@@ -236,12 +236,10 @@ def validate_and_generate_github_workflow(
 
     if orchestrator.wf_config.create_release_on_tag is not None:
         # TODO: move to some configurable parameters
-        artifacts_folder = "artifacts"
 
         release_creation_context = ReleaseCreationContext(
             orchestrator.createOrchestratorDescription(),
             [item.original_os_architecture_compiler_generator_list for item in wf_matrix],
-            artifacts_folder,
         )
 
         wf.on_job_create_release_on_tag(
