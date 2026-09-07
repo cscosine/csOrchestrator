@@ -196,9 +196,10 @@ type = "layers"
 
 layers = [
     "step",
+    "cscmake_presets",
     "github_workflow_translation : local_execution",
     "validation",
-    "reporters | cscmake_presets"
+    "reporters"
 ]
 containers = [
     "csorchestrator.frontend"

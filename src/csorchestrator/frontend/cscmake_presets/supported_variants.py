@@ -20,6 +20,9 @@ from csorchestrator.domain.context.context_os_architecture_compiler_generator im
     create_context_os_architecture_compiler_generator_string,
     create_context_os_architecture_compiler_generator_string_from_components,
 )
+from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
+    MatrixOsArchCompilerGeneratorGithubConstants,
+)
 
 # TODO this is a glue layer between csorchestrator and cscmake
 # it should not strictly belong to csorchestrator, but having it in cscmake
@@ -298,6 +301,19 @@ def workflow_name_from_description(
     config_string = description.config.value
     workflow_name = f"workflow-{supported_build_config_string}-{config_string}"
     return workflow_name
+
+
+def workflow_name_from_matrix_components(config_string: str) -> str:
+    return workflow_name_from_components(
+        MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME_EMBRACED,
+        MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION_EMBRACED,
+        MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_EMBRACED,
+        MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
+        MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_EMBRACED,
+        MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_VERSION_EMBRACED,
+        MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_EMBRACED,
+        config_string,
+    )
 
 
 def workflow_name_from_components(

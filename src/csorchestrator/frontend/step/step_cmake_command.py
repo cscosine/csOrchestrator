@@ -19,8 +19,8 @@ from csorchestrator.frontend.cscmake_presets.supported_variants import (
     get_all_supported_workflow_descriptions,
     get_supported_build_configs_for_generator_type,
     is_config_selected_for_generator,
-    workflow_name_from_components,
     workflow_name_from_description,
+    workflow_name_from_matrix_components,
 )
 from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
@@ -184,16 +184,7 @@ def step_cmake_workflow_to_githubwf_powershell(
             )
 
         for config in selected_configs:
-            wf_name = workflow_name_from_components(
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_VERSION_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_EMBRACED,
-                config.value,
-            )
+            wf_name = workflow_name_from_matrix_components(config.value)
             run_str_list += ["  cmake --workflow " + wf_name]
         run_str_list += ["}"]
     if not first_cycle:
@@ -252,16 +243,7 @@ def step_cmake_workflow_to_githubwf(
             )
 
         for config in selected_configs:
-            wf_name = workflow_name_from_components(
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_NAME_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_OS_VERSION_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_ARCHITECTURE_VARIANT_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_COMPILER_VERSION_EMBRACED,
-                MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_EMBRACED,
-                config.value,
-            )
+            wf_name = workflow_name_from_matrix_components(config.value)
             run_str_list += ["  cmake --workflow " + wf_name]
     if not first_cycle:
         return OptionalListGithubStepsWithReport.createReport(
