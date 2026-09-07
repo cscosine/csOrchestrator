@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import (
@@ -31,7 +31,7 @@ class StepAddGitHubActionCapabilityGithubWorkflow(StepCapabilityGithubWorkflow):
 class StepAddGitHubAction(StepBase):
     uses: str
     id: str | None = None
-    with_list: list[str] = field(default_factory=list)
+    with_list: dict[str, str] | None = None
 
     def __post_init__(self) -> None:
         self.add_capability(StepAddGitHubActionCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)

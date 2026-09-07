@@ -34,14 +34,15 @@ from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_
 
 
 def get_supported_os_version_list(os: OS) -> list[str]:
-    if os == OS.LINUX:
-        return [UBUNTU_VERSIONS.UBUNTU_22_04.value, UBUNTU_VERSIONS.UBUNTU_24_04.value]
-    elif os == OS.WINDOWS:
-        return [WINDOWS_VERSIONS.WIN10.value]
-    elif os == OS.MACOS:
-        return []  # TODO add MACOS support
-    else:
-        return []
+    match os:
+        case OS.LINUX:
+            return [UBUNTU_VERSIONS.UBUNTU_22_04.value, UBUNTU_VERSIONS.UBUNTU_24_04.value]
+        case OS.WINDOWS:
+            return [WINDOWS_VERSIONS.WIN10.value]
+        case OS.MACOS:
+            return []  # TODO add MACOS support
+        case _:
+            assert_never(os)
 
 
 class BuildConfig(Enum):
@@ -77,77 +78,46 @@ def get_supported_build_configs_for_generator_type(
             assert_never(generator_type)
 
 
-def get_supported_generators_linux(
-    use_ninja: bool, use_ninjamulti: bool, arch: Architecture, generate_all_combinations: bool
-) -> list[GeneratorWithType]:
+def get_default_generators_linux(arch: Architecture) -> list[GeneratorWithType]:
     lst: list[GeneratorWithType] = []
-    if arch == Architecture.X64:
-        if generate_all_combinations:
-            lst += [GeneratorWithType.NINJA, GeneratorWithType.NINJA_MULTI]
-        else:
-            # on x64 arch, we can use multi-config generators,
-            #  but if use_ninja_multi is False, we can still use single-config generators
-            if use_ninjamulti:
-                lst += [GeneratorWithType.NINJA_MULTI]
-            elif use_ninja:
-                lst += [GeneratorWithType.NINJA]
-    elif arch == Architecture.ARM64:
-        if generate_all_combinations:
-            lst += [GeneratorWithType.NINJA, GeneratorWithType.NINJA_MULTI]
-        else:
-            # on arm64 arch, we can only use single-config generators,
-            # so we ignore use_ninjamulti, but we can still use single-config generators if use_ninja is True
-            if use_ninja:
-                lst += [GeneratorWithType.NINJA]
-            elif use_ninjamulti:
-                lst += [GeneratorWithType.NINJA_MULTI]
+    match arch:
+        case Architecture.X64:
+            lst += [GeneratorWithType.NINJA_MULTI]
+        case Architecture.ARM64:
+            lst += [GeneratorWithType.NINJA]
+        case _:
+            assert_never(arch)
     return lst
 
 
-def get_supported_generators_windows(
-    use_ninja_for_windows: bool,
-    use_ninja: bool = True,
-    use_ninjamulti: bool = True,
-) -> list[GeneratorWithType]:
-    if use_ninja_for_windows:
-        lst: list[GeneratorWithType] = []
-        if use_ninja:
-            lst += [GeneratorWithType.NINJA]
-        if use_ninjamulti:
-            lst += [GeneratorWithType.NINJA_MULTI]
-        return lst
-    else:
-        return [
-            GeneratorWithType.MSVC_17_2022,
-            GeneratorWithType.MSVC_18_2026,
-        ]
+def get_default_generators_windows() -> list[GeneratorWithType]:
+    return [
+        GeneratorWithType.MSVC_17_2022,
+        GeneratorWithType.MSVC_18_2026,
+    ]
 
 
 def get_supported_compilers_linux() -> list[Compiler]:
     return [Compiler.GCC, Compiler.CLANG]
 
 
-def get_supported_compilers_windows(use_ninja_for_windows: bool) -> list[tuple[Compiler, str]]:
-    if not use_ninja_for_windows:
-        return [
-            (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT),
-            (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT),
-        ]
-    else:
-        return [
-            (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2022_17),
-            (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2022_17),
-            (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2026_18),
-            (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2026_18),
-        ]
+def get_supported_compilers_windows() -> list[tuple[Compiler, str]]:
+    return [
+        (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT),
+        (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_DEFAULT),
+    ]
 
 
-def get_supported_context_os_architecture_list(
-    use_ninja_for_windows: bool,
-    use_ninja: bool,
-    use_ninjamulti: bool,
-    generate_all_combinations: bool = False,
-) -> list[ContextOsArchitectureCompilerGenerator]:
+def get_supported_compilers_windows_ninja_generator() -> list[tuple[Compiler, str]]:
+    return [
+        (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2022_17),
+        (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2022_17),
+        (Compiler.MSVC, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2026_18),
+        (Compiler.MSVC_CLANG, ContextCompilerGenerator.COMPILER_VERSION_MSVC_2026_18),
+    ]
+
+
+def get_supported_context_os_architecture_list() -> list[ContextOsArchitectureCompilerGenerator]:
 
     retList: list[ContextOsArchitectureCompilerGenerator] = []
 
@@ -160,12 +130,7 @@ def get_supported_context_os_architecture_list(
                 architecture=arch,
                 architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
             )
-            generators = get_supported_generators_linux(
-                use_ninja=use_ninja,
-                use_ninjamulti=use_ninjamulti,
-                arch=arch,
-                generate_all_combinations=generate_all_combinations,
-            )
+            generators = get_default_generators_linux(arch)
             compilers = get_supported_compilers_linux()
 
             for compiler in compilers:
@@ -190,10 +155,8 @@ def get_supported_context_os_architecture_list(
             architecture_variant=ARCHITECTURE_VARIANT_GENERIC,
         )
 
-        generators = get_supported_generators_windows(
-            use_ninja_for_windows=use_ninja_for_windows, use_ninja=use_ninja, use_ninjamulti=use_ninjamulti
-        )
-        compilers_and_version = get_supported_compilers_windows(use_ninja_for_windows=use_ninja_for_windows)
+        generators = get_default_generators_windows()
+        compilers_and_version = get_supported_compilers_windows()
 
         for compiler, version in compilers_and_version:
             for generator in generators:

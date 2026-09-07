@@ -197,12 +197,12 @@ def step_get_precompiled_lib_to_githubwf(
             StepGitHubAction(
                 name=step.name + " download tar.gz",
                 uses="robinraju/release-downloader@v1.13",
-                with_list=[
-                    f"repository: {step.org}/{step.project_name}",
-                    f"tag: {step.project_tag}",
-                    f"fileName: {src_filename}",
-                    f"out-file-path: {libs_subdir.as_posix()}",
-                ],
+                with_list={
+                    "repository": f"{step.org}/{step.project_name}",
+                    "tag": f"{step.project_tag}",
+                    "fileName": f"{src_filename}",
+                    "out-file-path": f"{libs_subdir.as_posix()}",
+                },
             )
         )
 
@@ -255,12 +255,12 @@ def step_get_precompiled_lib_to_githubwf(
             StepGitHubAction(
                 name=step.name + " download tar.gz",
                 uses="robinraju/release-downloader@v1.13",
-                with_list=[
-                    f"repository: {step.org}/{step.project_name}",
-                    f"tag: {step.project_tag}",
-                    f"fileName: ${{{{ steps.{step_id}.outputs.{filename_variable} }}}}",
-                    f"out-file-path: {libs_subdir.as_posix()}",
-                ],
+                with_list={
+                    "repository": f"{step.org}/{step.project_name}",
+                    "tag": f"{step.project_tag}",
+                    "fileName": f"${{{{ steps.{step_id}.outputs.{filename_variable} }}}}",
+                    "out-file-path": f"{libs_subdir.as_posix()}",
+                },
             )
         )
 

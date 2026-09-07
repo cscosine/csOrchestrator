@@ -1,4 +1,4 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
@@ -15,7 +15,7 @@ class StepGitHubAction(GithubStepInterface):
     uses: str
     id: str | None = None
     if_str: str | None = None
-    with_list: list[str] = field(default_factory=list)
+    with_list: dict[str, str] | None = None
 
     def to_dict(self) -> dict[str, Any]:
         ret: dict[str, Any] = {"name": self.name}
@@ -24,9 +24,8 @@ class StepGitHubAction(GithubStepInterface):
         ret["uses"] = self.uses
         if self.if_str is not None:
             ret["if"] = self.if_str
-        if len(self.with_list) > 0:
+        if self.with_list is not None and len(self.with_list) > 0:
             ret["with"] = self.with_list
-
         return ret
 
 

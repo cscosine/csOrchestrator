@@ -16,6 +16,7 @@ def create_default_orchestrator(
     release_tag: str = "v*.*.*",
     schedule: Cron | None = None,
     artifacts_dir: str = "artifacts",
+    populate_default_matrix: bool = True,
 ) -> Orchestrator:
     if schedule is None:
         schedule = Cron.weekly(DayOfWeek.MON, hour=3)
@@ -24,6 +25,7 @@ def create_default_orchestrator(
         name=name,
         version=version,
         execution_matrix_name=execution_matrix_name,
+        populate_default_matrix=populate_default_matrix,
     )
 
     o.wf_config = WorkflowConfig(
