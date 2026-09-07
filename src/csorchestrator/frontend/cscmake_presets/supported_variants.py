@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from enum import Enum
+from typing import assert_never
 
 from csorchestrator.domain.context.context_compiler_generator import (
     Compiler,
@@ -55,25 +56,25 @@ class BuildConfig(Enum):
 def get_supported_build_configs_for_generator_type(
     generator_type: GeneratorType,
 ) -> list[BuildConfig]:
-    if generator_type == GeneratorType.SINGLE_CONFIG:
-        return [
-            BuildConfig.DEBUG,
-            BuildConfig.RELEASE,
-            BuildConfig.RELWITHDEBINFO,
-            BuildConfig.PARANOID,
-        ]
-    elif generator_type == GeneratorType.MULTI_CONFIG:
-        return [
-            BuildConfig.DEBUG,
-            BuildConfig.RELEASE,
-            BuildConfig.RELWITHDEBINFO,
-            BuildConfig.PARANOID,
-            BuildConfig.DEBUG_RELEASE,
-            BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
-        ]
-    else:
-        # defensive, for invalid cases
-        return []
+    match generator_type:
+        case GeneratorType.SINGLE_CONFIG:
+            return [
+                BuildConfig.DEBUG,
+                BuildConfig.RELEASE,
+                BuildConfig.RELWITHDEBINFO,
+                BuildConfig.PARANOID,
+            ]
+        case GeneratorType.MULTI_CONFIG:
+            return [
+                BuildConfig.DEBUG,
+                BuildConfig.RELEASE,
+                BuildConfig.RELWITHDEBINFO,
+                BuildConfig.PARANOID,
+                BuildConfig.DEBUG_RELEASE,
+                BuildConfig.DEBUG_RELEASE_RELWITHDEBINFO_PARANOID,
+            ]
+        case _:
+            assert_never(generator_type)
 
 
 def get_supported_generators_linux(
@@ -280,16 +281,17 @@ def is_config_selected_for_generator(
     current_config: BuildConfig,
     requested_config: BuildConfig,
 ) -> bool:
-    if generator_type == GeneratorType.SINGLE_CONFIG:
-        return is_config_selected_single_config_generator(
-            current_config=current_config, requested_config=requested_config
-        )
-    elif generator_type == GeneratorType.MULTI_CONFIG:
-        return is_config_selected_multi_config_generator(
-            current_config=current_config, requested_config=requested_config
-        )
-    else:
-        return False
+    match generator_type:
+        case GeneratorType.SINGLE_CONFIG:
+            return is_config_selected_single_config_generator(
+                current_config=current_config, requested_config=requested_config
+            )
+        case GeneratorType.MULTI_CONFIG:
+            return is_config_selected_multi_config_generator(
+                current_config=current_config, requested_config=requested_config
+            )
+        case _:
+            assert_never(generator_type)
 
 
 def workflow_name_from_description(

@@ -48,11 +48,6 @@ def test_is_config_selected_multi_config_generator() -> None:
 
 
 def test_is_config_selected_for_generator() -> None:
-    assert not is_config_selected_for_generator(
-        "INVALID",  # type: ignore
-        current_config=BuildConfig.DEBUG,
-        requested_config=BuildConfig.DEBUG,
-    )
     assert is_config_selected_for_generator(
         GeneratorType.SINGLE_CONFIG,
         current_config=BuildConfig.DEBUG,
