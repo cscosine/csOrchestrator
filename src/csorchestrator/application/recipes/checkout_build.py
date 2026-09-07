@@ -30,20 +30,13 @@ class _All:
 ALL: Final = _All()
 
 
-def checkout_and_build_repos(
+def checkout_repos(
     orchestrator: Orchestrator,
     base_target_dir: Path,
-    base_install_dir: Path,
     checkout_phase_name: str = "Repos Update",
-    build_phase_name: str = "Configure-Build-Test-Install",
-    create_artifact_phase_name: str = "Create and Upload Artifacts",
     repo_ref_build_type_list: dict[str, tuple[str, BuildConfig | None]] | None = None,
     checkout_self: bool = True,
-    build_self: BuildConfig | None = None,
     repo_access_token: str | None = None,
-    repos_auto_search_list: list[str] | _All | None = ALL,
-    repos_config_file_list: list[CMakeConfigPackageVersionGrep] | None = None,
-    repos_version_list: list[PackageVersion] | None = None,
 ) -> None:
     if repo_ref_build_type_list is None:
         repo_ref_build_type_list = {}
@@ -54,7 +47,7 @@ def checkout_and_build_repos(
     if checkout_self:
         p.add_step(
             StepGetRepositoryGitHubSelf(
-                name="3rdPartyBaseLibs git self-checkout",
+                name="Repo git self-checkout",
                 description="Checkout self repository",
             )
         )
@@ -86,7 +79,17 @@ def checkout_and_build_repos(
 
         p.add_step(s)
 
-    # ----------------------------------------------------------------
+
+def build_repos(
+    orchestrator: Orchestrator,
+    base_target_dir: Path,
+    build_phase_name: str = "Configure-Build-Test-Install",
+    repo_ref_build_type_list: dict[str, tuple[str, BuildConfig | None]] | None = None,
+    build_self: BuildConfig | None = None,
+) -> None:
+    if repo_ref_build_type_list is None:
+        repo_ref_build_type_list = {}
+
     p = orchestrator.create_phase(build_phase_name)
 
     if build_self is not None:
@@ -110,7 +113,19 @@ def checkout_and_build_repos(
                 )
             )
 
-    # ----------------------------------------------------------------
+
+def create_and_upload_artifacts(
+    orchestrator: Orchestrator,
+    base_install_dir: Path,
+    create_artifact_phase_name: str = "Create and Upload Artifacts",
+    repo_ref_build_type_list: dict[str, tuple[str, BuildConfig | None]] | None = None,
+    repos_auto_search_list: list[str] | _All | None = ALL,
+    repos_config_file_list: list[CMakeConfigPackageVersionGrep] | None = None,
+    repos_version_list: list[PackageVersion] | None = None,
+) -> None:
+    if repo_ref_build_type_list is None:
+        repo_ref_build_type_list = {}
+
     p = orchestrator.create_phase(create_artifact_phase_name)
 
     repos_auto_search_list_value: list[str] = []
@@ -156,4 +171,48 @@ def checkout_and_build_repos(
             base_install_dir=base_install_dir,
             artifact_prefix=create_artifact_prefix_from_orchestrator_name_version(orchestrator),
         )
+    )
+
+
+def checkout_and_build_repos(
+    orchestrator: Orchestrator,
+    base_target_dir: Path,
+    base_install_dir: Path,
+    checkout_phase_name: str = "Repos Update",
+    build_phase_name: str = "Configure-Build-Test-Install",
+    create_artifact_phase_name: str = "Create and Upload Artifacts",
+    repo_ref_build_type_list: dict[str, tuple[str, BuildConfig | None]] | None = None,
+    checkout_self: bool = True,
+    build_self: BuildConfig | None = None,
+    repo_access_token: str | None = None,
+    repos_auto_search_list: list[str] | _All | None = ALL,
+    repos_config_file_list: list[CMakeConfigPackageVersionGrep] | None = None,
+    repos_version_list: list[PackageVersion] | None = None,
+) -> None:
+
+    checkout_repos(
+        orchestrator=orchestrator,
+        base_target_dir=base_target_dir,
+        checkout_phase_name=checkout_phase_name,
+        repo_ref_build_type_list=repo_ref_build_type_list,
+        checkout_self=checkout_self,
+        repo_access_token=repo_access_token,
+    )
+
+    build_repos(
+        orchestrator=orchestrator,
+        base_target_dir=base_target_dir,
+        build_phase_name=build_phase_name,
+        repo_ref_build_type_list=repo_ref_build_type_list,
+        build_self=build_self,
+    )
+
+    create_and_upload_artifacts(
+        orchestrator=orchestrator,
+        base_install_dir=base_install_dir,
+        create_artifact_phase_name=create_artifact_phase_name,
+        repo_ref_build_type_list=repo_ref_build_type_list,
+        repos_auto_search_list=repos_auto_search_list,
+        repos_config_file_list=repos_config_file_list,
+        repos_version_list=repos_version_list,
     )
