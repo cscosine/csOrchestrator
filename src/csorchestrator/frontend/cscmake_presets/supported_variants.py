@@ -218,24 +218,23 @@ class ContextOsArchitectureCompilerGeneratorConfig(ContextOsArchitectureCompiler
     config: BuildConfig
 
 
-def get_supported_context_os_architecture_config_list(
-    src_list: list[ContextOsArchitectureCompilerGenerator],
+def get_supported_context_os_architecture_config(
+    src: ContextOsArchitectureCompilerGenerator,
 ) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
 
     retList: list[ContextOsArchitectureCompilerGeneratorConfig] = []
 
-    for src in src_list:
-        configs_per_generator_type = get_supported_build_configs_for_generator_type(
-            src.context_compiler_generator.build_generator.generator_type
-        )
-        for config in configs_per_generator_type:
-            retList.append(
-                ContextOsArchitectureCompilerGeneratorConfig(
-                    context_os_architecture=src.context_os_architecture,
-                    context_compiler_generator=src.context_compiler_generator,
-                    config=config,
-                )
+    configs_per_generator_type = get_supported_build_configs_for_generator_type(
+        src.context_compiler_generator.build_generator.generator_type
+    )
+    for config in configs_per_generator_type:
+        retList.append(
+            ContextOsArchitectureCompilerGeneratorConfig(
+                context_os_architecture=src.context_os_architecture,
+                context_compiler_generator=src.context_compiler_generator,
+                config=config,
             )
+        )
 
     return retList
 
@@ -341,7 +340,7 @@ def get_all_supported_workflow_descriptions(
 ) -> list[ContextOsArchitectureCompilerGeneratorConfig]:
     workflow_list: list[ContextOsArchitectureCompilerGeneratorConfig] = []
 
-    for supported_build_config in get_supported_context_os_architecture_config_list([os_arch_generator]):
+    for supported_build_config in get_supported_context_os_architecture_config(os_arch_generator):
         if not is_config_selected_for_generator(
             supported_build_config.context_compiler_generator.build_generator.generator_type,
             supported_build_config.config,

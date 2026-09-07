@@ -164,7 +164,7 @@ def step_cmake_workflow_to_githubwf_powershell(
     run_str_list += StepCMakeWorkflowGithubExtraCommandsPrefix.get_extra_cmd_prefix(step)
     run_str_list += [f'$gen = "{MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED}"']
     first_cycle = False
-    for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:
+    for generator_type in GeneratorType:
         if_elif_str = "if" if not first_cycle else "elseif"
         run_str_list += [if_elif_str + " ($gen -eq " + '"' + generator_type.value + '") {']
         first_cycle = True
@@ -220,7 +220,7 @@ def step_cmake_workflow_to_githubwf(
     run_str_list = ["set -e"]
     run_str_list += StepCMakeWorkflowGithubExtraCommandsPrefix.get_extra_cmd_prefix(step)
     first_cycle = False
-    for generator_type in [GeneratorType.SINGLE_CONFIG, GeneratorType.MULTI_CONFIG]:
+    for generator_type in GeneratorType:
         generator_type_matrix_embraced = MatrixOsArchCompilerGeneratorGithubConstants.MATRIX_GENERATOR_TYPE_EMBRACED
         if_elif_str = "if" if not first_cycle else "elif"
         run_str_list += [
