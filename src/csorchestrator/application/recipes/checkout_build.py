@@ -174,7 +174,7 @@ def create_and_upload_artifacts(
     )
 
 
-def checkout_and_build_repos(
+def checkout_build_and_archive_repos(
     orchestrator: Orchestrator,
     base_target_dir: Path,
     base_install_dir: Path,
