@@ -28,7 +28,7 @@ def test_run_command_loads_project_script(tmp_path: Path, monkeypatch: pytest.Mo
 
     executed = {"called": False}
 
-    def fake_validate_and_execute_orchestrator(orchestrator, target_folder_path, reporter):
+    def fake_validate_and_execute_orchestrator(orchestrator, script_folder_path, target_folder_path, reporter):
         assert Path(target_folder_path) == script_path.parent
         executed["called"] = True
         return ExecutionResult()

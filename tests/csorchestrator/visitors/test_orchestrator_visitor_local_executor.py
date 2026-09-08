@@ -46,7 +46,7 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
     orchestrator = orchestratorValidatedOpt.orchestrator
     assert orchestrator is not None
 
-    os_path_opt = create_os_and_path(str(tmp_path))
+    os_path_opt = create_os_and_path(tmp_path)
     assert os_path_opt.result is not None
 
     o = OrchestratorDescription(
@@ -57,6 +57,7 @@ def test_orchestrator_visitor_local_executor_succeed(tmp_path: Path, repo_url: R
 
     context = ContextLocalExecution(
         orchestrator_description=o,
+        script_folder_path=os_path_opt.result.path,
         base_folder_path=os_path_opt.result.path,
         os_architecture=os_path_opt.result.os_architecture,
         active_compiler_generator=ContextCompilerGenerator(

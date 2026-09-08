@@ -17,9 +17,14 @@ def create_default_orchestrator(
     schedule: Cron | None = None,
     artifacts_dir: str = "artifacts",
     populate_default_matrix: bool = True,
+    additional_files_list: list[Path] | None = None,
+    output_bundle_file_name: Path | None = None,
 ) -> Orchestrator:
     if schedule is None:
         schedule = Cron.weekly(DayOfWeek.MON, hour=3)
+
+    if additional_files_list is None:
+        additional_files_list = []
 
     o = create_orchestrator_factory_all_supported_cases(
         name=name,
@@ -27,6 +32,9 @@ def create_default_orchestrator(
         execution_matrix_name=execution_matrix_name,
         populate_default_matrix=populate_default_matrix,
     )
+
+    if output_bundle_file_name is None:
+        output_bundle_file_name = Path(o.createOrchestratorDescription().name_and_version_string + "-bundle.tar.gz")
 
     o.wf_config = WorkflowConfig(
         trigger=WorkflowTrigger(
@@ -37,7 +45,11 @@ def create_default_orchestrator(
             on_schedule=schedule,
         ),
         create_release_on_tag=ReleaseCreationOnTagConfig(
-            name="release-from-artifacts", base_install_dir=base_install_dir, artifacts_dir=artifacts_dir
+            name="release-from-artifacts",
+            base_install_dir=base_install_dir,
+            artifacts_dir=artifacts_dir,
+            additional_files_list=additional_files_list,
+            output_bundle_file_name=output_bundle_file_name,
         ),
     )
 

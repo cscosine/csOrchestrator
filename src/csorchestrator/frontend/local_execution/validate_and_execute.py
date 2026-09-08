@@ -51,7 +51,7 @@ def create_context_os_architecture_string(
     return "-".join(parts)
 
 
-def create_os_and_path(base_folder_path: str) -> OptionalOsArchitectureAndPathWithReport:
+def create_os_and_path(base_folder_path: Path) -> OptionalOsArchitectureAndPathWithReport:
     report = Report()
 
     pr = ensure_directory_exists_or_create_and_is_usable(base_folder_path)
@@ -74,7 +74,10 @@ def create_os_and_path(base_folder_path: str) -> OptionalOsArchitectureAndPathWi
 
 
 def validate_and_execute_orchestrator(
-    orchestrator: Orchestrator, target_folder_path: str, reporter: OrchestratorExecutorReporterBase
+    orchestrator: Orchestrator,
+    script_folder_path: Path,
+    target_folder_path: Path,
+    reporter: OrchestratorExecutorReporterBase,
 ) -> ExecutionResult:
     er = ExecutionResult()
     er.execution_description = orchestrator.extract_minimal_description()
@@ -133,6 +136,7 @@ def validate_and_execute_orchestrator(
 
         context = ContextLocalExecution(
             orchestrator_description=orchestrator.createOrchestratorDescription(),
+            script_folder_path=script_folder_path,
             base_folder_path=os_and_path.path,
             os_architecture=os_architecture_compiler_generator.context_os_architecture,
             active_compiler_generator=os_architecture_compiler_generator.context_compiler_generator,
@@ -180,10 +184,11 @@ def validate_and_execute_orchestrator(
                 er.report_post_execution.append(report)
             else:
                 release_context = ReleaseCreationContextLocalExecution(
-                    matrix.os_architecture_compiler_generator_list,
-                    orchestrator.createOrchestratorDescription(),
-                    os_and_path.os_architecture,
-                    os_and_path.path,
+                    os_architecture_compiler_generator_list=matrix.os_architecture_compiler_generator_list,
+                    orchestrator_description=orchestrator.createOrchestratorDescription(),
+                    os_architecture=os_and_path.os_architecture,
+                    script_folder_path=script_folder_path,
+                    base_path=os_and_path.path,
                 )
                 report = capability.execute_locally(release_context)
                 reporter.report_postexecution(report)

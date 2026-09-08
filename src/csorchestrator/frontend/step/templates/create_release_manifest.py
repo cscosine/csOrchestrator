@@ -1,3 +1,4 @@
+import os  # noqa: F401 keep even if locally unused, necessary with variable subst
 import sys
 from pathlib import Path
 from typing import cast
@@ -7,15 +8,23 @@ from csorchestrator.portable.release_manifest import (
 )
 
 input_manifest_path_variant = cast(list[tuple[Path, str]], "__INPUT_MANIFEST_PATH_VARIANT__")
-output_filepath=cast(Path, "__OUTPUT_FILE_PATH__")  # fmt: skip
+output_filepath = cast(Path, "__OUTPUT_FILE_PATH__")
 project_name = "__PROJECT_NAME__"
 project_version = "__PROJECT_VERSION__"
+base_path_additional_files = cast(Path, "_")
+list_additional_files = cast(list[Path], "_")
+output_folder_additional_files = cast(Path, "_")
+output_bundle_file_name = cast(Path, "_")
 
 errors_list = collect_release_manifest_single_variant_and_prepare_manifest(
     input_manifest_path_variant=input_manifest_path_variant,
     output_filepath=output_filepath,
     project_name=project_name,
     project_version=project_version,
+    base_path_additional_files=base_path_additional_files,
+    list_additional_files=list_additional_files,
+    output_folder_additional_files=output_folder_additional_files,
+    output_bundle_file_name=output_bundle_file_name,
 )
 
 if len(errors_list) > 0:

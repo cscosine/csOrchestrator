@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
@@ -142,12 +143,15 @@ class ShowDownloadedFiles(GithubStepInterface):
 class CreateGitHubRelease(GithubStepInterface):
     artifacts_folder: str
     if_str: str
+    additional_files_list: list[Path]
     extra_extension_for_release_files: str | None
 
     def to_dict(self) -> dict[str, Any]:
         extension_files = [f"{self.artifacts_folder}/**/*.tar.gz"]
         if self.extra_extension_for_release_files is not None:
             extension_files.append(f"{self.artifacts_folder}/**/*{self.extra_extension_for_release_files}")
+        for f in self.additional_files_list:
+            extension_files.append(f"{self.artifacts_folder}/{f.as_posix()}")
 
         ret: dict[str, Any] = {
             "name": "Create GitHub Release",

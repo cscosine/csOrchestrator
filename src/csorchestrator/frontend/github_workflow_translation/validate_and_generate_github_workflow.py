@@ -219,7 +219,7 @@ def validate_and_generate_github_workflow(
         portable_output_folder = script_folder_path
         output_path = script_folder_path / Path(".github") / Path("workflows")
 
-    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(output_path.resolve()))
+    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(output_path.resolve())
 
     if dir_creation_res.error is not None:
         res.report_pre_execution.append_error(dir_creation_res.error)
@@ -238,8 +238,9 @@ def validate_and_generate_github_workflow(
         # TODO: move to some configurable parameters
 
         release_creation_context = ReleaseCreationContext(
-            orchestrator.createOrchestratorDescription(),
-            [item.original_os_architecture_compiler_generator_list for item in wf_matrix],
+            orchestrator_description=orchestrator.createOrchestratorDescription(),
+            matrix_list=[item.original_os_architecture_compiler_generator_list for item in wf_matrix],
+            script_folder_path=script_folder_path,
         )
 
         wf.on_job_create_release_on_tag(

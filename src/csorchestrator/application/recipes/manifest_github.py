@@ -33,7 +33,7 @@ OptionalManifestPathWithReport: TypeAlias = OptionalResultWithReport[Path]
 def download_manifest(manifest_description: ManifestGithub, output_folder: Path) -> OptionalManifestPathWithReport:
     report = Report()
 
-    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(output_folder.resolve()))
+    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(output_folder.resolve())
 
     if dir_creation_res.error is not None:
         report.append_error(dir_creation_res.error)

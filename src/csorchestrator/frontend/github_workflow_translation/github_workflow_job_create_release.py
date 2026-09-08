@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 from csorchestrator.domain.orchestrator.workflow_config import (
@@ -24,6 +25,9 @@ class ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow(ReleaseCreationOnTa
 
     def get_artifacts_dir(self) -> str:
         return ""
+
+    def get_output_bundle_filename(self) -> Path | None:
+        return None
 
 
 @dataclass
@@ -56,6 +60,8 @@ class JobReleaseCreationFromArtifacts:
             ShowDownloadedFiles(artifacts_dir).to_dict(),
         ]
 
+        output_bundle_file = None
+
         capability = self.config.get_capability(ReleaseCreationOnTagConfigBaseCapabilityGithubWorkflow)
         extra_extension_for_release_files = None
         if capability is not None:
@@ -63,13 +69,30 @@ class JobReleaseCreationFromArtifacts:
             extra_extension_for_release_files = ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION
             steps.append(
                 StepGitHubUploadArtifacts(
-                    name="Upload artifacts",
+                    name="Upload manifest as artifacts",
                     with_name="manifest" + extra_extension_for_release_files,
                     with_path=[f"{artifacts_dir}/**/*{extra_extension_for_release_files}"],
                 ).to_dict()
             )
 
-        steps.append(CreateGitHubRelease(artifacts_dir, self.if_str, extra_extension_for_release_files).to_dict())
+            output_bundle_file = capability.get_output_bundle_filename()
+            if output_bundle_file is not None:
+                steps.append(
+                    StepGitHubUploadArtifacts(
+                        name=f"Upload additional file {str(output_bundle_file)} as artifact",
+                        with_name=output_bundle_file.as_posix(),
+                        with_path=[f"{artifacts_dir}/{output_bundle_file.as_posix()}"],
+                    ).to_dict()
+                )
+
+        steps.append(
+            CreateGitHubRelease(
+                artifacts_folder=artifacts_dir,
+                if_str=self.if_str,
+                extra_extension_for_release_files=extra_extension_for_release_files,
+                additional_files_list=[output_bundle_file] if output_bundle_file is not None else [],
+            ).to_dict()
+        )
 
         return {
             self.config.name: {

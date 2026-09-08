@@ -100,7 +100,7 @@ def execute_step_get_precompiled_lib(
 
     libs_subdir_path: Path = context.base_folder_path / step.base_libs_dir / libs_subdir
 
-    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(str(libs_subdir_path.resolve()))
+    dir_creation_res = ensure_directory_exists_or_create_and_is_usable(libs_subdir_path.resolve())
 
     if dir_creation_res.error is not None:
         report.append_error(dir_creation_res.error)

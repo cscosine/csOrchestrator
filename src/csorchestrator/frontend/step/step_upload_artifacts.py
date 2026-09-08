@@ -57,7 +57,7 @@ def step_upload_artifacts_to_githubwf(
 
     steps: list[GithubStepInterface] = [
         StepGitHubUploadArtifacts(
-            name="Upload Artifacts",
+            name=step.name,
             with_name=artifact_name,
             with_path=[
                 (step.base_install_dir / "*.tar.gz").as_posix(),

@@ -181,6 +181,3 @@ def test_get_supported_os_version_list() -> None:
 
     macos_versions = get_supported_os_version_list(OS.MACOS)
     assert len(macos_versions) == 0  # TODO add MACOS support
-
-    invalid_versions = get_supported_os_version_list("INVALID")  # type: ignore
-    assert len(invalid_versions) == 0

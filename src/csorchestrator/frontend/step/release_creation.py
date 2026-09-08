@@ -47,6 +47,11 @@ class ReleaseCreationOnTagConfigCapabilityGithubWorkflow(ReleaseCreationOnTagCon
     def get_artifacts_dir(self) -> str:
         return self.step.artifacts_dir
 
+    def get_output_bundle_filename(self) -> Path | None:
+        if len(self.step.additional_files_list) > 0:
+            return self.step.output_bundle_file_name
+        return None
+
 
 @dataclass
 class ReleaseCreationOnTagConfiCapabilityLocalExecution(ReleaseCreationOnTagConfigBaseCapabilityLocalExecution):
@@ -60,6 +65,8 @@ class ReleaseCreationOnTagConfiCapabilityLocalExecution(ReleaseCreationOnTagConf
 class ReleaseCreationOnTagConfig(ReleaseCreationOnTagConfigBase):
     base_install_dir: Path  # used only in local executions, not in github wf where artifacts are downloaded
     artifacts_dir: str  # used only in github execution, specfify folders where artifacts are downloaded
+    additional_files_list: list[Path]  # list of additional files
+    output_bundle_file_name: Path
 
     def __post_init__(self) -> None:
         self.add_capability(
@@ -117,6 +124,21 @@ def release_creation_on_tag_config_to_githubwf(
         python_code, "repos_version", repr(release_creation_context.orchestrator_description.orchestrator_version)
     )
 
+    python_code = replace_template_variable(
+        python_code, "base_path_additional_files", 'Path(os.environ["GITHUB_WORKSPACE"])'
+    )
+    python_code = replace_template_variable(
+        python_code, "list_additional_files", fix_path_repr(repr(step.additional_files_list))
+    )
+    python_code = replace_template_variable(
+        python_code,
+        "output_folder_additional_files",
+        fix_path_repr(repr(Path("./"))),  # this is executed in artifacts folder
+    )
+    python_code = replace_template_variable(
+        python_code, "output_bundle_file_name", fix_path_repr(repr(step.output_bundle_file_name))
+    )
+
     python_lines = python_code.splitlines()
 
     step_github = StepRunCommand(
@@ -159,6 +181,7 @@ def release_creation_on_tag_config_execute_local(
         context = ContextLocalExecution(
             orchestrator_description=relase_context.orchestrator_description,
             base_folder_path=relase_context.base_path,
+            script_folder_path=relase_context.script_folder_path,
             os_architecture=os_architecture_compiler_generator.context_os_architecture,
             active_compiler_generator=os_architecture_compiler_generator.context_compiler_generator,
             matrix_extras={},
@@ -186,11 +209,22 @@ def release_creation_on_tag_config_execute_local(
         + ReleaseManifest.CS_ORCHESTRATOR_MANIFEST_EXTENSION
     )
 
+    base_path_additional_files = relase_context.script_folder_path
+
+    # TODO check they are relative and not leaving the folder
+    list_additional_files = step.additional_files_list
+
+    output_folder_additional_files = step.base_install_dir
+
     errors = collect_release_manifest_single_variant_and_prepare_manifest(
         input_manifest_path_variant=input_manifest_path_variant,
         output_filepath=output_filepath,
         project_name=relase_context.orchestrator_description.orchestrator_name,
         project_version=relase_context.orchestrator_description.orchestrator_version,
+        base_path_additional_files=base_path_additional_files,
+        list_additional_files=list_additional_files,
+        output_folder_additional_files=output_folder_additional_files,
+        output_bundle_file_name=step.output_bundle_file_name,
     )
     if len(errors) > 0:
         for e in errors:

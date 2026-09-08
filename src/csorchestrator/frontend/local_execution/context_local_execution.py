@@ -23,6 +23,7 @@ ContextLocalExecutionExtraT = TypeVar("ContextLocalExecutionExtraT", bound=Conte
 @dataclass(frozen=True)
 class ContextLocalExecution:
     orchestrator_description: OrchestratorDescription
+    script_folder_path: Path
     base_folder_path: Path
     os_architecture: ContextOsArchitecture
     active_compiler_generator: ContextCompilerGenerator

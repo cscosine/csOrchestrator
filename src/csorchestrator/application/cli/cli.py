@@ -146,8 +146,14 @@ def execute_project_script(
     orchestrator_or_none = project_script_preparation(script_path, reporter)
     if orchestrator_or_none is None:
         return 1
+    orchestrator = orchestrator_or_none
 
-    res = validate_and_execute_orchestrator(orchestrator_or_none, str(target_folder), reporter)
+    res = validate_and_execute_orchestrator(
+        orchestrator=orchestrator,
+        script_folder_path=script_path.parent.resolve(),
+        target_folder_path=target_folder,
+        reporter=reporter,
+    )
 
     if res.is_execution_successful():
         return 0

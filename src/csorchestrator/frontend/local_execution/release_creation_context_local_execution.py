@@ -14,3 +14,4 @@ class ReleaseCreationContextLocalExecution:
     orchestrator_description: OrchestratorDescription
     os_architecture: ContextOsArchitecture
     base_path: Path
+    script_folder_path: Path
