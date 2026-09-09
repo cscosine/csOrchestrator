@@ -1,9 +1,24 @@
 from pathlib import Path
 
 from csorchestrator.application.factory.factory import create_orchestrator_factory_all_supported_cases
+from csorchestrator.domain.context.context_os_architecture_compiler_generator import (
+    ContextOsArchitectureCompilerGenerator,
+    ExecutionMatrixOsArchCompilerGenerator,
+)
 from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 from csorchestrator.domain.orchestrator.workflow_config import Cron, DayOfWeek, WorkflowConfig, WorkflowTrigger
 from csorchestrator.frontend.step.release_creation import ReleaseCreationOnTagConfig
+
+
+def create_default_execution_matrix(
+    matrix_list: list[ContextOsArchitectureCompilerGenerator],
+    execution_matrix_name: str = "orchestrator-matrix",
+) -> ExecutionMatrixOsArchCompilerGenerator:
+    em = ExecutionMatrixOsArchCompilerGenerator(execution_matrix_name)
+
+    em.os_architecture_compiler_generator_list = matrix_list
+
+    return em
 
 
 def create_default_orchestrator(
