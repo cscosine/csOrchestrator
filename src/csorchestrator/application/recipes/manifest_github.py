@@ -16,6 +16,7 @@ from csorchestrator.foundation.file_system.directory import (
     ensure_directory_exists_or_create_and_is_usable,
 )
 from csorchestrator.frontend.step.step_get_precompiled_lib_github import (
+    MappingFunction,
     StepGetPrecompiledLibGithub,
 )
 from csorchestrator.frontend.step.step_get_repository import StepGetRepositoryGitHub
@@ -47,6 +48,7 @@ def create_steps_to_get_libs_from_manifest(
     base_libs_dir: Path,
     phase_name: str | None = None,
     lib_name_list: list[str] | None = None,
+    mapping_function: MappingFunction | None = None,
 ) -> Report:
     """
     Add a phase with one StepGetPrecompiledLibGithub per selected library declared in the release manifest.
@@ -98,10 +100,12 @@ def create_steps_to_get_libs_from_manifest(
                 org=manifest_description.org,
                 git_repo=manifest_description.git_repo,
                 project_name=manifest_description.project_name,
+                project_version=manifest_description.project_version,
                 project_tag=manifest_description.release_tag,
                 lib_name=lib_name,
                 lib_version=versions[0],
                 base_libs_dir=base_libs_dir,
+                mapping_function=mapping_function,
             )
         )
 
@@ -274,6 +278,7 @@ def download_csorchestrator_managed_libraries(
     manifest_dest_folder: Path | None = None,
     bundle_dest_folder: Path | None = None,
     lib_name_list: list[str] | None = None,
+    mapping_function: MappingFunction | None = None,
 ) -> Report:
     if manifest_dest_folder is None:
         manifest_dest_folder = Path("libs") / Path("manifests")
@@ -316,6 +321,7 @@ def download_csorchestrator_managed_libraries(
                 manifest_loaded=manifest_loaded,
                 base_libs_dir=base_libs_dir,
                 lib_name_list=lib_name_list,
+                mapping_function=mapping_function,
             )
         )
 

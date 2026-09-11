@@ -48,8 +48,12 @@ class Orchestrator:
             name_and_version_string=self.name_version_to_string(),
         )
 
+    @classmethod
+    def compose_name_version_to_string(cls, name: str, version: str) -> str:
+        return f"{name}-{version}"
+
     def name_version_to_string(self) -> str:
-        return f"{self.name}-{self.version}"
+        return Orchestrator.compose_name_version_to_string(self.name, self.version)
 
     def add_phase(self, phase: Phase) -> "Orchestrator":
         self.phases.append(phase)

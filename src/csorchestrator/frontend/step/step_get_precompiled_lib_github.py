@@ -13,6 +13,7 @@ from csorchestrator.domain.context.context_os_architecture_compiler_generator im
     ContextOsArchitectureCompilerGenerator,
     create_context_os_architecture_compiler_generator_string,
 )
+from csorchestrator.domain.orchestrator.orchestrator import Orchestrator
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.foundation.core.report import Report
@@ -44,6 +45,7 @@ from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor
     StepCapabilityLocalExecution,
 )
 from csorchestrator.frontend.step.step_get_repository import StepGetRepositoryGitHub
+from csorchestrator.portable.release_manifest import create_archive_filename
 
 
 @dataclass
@@ -66,23 +68,24 @@ class StepGetPrecompiledLibGithubCapabilityLocalExecution(StepCapabilityLocalExe
         return execute_step_get_precompiled_lib(self.step, context, reporter_sink)
 
 
+MappingFunction = Callable[
+    [ContextOsArchitectureCompilerGenerator],
+    ContextOsArchitectureCompilerGenerator | None,
+]
+
+
 @dataclass
 class StepGetPrecompiledLibGithub(StepBase):
     base_url: str
     org: str
     git_repo: str
     project_name: str
+    project_version: str
     project_tag: str
     lib_name: str
     lib_version: str
     base_libs_dir: Path
-    mapping_function: (
-        Callable[
-            [ContextOsArchitectureCompilerGenerator],
-            ContextOsArchitectureCompilerGenerator | None,
-        ]
-        | None
-    ) = None
+    mapping_function: MappingFunction | None = None
 
     def __post_init__(self) -> None:
         self.add_capability(
@@ -133,8 +136,14 @@ def execute_step_get_precompiled_lib(
     target_dir = dir_creation_res.value
 
     # TODO: correct name, use the proper function to generate
-    source_filename = release_name_part + "-" + step.lib_name + "-" + step.lib_version + ".tar.gz"
-    target_filename = target_dir / str(release_name_part + "-" + step.lib_name + "-" + step.lib_version + ".tar.gz")
+    filename = create_archive_filename(
+        project_name_and_version=Orchestrator.compose_name_version_to_string(step.project_name, step.project_version),
+        context_os_architecture_compiler_generator_string=release_name_part,
+        lib_name=step.lib_name,
+        lib_version=step.lib_version,
+    )
+    source_filename = filename
+    target_filename = target_dir / filename
 
     download_url = urljoin(
         step.base_url,
