@@ -16,8 +16,12 @@ from csorchestrator.domain.context.context_os_architecture_compiler_generator im
 from csorchestrator.domain.orchestrator.reporter_sink_base import ReporterSinkBase
 from csorchestrator.domain.orchestrator.step_base import StepBase
 from csorchestrator.foundation.core.report import Report
-from csorchestrator.foundation.file_system.directory import ensure_directory_exists_or_create_and_is_usable
-from csorchestrator.frontend.github_workflow_translation.github_step_interface import GithubStepInterface
+from csorchestrator.foundation.file_system.directory import (
+    ensure_directory_exists_or_create_and_is_usable,
+)
+from csorchestrator.frontend.github_workflow_translation.github_step_interface import (
+    GithubStepInterface,
+)
 from csorchestrator.frontend.github_workflow_translation.github_workflow_matrix_constants import (
     MatrixOsArchCompilerGeneratorGithubConstants,
     create_context_os_architecture_compiler_generator_string_github_matrix,
@@ -33,8 +37,12 @@ from csorchestrator.frontend.github_workflow_translation.orchestrator_visitor_gi
     OptionalListGithubStepsWithReport,
     StepCapabilityGithubWorkflow,
 )
-from csorchestrator.frontend.local_execution.context_local_execution import ContextLocalExecution
-from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import StepCapabilityLocalExecution
+from csorchestrator.frontend.local_execution.context_local_execution import (
+    ContextLocalExecution,
+)
+from csorchestrator.frontend.local_execution.orchestrator_visitor_local_executor import (
+    StepCapabilityLocalExecution,
+)
 from csorchestrator.frontend.step.step_get_repository import StepGetRepositoryGitHub
 
 
@@ -43,7 +51,9 @@ class StepGetPrecompiledLibGithubCapabilityGithubWorkflow(StepCapabilityGithubWo
     step: "StepGetPrecompiledLibGithub"
 
     def to_githubwf(
-        self, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
+        self,
+        wf_job: JobOrchestratorMatrixExecutionContext,
+        reporter_sink: ReporterSinkBase,
     ) -> OptionalListGithubStepsWithReport:
         return step_get_precompiled_lib_to_githubwf(self.step, wf_job, reporter_sink)
 
@@ -60,18 +70,29 @@ class StepGetPrecompiledLibGithubCapabilityLocalExecution(StepCapabilityLocalExe
 class StepGetPrecompiledLibGithub(StepBase):
     base_url: str
     org: str
+    git_repo: str
     project_name: str
     project_tag: str
     lib_name: str
     lib_version: str
     base_libs_dir: Path
     mapping_function: (
-        Callable[[ContextOsArchitectureCompilerGenerator], ContextOsArchitectureCompilerGenerator | None] | None
+        Callable[
+            [ContextOsArchitectureCompilerGenerator],
+            ContextOsArchitectureCompilerGenerator | None,
+        ]
+        | None
     ) = None
 
     def __post_init__(self) -> None:
-        self.add_capability(StepGetPrecompiledLibGithubCapabilityGithubWorkflow(self), StepCapabilityGithubWorkflow)
-        self.add_capability(StepGetPrecompiledLibGithubCapabilityLocalExecution(self), StepCapabilityLocalExecution)
+        self.add_capability(
+            StepGetPrecompiledLibGithubCapabilityGithubWorkflow(self),
+            StepCapabilityGithubWorkflow,
+        )
+        self.add_capability(
+            StepGetPrecompiledLibGithubCapabilityLocalExecution(self),
+            StepCapabilityLocalExecution,
+        )
 
     GITHUB_BASE_URL_HTTPS: str = StepGetRepositoryGitHub.GITHUB_BASE_URL_HTTPS
 
@@ -80,7 +101,9 @@ class StepGetPrecompiledLibGithub(StepBase):
 
 
 def execute_step_get_precompiled_lib(
-    step: StepGetPrecompiledLibGithub, context: ContextLocalExecution, reporter_sink: ReporterSinkBase
+    step: StepGetPrecompiledLibGithub,
+    context: ContextLocalExecution,
+    reporter_sink: ReporterSinkBase,
 ) -> Report:
     report = Report()
 
@@ -118,7 +141,7 @@ def execute_step_get_precompiled_lib(
         "/".join(
             [
                 step.org,
-                step.project_name,
+                step.git_repo,
                 "releases",
                 "download",
                 step.project_tag,
@@ -182,7 +205,9 @@ def sanitize_github_identifier(value: str) -> str:
 
 
 def step_get_precompiled_lib_to_githubwf(
-    step: StepGetPrecompiledLibGithub, wf_job: JobOrchestratorMatrixExecutionContext, reporter_sink: ReporterSinkBase
+    step: StepGetPrecompiledLibGithub,
+    wf_job: JobOrchestratorMatrixExecutionContext,
+    reporter_sink: ReporterSinkBase,
 ) -> OptionalListGithubStepsWithReport:
 
     release_name_part = create_context_os_architecture_compiler_generator_string_github_matrix()
@@ -198,7 +223,7 @@ def step_get_precompiled_lib_to_githubwf(
                 name=step.name + " download tar.gz",
                 uses="robinraju/release-downloader@v1.13",
                 with_list={
-                    "repository": f"{step.org}/{step.project_name}",
+                    "repository": f"{step.org}/{step.git_repo}",
                     "tag": f"{step.project_tag}",
                     "fileName": f"{src_filename}",
                     "out-file-path": f"{libs_subdir.as_posix()}",
@@ -248,7 +273,12 @@ def step_get_precompiled_lib_to_githubwf(
         ]
 
         steps.append(
-            StepRunCommand(name=step.name + " prepare filename", id=step_id, shell_type="python", run=run_list)
+            StepRunCommand(
+                name=step.name + " prepare filename",
+                id=step_id,
+                shell_type="python",
+                run=run_list,
+            )
         )
 
         steps.append(
@@ -256,7 +286,7 @@ def step_get_precompiled_lib_to_githubwf(
                 name=step.name + " download tar.gz",
                 uses="robinraju/release-downloader@v1.13",
                 with_list={
-                    "repository": f"{step.org}/{step.project_name}",
+                    "repository": f"{step.org}/{step.git_repo}",
                     "tag": f"{step.project_tag}",
                     "fileName": f"${{{{ steps.{step_id}.outputs.{filename_variable} }}}}",
                     "out-file-path": f"{libs_subdir.as_posix()}",
